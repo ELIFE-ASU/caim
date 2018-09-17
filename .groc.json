@@ -1,0 +1,5 @@
+{
+	"glob": ["README.md", "main.js"],
+	"out": "docs",
+	"repository-url": "https://github.com/dglmoore/caim"
+}
