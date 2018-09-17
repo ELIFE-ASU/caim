@@ -1,0 +1,26 @@
+{
+  "name": "caim",
+  "version": "0.0.0",
+  "description": "Information analysis of videographic time series data",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dglmoore/caim.git"
+  },
+  "keywords": [
+    "electron",
+    "information",
+    "math",
+    "analysis"
+  ],
+  "author": "Douglas G. Moore <doug@dglmoore.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dglmoore/caim/issues"
+  },
+  "homepage": "https://dglmoore.github.io/caim"
+}
