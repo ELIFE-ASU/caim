@@ -4,7 +4,7 @@
   "description": "Information analysis of videographic time series data",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node ."
   },
   "repository": {
@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/dglmoore/caim/issues"
   },
-  "homepage": "https://dglmoore.github.io/caim"
+  "homepage": "https://dglmoore.github.io/caim",
+  "devDependencies": {
+    "jest": "^23.6.0"
+  }
 }
