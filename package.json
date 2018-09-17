@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "test": "jest",
-    "start": "node ."
+    "start": "electron ."
   },
   "repository": {
     "type": "git",
@@ -24,6 +24,7 @@
   },
   "homepage": "https://dglmoore.github.io/caim",
   "devDependencies": {
+    "electron": "^2.0.9",
     "jest": "^23.6.0"
   }
 }

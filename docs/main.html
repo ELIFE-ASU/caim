@@ -1,5 +1,47 @@
 <!DOCTYPE html><html lang="en"><head><title>main</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="main"><meta name="groc-project-path" content="main.js"><meta name="groc-github-url" content="https://github.com/dglmoore/caim"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/dglmoore/caim/blob/master/main.js">main.js</a></div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><p>Copyright 2018. Douglas G. Moore. All rights reserved.</p>
 <p>Use of this source code is governed by the MIT
-license that can be found in the LICENSE file.</p></div></div><div class="code"><div class="wrapper">(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-	<span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Caim v0.0.0'</span>);
-}());</div></div></div></div></body></html>
+license that can be found in the LICENSE file.</p></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h1 id="the-caim-ui">The Caim UI</h1>
+<p>Caim&#39;s UI is built on <a href="https://electronjs.org">electron</a>. This design
+decision was based on two factors:</p>
+<ol>
+<li>Electron is a reasonable cross-platform UI toolkit</li>
+<li>It is 100% Javascript + HTML + CSS</li>
+</ol>
+<p>The original version of <a href="https://github.com/elife-asu/caim-go">caim</a>
+was written using a Server + Client architecture, with the front-end
+implemented with the standard web technologies. The hope is that this
+will make porting caim to a standalone application using electron fairly
+straitforward.</p>
+<p>To start, I get <code>app</code> and <code>BrowserWindow</code> from electron. The former
+will be our application object, and I&#39;ll use the latter to create
+windows.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">const</span> {app, BrowserWindow} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'electron'</span>);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="creating-windows">Creating Windows</h2>
+<p>I then need to create a global variable to keep track of our active
+window. Caim is to be designed as a single-window application, so I
+don&#39;t need <code>win</code> to be an array.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">let</span> win = <span class="hljs-literal">null</span>;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>From here I define a <code>createWindow</code> function will will take care of
+building a new Caim window.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createWindow</span>(<span class="hljs-params"></span>) </span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This entails initializing <code>win</code> with a new <code>BrowserWindow</code>.</p></div></div><div class="code"><div class="wrapper">	win = <span class="hljs-keyword">new</span> BrowserWindow();</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>I then load a dummy url (my personal github page) as a
+placeholder for the future UI.</p></div></div><div class="code"><div class="wrapper">	win.loadURL(<span class="hljs-string">'https://github.com/dglmoore'</span>);
+	</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>I then register an <code>onclosed</code> event handler which sets our
+<code>win</code> variable to <code>null</code> so it can be garbage collected.</p></div></div><div class="code"><div class="wrapper">	win.on(<span class="hljs-string">'closed'</span>, () =&gt; win = <span class="hljs-literal">null</span>);
+}</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="handling-app-events">Handling App Events</h2>
+<p>I create a window in response two events:</p>
+<ol>
+<li>when the app&#39;s <code>&#39;ready&#39;</code> event fires</li>
+<li>when the application becomes activated and there is no window.</li>
+</ol></div></div><div class="code"><div class="wrapper">app.on(<span class="hljs-string">'ready'</span>, createWindow);
+
+app.on(<span class="hljs-string">'activate'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+	<span class="hljs-keyword">if</span> (win === <span class="hljs-literal">null</span>) {
+		createWindow();
+	}
+});</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Finally, we quit the app if when the last window is close.</p>
+<p><strong>Note</strong>: it is OS X standard operating procedure to keep the
+application running after the last window is closed. Users have to
+explictly quit the application.</p></div></div><div class="code"><div class="wrapper">app.on(<span class="hljs-string">'window-all-closed'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+	<span class="hljs-keyword">if</span> (process.platform !== <span class="hljs-string">'darwin'</span>) {
+		app.quit();
+	}
+});</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="conclusion">Conclusion</h2>
+<p>That&#39;s all we need to create a basic UI with electron. As we develop
+the project further, we&#39;ll need to extend electron&#39;s base menus with
+options for loading videos and reloading sessions, but this is good
+for now.</p></div></div></div></div></body></html>
