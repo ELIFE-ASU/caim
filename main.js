@@ -35,14 +35,13 @@ function createWindow() {
     // This entails initializing `win` with a new `BrowserWindow`.
 	win = new BrowserWindow();
 
-	// I then load a dummy url (my personal github page) as a
-	// placeholder for the future UI.
-
-	win.loadURL('https://github.com/dglmoore');
+	// The primary UI is provided in the `assets/index.html`
+	// directory. To load it, I simply pass the path to the
+	// `loadFile` method of `win`.
+	win.loadFile('assets/index.html');
 	
 	// I then register an `onclosed` event handler which sets our
 	// `win` variable to `null` so it can be garbage collected.
-
 	win.on('closed', () => win = null);
 }
 
