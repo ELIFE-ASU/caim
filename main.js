@@ -20,7 +20,7 @@
 // To start, I get `app` and `BrowserWindow` from electron. The former
 // will be our application object, and I'll use the latter to create
 // windows.
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, Menu} = require('electron');
 
 // ## Creating Windows
 //
@@ -34,6 +34,30 @@ let win = null;
 function createWindow() {
     // This entails initializing `win` with a new `BrowserWindow`.
 	win = new BrowserWindow();
+
+	// Now that we have a window, I need to setup it's menu. This
+	// first pass will just include a "File -> Quit" and
+	// "View -> Fullscreen".
+	Menu.setApplicationMenu(new Menu.buildFromTemplate([
+		{
+			label: 'File',
+			submenu: [
+				{
+					label: 'Quit',
+					role: 'quit'
+				}
+			]
+		},
+		{
+			label: 'View',
+			submenu: [
+				{
+					label: 'Fullscreen',
+					role: 'toggleFullScreen'
+				}
+			]
+		}
+	]));
 
 	// The primary UI is provided in the `assets/index.html`
 	// directory. To load it, I simply pass the path to the
