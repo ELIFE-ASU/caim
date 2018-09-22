@@ -29,9 +29,9 @@ const {app, BrowserWindow, Menu} = require('electron');
 // don't need `win` to be an array.
 let win = null;
 
-// From here I define a `createWindow` function will will take care of
+// From here I define a `create_window` function will will take care of
 // building a new Caim window.
-function createWindow() {
+function create_window() {
     // This entails initializing `win` with a new `BrowserWindow`.
 	win = new BrowserWindow();
 
@@ -75,11 +75,11 @@ function createWindow() {
 //
 // 1. when the app's `'ready'` event fires
 // 2. when the application becomes activated and there is no window.
-app.on('ready', createWindow);
+app.on('ready', create_window);
 
 app.on('activate', function() {
 	if (win === null) {
-		createWindow();
+		create_window();
 	}
 });
 
