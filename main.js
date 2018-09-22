@@ -35,13 +35,22 @@ function create_window() {
     // This entails initializing `win` with a new `BrowserWindow`.
 	win = new BrowserWindow();
 
-	// Now that we have a window, I need to setup it's menu. This
-	// first pass will just include a "File -> Quit" and
-	// "View -> Fullscreen".
+	// Now that we have a window, I need to setup it's menu.
+	// It consists of the following menu items:
+	//
+	// 1. File
+	//     * New Session
+	//     * Quit
+	// 2. View
+	//     * Fullscreen
 	Menu.setApplicationMenu(new Menu.buildFromTemplate([
 		{
 			label: 'File',
 			submenu: [
+				{
+					label: 'New Session',
+					click: new_session
+				},
 				{
 					label: 'Quit',
 					role: 'quit'
@@ -63,7 +72,7 @@ function create_window() {
 	// directory. To load it, I simply pass the path to the
 	// `loadFile` method of `win`.
 	win.loadFile('assets/index.html');
-	
+
 	// I then register an `onclosed` event handler which sets our
 	// `win` variable to `null` so it can be garbage collected.
 	win.on('closed', () => win = null);
@@ -93,6 +102,19 @@ app.on('window-all-closed', function() {
 		app.quit();
 	}
 });
+
+// ## Handling Menu Events
+//
+// I need to be able to create new sessions, load old sessions,
+// etc... That is all handled via the menu. Each menu item, then, needs
+// an associated event handler.
+//
+// I started with the `File -> New Session` menu item, and created the
+// `new_session` handler.  At the moment, it just prints the click event
+// to the console.
+function new_session(menuItem, browserWindow, event) {
+	console.log(event);
+}
 
 // ## Conclusion
 //

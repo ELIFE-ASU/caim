@@ -17,13 +17,27 @@ will be our application object, and I&#39;ll use the latter to create
 windows.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">const</span> {app, BrowserWindow, Menu} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'electron'</span>);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="creating-windows">Creating Windows</h2>
 <p>I then need to create a global variable to keep track of our active
 window. Caim is to be designed as a single-window application, so I
-don&#39;t need <code>win</code> to be an array.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">let</span> win = <span class="hljs-literal">null</span>;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>From here I define a <code>createWindow</code> function will will take care of
-building a new Caim window.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createWindow</span>(<span class="hljs-params"></span>) </span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This entails initializing <code>win</code> with a new <code>BrowserWindow</code>.</p></div></div><div class="code"><div class="wrapper">	win = <span class="hljs-keyword">new</span> BrowserWindow();</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Now that we have a window, I need to setup it&#39;s menu. This
-first pass will just include a &quot;File -&gt; Quit&quot; and
-&quot;View -&gt; Fullscreen&quot;.</p></div></div><div class="code"><div class="wrapper">	Menu.setApplicationMenu(<span class="hljs-keyword">new</span> Menu.buildFromTemplate([
+don&#39;t need <code>win</code> to be an array.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">let</span> win = <span class="hljs-literal">null</span>;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>From here I define a <code>create_window</code> function will will take care of
+building a new Caim window.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">create_window</span>(<span class="hljs-params"></span>) </span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This entails initializing <code>win</code> with a new <code>BrowserWindow</code>.</p></div></div><div class="code"><div class="wrapper">	win = <span class="hljs-keyword">new</span> BrowserWindow();</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Now that we have a window, I need to setup it&#39;s menu.
+It consists of the following menu items:</p>
+<ol>
+<li>File<ul>
+<li>New Session</li>
+<li>Quit</li>
+</ul>
+</li>
+<li>View<ul>
+<li>Fullscreen</li>
+</ul>
+</li>
+</ol></div></div><div class="code"><div class="wrapper">	Menu.setApplicationMenu(<span class="hljs-keyword">new</span> Menu.buildFromTemplate([
 		{
 			label: <span class="hljs-string">'File'</span>,
 			submenu: [
+				{
+					label: <span class="hljs-string">'New Session'</span>,
+					click: new_session
+				},
 				{
 					label: <span class="hljs-string">'Quit'</span>,
 					role: <span class="hljs-string">'quit'</span>
@@ -41,19 +55,18 @@ first pass will just include a &quot;File -&gt; Quit&quot; and
 		}
 	]));</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The primary UI is provided in the <code>assets/index.html</code>
 directory. To load it, I simply pass the path to the
-<code>loadFile</code> method of <code>win</code>.</p></div></div><div class="code"><div class="wrapper">	win.loadFile(<span class="hljs-string">'assets/index.html'</span>);
-	</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>I then register an <code>onclosed</code> event handler which sets our
+<code>loadFile</code> method of <code>win</code>.</p></div></div><div class="code"><div class="wrapper">	win.loadFile(<span class="hljs-string">'assets/index.html'</span>);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>I then register an <code>onclosed</code> event handler which sets our
 <code>win</code> variable to <code>null</code> so it can be garbage collected.</p></div></div><div class="code"><div class="wrapper">	win.on(<span class="hljs-string">'closed'</span>, () =&gt; win = <span class="hljs-literal">null</span>);
 }</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="handling-app-events">Handling App Events</h2>
 <p>I create a window in response two events:</p>
 <ol>
 <li>when the app&#39;s <code>&#39;ready&#39;</code> event fires</li>
 <li>when the application becomes activated and there is no window.</li>
-</ol></div></div><div class="code"><div class="wrapper">app.on(<span class="hljs-string">'ready'</span>, createWindow);
+</ol></div></div><div class="code"><div class="wrapper">app.on(<span class="hljs-string">'ready'</span>, create_window);
 
 app.on(<span class="hljs-string">'activate'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
 	<span class="hljs-keyword">if</span> (win === <span class="hljs-literal">null</span>) {
-		createWindow();
+		create_window();
 	}
 });</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Finally, we quit the app if when the last window is close.</p>
 <p><strong>Note</strong>: it is OS X standard operating procedure to keep the
@@ -62,7 +75,15 @@ explictly quit the application.</p></div></div><div class="code"><div class="wra
 	<span class="hljs-keyword">if</span> (process.platform !== <span class="hljs-string">'darwin'</span>) {
 		app.quit();
 	}
-});</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="conclusion">Conclusion</h2>
+});</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="handling-menu-events">Handling Menu Events</h2>
+<p>I need to be able to create new sessions, load old sessions,
+etc... That is all handled via the menu. Each menu item, then, needs
+an associated event handler.</p>
+<p>I started with the <code>File -&gt; New Session</code> menu item, and created the
+<code>new_session</code> handler.  At the moment, it just prints the click event
+to the console.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">new_session</span>(<span class="hljs-params">menuItem, browserWindow, event</span>) </span>{
+	<span class="hljs-built_in">console</span>.log(event);
+}</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="conclusion">Conclusion</h2>
 <p>That&#39;s all we need to create a basic UI with electron. As we develop
 the project further, we&#39;ll need to extend electron&#39;s base menus with
 options for loading videos and reloading sessions, but this is good
