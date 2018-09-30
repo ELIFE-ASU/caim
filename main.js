@@ -48,10 +48,17 @@ function create_window() {
             submenu: [
                 {
                     label: 'New Session',
-                    click: new_session_dialog,
+                    id: 'new-session',
+                    click: new_session_dialog
+                },
+                {
+                    label: 'Import Video',
+                    id: 'import-video',
+                    enabled: false
                 },
                 {
                     label: 'Quit',
+                    id: 'quit',
                     role: 'quit'
                 }
             ]
@@ -61,6 +68,7 @@ function create_window() {
             submenu: [
                 {
                     label: 'Fullscreen',
+                    id: 'fullscreen',
                     role: 'toggleFullScreen'
                 }
             ]
@@ -149,6 +157,9 @@ function new_session(session_path) {
 
         // I then load the `assets/session.html` page into the UI.
         win.loadFile("assets/session.html");
+
+        // Finally, I enable the `File -> Import Video` menu item.
+        app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
     }
 }
 
