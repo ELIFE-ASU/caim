@@ -145,14 +145,20 @@ function new_session(session_path) {
         }
         session_path = session_path[0];
 
-        // I can then create the session directory if it doesn't
-        // exits or display an error if it isn't a directory.
+        // I can then create the session directory if it doesn't exit, display
+        // an error if it isn't a directory, or display an error if it isn't
+        // empty.
         if (!fs.existsSync(session_path)) {
             fs.mkdirSync(session_path);
         } else if (!fs.statSync(session_path).isDirectory()) {
             new_session_error({
                 message: `Requested session path (${session_path}) is not a directory`,
                 detail: 'Please report this error the maintainer Douglas G. Moore <doug@dglmoore.com>',
+            });
+            return;
+        } else if (fs.readdirSync(session_path).length != 0) {
+            new_session_error({
+                message: `Requested session path (${session_path}) is not empty`,
             });
             return;
         }
