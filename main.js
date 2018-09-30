@@ -67,9 +67,9 @@ function create_window() {
         }
     ]));
 
-    // The primary UI is provided in the `assets/index.html` directory. To load
-    // it, I simply pass the path to the `loadFile` method of `win`.
-    win.loadFile('assets/index.html');
+    // The primary UI is provided in the `assets/startup.html` directory. To
+    // load it, I simply pass the path to the `loadFile` method of `win`.
+    win.loadFile('assets/startup.html');
 
     // I then register an `onclosed` event handler which sets our `win`
     // variable to `null` so it can be garbage collected.
