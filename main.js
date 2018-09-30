@@ -146,6 +146,9 @@ function new_session(session_path) {
             });
             return;
         }
+
+        // I then load the `assets/session.html` page into the UI.
+        win.loadFile("assets/session.html");
     }
 }
 
