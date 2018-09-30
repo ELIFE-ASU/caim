@@ -20,7 +20,8 @@
 // To start, I get `app` and `BrowserWindow` from electron. The former
 // will be our application object, and I'll use the latter to create
 // windows.
-const {app, BrowserWindow, Menu} = require('electron');
+const {app, dialog, BrowserWindow, Menu} = require('electron');
+const fs = require('fs');
 
 // ## Creating Windows
 //
@@ -32,7 +33,7 @@ let win = null;
 // From here I define a `create_window` function will will take care of
 // building a new Caim window.
 function create_window() {
-    // This entails initializing `win` with a new `BrowserWindow`.
+	// This entails initializing `win` with a new `BrowserWindow`.
 	win = new BrowserWindow();
 
 	// Now that we have a window, I need to setup it's menu.
@@ -49,7 +50,7 @@ function create_window() {
 			submenu: [
 				{
 					label: 'New Session',
-					click: new_session
+					click: new_session_dialog,
 				},
 				{
 					label: 'Quit',
@@ -110,10 +111,65 @@ app.on('window-all-closed', function() {
 // an associated event handler.
 //
 // I started with the `File -> New Session` menu item, and created the
-// `new_session` handler.  At the moment, it just prints the click event
-// to the console.
-function new_session(menuItem, browserWindow, event) {
-	console.log(event);
+// `new_session_dialog` handler. It starts a `dialog.showOpenDialog`
+// allowing the user to select a directory.
+function new_session_dialog(menuItem, browserWindow, event) {
+	dialog.showOpenDialog(browserWindow, {
+		title: 'Choose New Session Directory',
+		properties: [
+			'openDirectory',
+			'createDirectory',
+			'promptToCreate'
+		]
+	}, new_session);
+}
+
+// The resulting paths are then passed to the `new_session` function.
+function new_session(session_path) {
+	// I first ensure that the user made a selection.
+	if (session_path !== undefined) {
+		// Since a session must exist in a single directory,
+		// I also make sure they've only selected one path.
+		if (session_path.length !== 1) {
+			new_session_error({
+				message: 'Too many paths selected, select only one'
+			});
+			return;
+		}
+		session_path = session_path[0];
+
+		// I can then create the session directory if it doesn't
+		// exits or display an error if it isn't a directory.
+		if (!fs.existsSync(session_path)) {
+			fs.mkdirSync(session_path);
+		} else if (!fs.statSync(session_path).isDirectory()) {
+			new_session_error({
+				message: `Requested session path (${session_path}) \
+is not a directory`,
+				detail: 'Please report this error the maintainer \
+Douglas G. Moore <doug@dglmoore.com>',
+			});
+			return;
+		}
+	}
+}
+
+// ## Error Dialogs
+//
+// Errors are likely time a program has to interact with humans. I need
+// to be able to easily report errors, in the form of dialog messages,
+// to the users.
+//
+// Our first such message dialog is opened whenever an error occurs
+// within the `new_session` function.
+function new_session_error(options) {
+	options = {
+		type: 'error',
+		title: 'New Session Error',
+		buttons: ['OK']
+	};
+
+	dialog.showMessageBox(options);
 }
 
 // ## Conclusion
