@@ -16,8 +16,9 @@
 // with the standard web technologies. The hope is that this will make porting
 // caim to a standalone application using electron fairly straitforward.
 //
-// To start, I get `app` and `BrowserWindow` from electron. The former will be
-// our application object, and I'll use the latter to create windows.
+// To start, I get `app`, `dialog`, `BrowserWindow` and `Menu` from electron.
+// The former will be our application object, and I'll use the latter to create
+// windows.
 const {app, dialog, BrowserWindow, Menu} = require('electron');
 const fs = require('fs');
 
@@ -39,6 +40,7 @@ function create_window() {
     //
     // 1. File
     //     * New Session
+    //     * Import Video
     //     * Quit
     // 2. View
     //     * Fullscreen
