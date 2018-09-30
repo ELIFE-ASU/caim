@@ -38,61 +38,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
         "pageTitle": "main",
         "title": "main"
       },
-      "depth": 1,
-      "outline": [
-        {
-          "type": "heading",
-          "data": {
-            "level": 1,
-            "title": "The Caim UI",
-            "slug": "the-caim-ui"
-          },
-          "depth": 1,
-          "children": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Creating Windows",
-                "slug": "creating-windows"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Handling App Events",
-                "slug": "handling-app-events"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Handling Menu Events",
-                "slug": "handling-menu-events"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Error Dialogs",
-                "slug": "error-dialogs"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Conclusion",
-                "slug": "conclusion"
-              },
-              "depth": 2
-            }
-          ]
-        }
-      ]
+      "depth": 1
     }
   ];
 
