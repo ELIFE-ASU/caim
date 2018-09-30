@@ -173,11 +173,11 @@ function new_session(session_path) {
 // Our first such message dialog is opened whenever an error occurs within the
 // `new_session` function.
 function new_session_error(options) {
-    options = {
+    options = Object.assign({
         type: 'error',
         title: 'New Session Error',
         buttons: ['OK']
-    };
+    }, options);
 
     dialog.showMessageBox(options);
 }
