@@ -39,6 +39,46 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
         "title": "main"
       },
       "depth": 1
+    }, {
+      "type": "folder",
+      "data": {
+        "path": "src",
+        "title": "src"
+      },
+      "depth": 1,
+      "children": [
+        {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/home/dglmoore/projects/caim/src/session.js",
+            "projectPath": "src/session.js",
+            "targetPath": "src/session",
+            "pageTitle": "src/session",
+            "title": "session"
+          },
+          "depth": 2,
+          "outline": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Sessions",
+                "slug": "sessions"
+              },
+              "depth": 2
+            }
+          ]
+        }
+      ]
     }
   ];
 

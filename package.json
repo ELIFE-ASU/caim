@@ -4,7 +4,7 @@
   "description": "Information analysis of videographic time series data",
   "main": "main.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "start": "electron ."
   },
   "repository": {
