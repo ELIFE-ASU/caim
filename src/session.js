@@ -28,7 +28,7 @@ const Session = function(session_path) {
             if (callback === undefined) {
                 throw err;
             }
-            return callback(err);
+            return callback(err, session_file);
         });
     };
 
