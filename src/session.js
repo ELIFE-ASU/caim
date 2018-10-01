@@ -22,13 +22,19 @@ const Session = function(session_path) {
 
     // The session directory contains a JSON file, `{path}/session.json` which
     // stores the content of the Session object.
-    session.save = function(callback) {
-        const session_file = path.join(this.path, 'session.json');
-        fs.writeFile(session_file, JSON.stringify(this), 'utf8', function(err) {
-            if (callback === undefined) {
-                throw err;
-            }
-            return callback(err, session_file);
+    session.save = function() {
+        const session = this;
+        const session_file = path.join(session.path, 'session.json');
+        return new Promise(function(resolve, reject) {
+            fs.writeFile(session_file, JSON.stringify(session), 'utf8',
+                function(err) {
+                    if (err !== null) {
+                        reject(err);
+                    } else {
+                        resolve(session_file);
+                    }
+                }
+            );
         });
     };
 
