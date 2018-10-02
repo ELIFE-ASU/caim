@@ -14,13 +14,17 @@
 // The original version of [caim](https://github.com/elife-asu/caim-go) was
 // written using a Server + Client architecture, with the front-end implemented
 // with the standard web technologies. The hope is that this will make porting
-// caim to a standalone application using electron fairly straitforward.
+// caim to a standalone application using electron fairly straightforward.
 //
 // To start, I get `app`, `dialog`, `BrowserWindow` and `Menu` from electron.
 // The former will be our application object, and I'll use the latter to create
 // windows.
 const {app, dialog, BrowserWindow, Menu} = require('electron');
 const fs = require('fs');
+
+// Next we create require the `Session` generator function from
+// `src/session.js`.
+const {Session} = require('./src/session');
 
 // ## Creating Windows
 //
@@ -111,6 +115,12 @@ app.on('window-all-closed', function() {
     }
 });
 
+// ## Session Handling
+//
+// Our next step is to create the `session` variable which will store the
+// session details.
+let session = null;
+
 // ## Handling Menu Events
 //
 // I need to be able to create new sessions, load old sessions, etc... That is
@@ -162,6 +172,11 @@ function new_session(session_path) {
             });
             return;
         }
+
+        // At last, we have a valid session path. We can create a new session,
+        // and save it.
+        session = Session(session_path);
+        session.save();
 
         // I then load the `assets/session.html` page into the UI.
         win.loadFile("assets/session.html");
