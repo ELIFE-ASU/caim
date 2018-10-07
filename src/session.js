@@ -28,6 +28,23 @@ const Session = function() {
     return session;
 };
 
+const load_session = function(session_path) {
+    const session_file = path.join(session_path, 'session.json');
+    return new Promise(function(resolve, reject) {
+        fs.readFile(session_file, function(err, data) {
+            if (err !== null) {
+                reject(err);
+            }
+            try {
+                resolve(Object.assign(Session(), JSON.parse(data)));
+            } catch (err) {
+                reject(err);
+            }
+        });
+    });
+};
+
 module.exports = {
-    Session: Session
+    Session: Session,
+    load_session: load_session
 };
