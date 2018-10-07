@@ -21,6 +21,7 @@
 // windows.
 const {app, dialog, BrowserWindow, Menu} = require('electron');
 const fs = require('fs');
+const path = require('path');
 
 // Next we create require the `Session` generator function from
 // `src/session.js`.
@@ -209,7 +210,24 @@ function import_video_dialog(menuItem, browserWindow, event) {
         properties: [
             'openFile'
         ]
-    }, console.log);
+    }, import_video);
+}
+
+function import_video(video_path) {
+    if (video_path !== undefined) {
+        if (video_path.length !== 1) {
+            import_video_error({
+                message: 'Too many paths selected, select only one'
+            });
+            return;
+        }
+        video_path = video_path[0];
+
+        let ext = path.extname(video_path),
+            dst = path.join(session.path, 'video' + ext);
+
+        fs.copyFileSync(video_path, dst);
+    }
 }
 
 // ## Error Dialogs
@@ -223,6 +241,16 @@ function new_session_error(options) {
     options = Object.assign({
         type: 'error',
         title: 'New Session Error',
+        buttons: ['OK']
+    }, options);
+
+    dialog.showMessageBox(options);
+}
+
+function import_video_error(options) {
+    options = Object.assign({
+        type: 'error',
+        title: 'Video Import Error',
         buttons: ['OK']
     }, options);
 
