@@ -13,22 +13,13 @@ beforeAll(function() {
     }
 });
 
-test('session throws', function() {
-    expect(Session).toThrow(Error);
-    expect(() => Session('')).toThrow(Error);
-});
-
-test('session store path', function() {
-    expect(Session(session_dir).path).toBe(session_dir);
-});
-
 test('session cannot save to invalid path', function() {
-    expect(Session('does-not-exist').save()).rejects.toThrow(/ENOENT/);
+    expect(Session().save('does-not-exist')).rejects.toThrow(/ENOENT/);
 });
 
 test('session saves to path', async function() {
-    const session = Session(session_dir);
-    const session_file = await session.save();
+    const session = Session();
+    const session_file = await session.save(session_dir);
     const read_session = JSON.parse(fs.readFileSync(session_file));
     expect(session).toMatchObject(read_session);
 });

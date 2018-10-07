@@ -118,8 +118,15 @@ app.on('window-all-closed', function() {
 // ## Session Handling
 //
 // Our next step is to create the `session` variable which will store the
-// session details.
-let session = null;
+// session details. This includes the path to the session, `path`, and the
+// session object itself, `data`.
+let session = {
+    path: null,
+    data: null,
+    save: function() {
+        return this.data.save(this.path);
+    }
+};
 
 // ## Handling Menu Events
 //
@@ -175,7 +182,8 @@ function new_session(session_path) {
 
         // At last, we have a valid session path. We can create a new session,
         // and save it.
-        session = Session(session_path);
+        session.path = session_path;
+        session.data = Session();
         session.save();
 
         // I then load the `assets/session.html` page into the UI.
