@@ -60,7 +60,8 @@ function create_window() {
                 {
                     label: 'Import Video',
                     id: 'import-video',
-                    enabled: false
+                    enabled: false,
+                    click: import_video_dialog
                 },
                 {
                     label: 'Quit',
@@ -192,6 +193,23 @@ function new_session(session_path) {
         // Finally, I enable the `File -> Import Video` menu item.
         app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
     }
+}
+
+// The next handler is the `import_video_dialog` for the `File → Import Video`
+// menu item. It starts a `dialog.showOpenDialog` to let the user select video
+// files. The current implementation simply prints the selected filename.
+function import_video_dialog(menuItem, browserWindow, event) {
+    dialog.showOpenDialog(browserWindow, {
+        title: 'Choose a Video to Import',
+        buttonLabel: 'Import',
+        filters: [
+            {name: 'Videos', extensions: ['mkv', 'avi', 'mp4']},
+            {name: 'All Files', extensions: ['*']}
+        ],
+        properties: [
+            'openFile'
+        ]
+    }, console.log);
 }
 
 // ## Error Dialogs
