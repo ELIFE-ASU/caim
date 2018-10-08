@@ -83,7 +83,8 @@ function new_session_dialog(menuItem, browserWindow, event) {
 function new_session(session_path) {
     if (session_path !== undefined) {
         if (session_path.length !== 1) {
-            new_session_error({
+            error_dialog({
+                title: 'New Session Error',
                 message: 'Too many paths selected, select only one'
             });
             return;
@@ -93,13 +94,15 @@ function new_session(session_path) {
         if (!fs.existsSync(session_path)) {
             fs.mkdirSync(session_path);
         } else if (!fs.statSync(session_path).isDirectory()) {
-            new_session_error({
+            error_dialog({
+                title: 'New Session Error',
                 message: `Requested session path (${session_path}) is not a directory`,
                 detail: 'Please report this error the maintainer Douglas G. Moore <doug@dglmoore.com>',
             });
             return;
         } else if (fs.readdirSync(session_path).length != 0) {
-            new_session_error({
+            error_dialog({
+                title: 'New Session Error',
                 message: `Requested session path (${session_path}) is not empty`,
             });
             return;
@@ -132,7 +135,8 @@ function import_video_dialog(menuItem, browserWindow, event) {
 function import_video(video_path) {
     if (video_path !== undefined) {
         if (video_path.length !== 1) {
-            import_video_error({
+            error_dialog({
+                title: 'Import Video Error',
                 message: 'Too many paths selected, select only one'
             });
             return;
@@ -146,20 +150,9 @@ function import_video(video_path) {
     }
 }
 
-function new_session_error(options) {
+function error_dialog(options) {
     options = Object.assign({
         type: 'error',
-        title: 'New Session Error',
-        buttons: ['OK']
-    }, options);
-
-    dialog.showMessageBox(options);
-}
-
-function import_video_error(options) {
-    options = Object.assign({
-        type: 'error',
-        title: 'Video Import Error',
         buttons: ['OK']
     }, options);
 
