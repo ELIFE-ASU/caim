@@ -3,17 +3,9 @@ const fs = require('fs-extra');
 
 const session_dir = 'test/session';
 
-beforeEach(function() {
-    if (!fs.existsSync(session_dir)) {
-        fs.mkdirSync(session_dir);
-    }
-});
+beforeEach(() => fs.emptyDirSync(session_dir));
 
-afterEach(async function() {
-    if (fs.existsSync(session_dir)) {
-        fs.removeSync(session_dir);
-    }
-});
+afterEach(() => fs.removeSync(session_dir));
 
 test('session requires path', function() {
     expect(Session).toThrow(Error);
