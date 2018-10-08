@@ -27,6 +27,7 @@
     "jest": "^23.6.0"
   },
   "dependencies": {
-    "electron": "^2.0.11"
+    "electron": "^2.0.11",
+    "ffmpeg-extract-frames": "^2.0.1"
   }
 }

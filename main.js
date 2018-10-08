@@ -2,6 +2,7 @@ const {app, dialog, BrowserWindow, Menu} = require('electron');
 const fs = require('fs');
 const path = require('path');
 const {Session, load_session} = require('./src/session');
+const extractFrames = require('ffmpeg-extract-frames');
 
 let win = null;
 
@@ -180,7 +181,7 @@ function import_video_dialog(menuItem, browserWindow, event) {
     }, import_video);
 }
 
-function import_video(video_path) {
+async function import_video(video_path) {
     if (video_path !== undefined) {
         if (video_path.length !== 1) {
             error_dialog({
@@ -193,12 +194,21 @@ function import_video(video_path) {
 
         let ext = path.extname(video_path),
             video_filename = 'video' + ext,
-            dst = path.join(session.path, video_filename);
+            dst = path.join(session.path, video_filename),
+            frames_path = path.join(session.path, 'frames'),
+            frames_format = path.join(frames_path, '%06d.bmp');
 
         fs.copyFileSync(video_path, dst);
 
         session.data.video_filename = video_filename;
         session.save();
+
+        fs.mkdirSync(path.join(session.path, 'frames'));
+
+        await extractFrames({
+            input: dst,
+            output: frames_format
+        });
     }
 }
 
