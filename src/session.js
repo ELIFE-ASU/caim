@@ -1,5 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
+const images = require('./images');
 
 const Session = function(session_path, data={ }) {
     if (session_path === undefined || session_path === null || session_path.trim() === '') {
@@ -27,7 +28,7 @@ const Session = function(session_path, data={ }) {
         });
     };
 
-    session.import_video = function(video_path) {
+    session.import_video = async function(video_path) {
         const ext = path.extname(video_path);
         const video_filename = 'video' + ext;
         const local_video_path = path.join(this.path, video_filename);
@@ -36,6 +37,8 @@ const Session = function(session_path, data={ }) {
 
         this.data.video = video_filename;
         this.save();
+
+        return images.extract_frames(local_video_path);
     };
 
     return session;

@@ -172,7 +172,7 @@ function import_video_dialog(menuItem, browserWindow) {
     }, import_video);
 }
 
-function import_video(video_path) {
+async function import_video(video_path) {
     if (video_path !== undefined) {
         if (video_path.length !== 1) {
             error_dialog({
@@ -180,7 +180,7 @@ function import_video(video_path) {
                 message: 'Too many paths selected, select only one'
             });
         } else {
-            session.import_video(video_path[0]);
+            await session.import_video(video_path[0]);
         }
     }
 }
