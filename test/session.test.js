@@ -1,6 +1,5 @@
 const {Session, load_session} = require('../src/session');
 const fs = require('fs-extra');
-const path = require('path');
 
 const session_dir = 'test/session';
 
