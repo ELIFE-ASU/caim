@@ -60,8 +60,5 @@ typings/
 # next.js build output
 .next
 
-# temporary test directories
-test/session
-
 # VS Code directory
 .vscode

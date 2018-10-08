@@ -1,12 +1,18 @@
 const {Session, load_session} = require('../src/session');
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 
 const session_dir = 'test/session';
 
-beforeAll(function() {
+beforeEach(function() {
     if (!fs.existsSync(session_dir)) {
         fs.mkdirSync(session_dir);
+    }
+});
+
+afterEach(async function() {
+    if (fs.existsSync(session_dir)) {
+        fs.removeSync(session_dir);
     }
 });
 
