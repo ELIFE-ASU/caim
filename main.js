@@ -192,9 +192,13 @@ function import_video(video_path) {
         video_path = video_path[0];
 
         let ext = path.extname(video_path),
-            dst = path.join(session.path, 'video' + ext);
+            video_filename = 'video' + ext,
+            dst = path.join(session.path, video_filename);
 
         fs.copyFileSync(video_path, dst);
+
+        session.data.video_filename = video_filename;
+        session.save();
     }
 }
 
