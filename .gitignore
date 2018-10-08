@@ -62,3 +62,6 @@ typings/
 
 # temporary test directories
 test/session
+
+# VS Code directory
+.vscode
