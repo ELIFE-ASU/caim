@@ -1,7 +1,7 @@
 const {app, dialog, BrowserWindow, Menu} = require('electron');
 const fs = require('fs');
 const path = require('path');
-const {Session} = require('./src/session');
+const {Session, load_session} = require('./src/session');
 
 let win = null;
 
@@ -16,6 +16,11 @@ function create_window() {
                     label: 'New Session',
                     id: 'new-session',
                     click: new_session_dialog
+                },
+                {
+                    label: 'Open Session',
+                    id: 'open-session',
+                    click: open_session_dialog
                 },
                 {
                     label: 'Import Video',
@@ -115,6 +120,49 @@ function new_session(session_path) {
         win.loadFile("assets/session.html");
 
         app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
+    }
+}
+
+function open_session_dialog(menuItem, browserWindow, event) {
+    dialog.showOpenDialog(browserWindow, {
+        title: 'Choose a Caim Session File',
+        buttonLabel: 'Open',
+        filters: [
+            {name: 'JSON', extensions: ['json']},
+            {name: 'All Files', extensions: ['*']}
+        ],
+        properties: [
+            'openFile'
+        ]
+    }, open_session);
+}
+
+async function open_session(session_file) {
+    if (session_file !== undefined) {
+        if (session_file.length !== 1) {
+            error_dialog({
+                title: 'Open Session Error',
+                message: 'Too many paths selected, select only one'
+            });
+            return;
+        }
+        session_file = session_file[0];
+
+        let session_path = path.dirname(session_file);
+
+        try {
+            session.data = await load_session(session_path);
+            session.path = session_path;
+
+            win.loadFile("assets/session.html");
+            app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
+        } catch(err) {
+            error_dialog({
+                title: 'Open Session Error',
+                message: 'Cannot open session file',
+                detail: err
+            });
+        }
     }
 }
 
