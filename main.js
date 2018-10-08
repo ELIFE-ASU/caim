@@ -1,5 +1,5 @@
 const {app, dialog, BrowserWindow, Menu} = require('electron');
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const {Session, load_session} = require('./src/session');
 const extractFrames = require('ffmpeg-extract-frames');
