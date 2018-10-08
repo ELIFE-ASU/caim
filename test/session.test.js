@@ -30,7 +30,7 @@ test('session constructs', function() {
 test('session cosntructs with data', function() {
     const session = Session(session_dir, { video: 'video.avi' });
     expect(session.path).toBe(session_dir);
-    expect(session.data).toMatchObject({ video: 'video.avi'});
+    expect(session.data).toMatchObject({ video: 'video.avi' });
 });
 
 test('session cannot save to invalid path', function() {
