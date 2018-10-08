@@ -67,13 +67,7 @@ app.on('window-all-closed', function() {
     }
 });
 
-let session = {
-    path: null,
-    data: null,
-    save: function() {
-        return this.data.save(this.path);
-    }
-};
+let session = null;
 
 function new_session_dialog(menuItem, browserWindow) {
     dialog.showOpenDialog(browserWindow, {
@@ -114,8 +108,7 @@ function new_session(session_path) {
             return;
         }
 
-        session.path = session_path;
-        session.data = Session();
+        session = Session(session_path);
         session.save();
 
         win.loadFile('assets/session.html');
@@ -152,8 +145,7 @@ async function open_session(session_file) {
         let session_path = path.dirname(session_file);
 
         try {
-            session.data = await load_session(session_path);
-            session.path = session_path;
+            session = await load_session(session_path);
 
             win.loadFile('assets/session.html');
             app.getApplicationMenu().getMenuItemById('import-video').enabled = true;

@@ -1,19 +1,21 @@
 const fs = require('fs');
 const path = require('path');
 
-const Session = function() {
-    const session = { };
+const Session = function(session_path, data={ }) {
+    if (session_path === undefined || session_path === null || session_path.trim() === '') {
+        throw new Error('session path is required');
+    }
 
-    session.save = function(session_path) {
-        if (session_path === undefined) {
-            throw new Error('no session path');
-        } else if (session_path === '') {
-            throw new Error(`invalid session path ("$(session_path)")`);
-        }
+    const session = {
+        path: session_path,
+        data: data
+    };
+
+    session.save = function() {
         const session = this;
-        const session_file = path.join(session_path, 'session.json');
+        const session_file = path.join(session.path, 'session.json');
         return new Promise(function(resolve, reject) {
-            fs.writeFile(session_file, JSON.stringify(session), 'utf8',
+            fs.writeFile(session_file, JSON.stringify(session.data), 'utf8',
                 function(err) {
                     if (err !== null) {
                         reject(err);
@@ -34,11 +36,12 @@ const load_session = function(session_path) {
         fs.readFile(session_file, function(err, data) {
             if (err !== null) {
                 reject(err);
-            }
-            try {
-                resolve(Object.assign(Session(), JSON.parse(data)));
-            } catch (err) {
-                reject(err);
+            } else {
+                try {
+                    resolve(Session(session_path, JSON.parse(data)));
+                } catch (err) {
+                    reject(err);
+                }
             }
         });
     });
