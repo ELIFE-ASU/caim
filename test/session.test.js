@@ -42,7 +42,8 @@ test('session saves and is loadable', async function() {
     await session.save();
 
     const expectedSession = Object.assign(session, {
-        save: expect.any(Function)
+        save: expect.any(Function),
+        import_video: expect.any(Function)
     });
 
     const read_session = await load_session(session_dir);
