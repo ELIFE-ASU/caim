@@ -24,7 +24,7 @@
   },
   "homepage": "https://dglmoore.github.io/caim",
   "devDependencies": {
-    "electron": "^2.0.9",
+    "electron": "^2.0.11",
     "jest": "^23.6.0"
   }
 }
