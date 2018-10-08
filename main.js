@@ -75,7 +75,7 @@ let session = {
     }
 };
 
-function new_session_dialog(menuItem, browserWindow, event) {
+function new_session_dialog(menuItem, browserWindow) {
     dialog.showOpenDialog(browserWindow, {
         title: 'Choose New Session Directory',
         properties: [
@@ -118,13 +118,13 @@ function new_session(session_path) {
         session.data = Session();
         session.save();
 
-        win.loadFile("assets/session.html");
+        win.loadFile('assets/session.html');
 
         app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
     }
 }
 
-function open_session_dialog(menuItem, browserWindow, event) {
+function open_session_dialog(menuItem, browserWindow) {
     dialog.showOpenDialog(browserWindow, {
         title: 'Choose a Caim Session File',
         buttonLabel: 'Open',
@@ -155,7 +155,7 @@ async function open_session(session_file) {
             session.data = await load_session(session_path);
             session.path = session_path;
 
-            win.loadFile("assets/session.html");
+            win.loadFile('assets/session.html');
             app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
         } catch(err) {
             error_dialog({
@@ -167,7 +167,7 @@ async function open_session(session_file) {
     }
 }
 
-function import_video_dialog(menuItem, browserWindow, event) {
+function import_video_dialog(menuItem, browserWindow) {
     dialog.showOpenDialog(browserWindow, {
         title: 'Choose a Video to Import',
         buttonLabel: 'Import',
