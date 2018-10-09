@@ -17,12 +17,12 @@
     "math",
     "analysis"
   ],
-  "author": "Douglas G. Moore <doug@dglmoore.com>",
+  "author": "Douglas G. Moore <doug@dglmoore.com> (https://dglmoore.com)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/dglmoore/caim/issues"
   },
-  "homepage": "https://dglmoore.github.io/caim",
+  "homepage": "https://dglmoore.com/caim",
   "devDependencies": {
     "electron-builder": "^20.28.4",
     "eslint": "^5.6.1",
