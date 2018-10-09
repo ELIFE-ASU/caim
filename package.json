@@ -30,6 +30,9 @@
   },
   "dependencies": {
     "electron": "^2.0.11",
+    "ffmpeg-static-electron": "^2.0.1",
+    "ffprobe-static-electron": "^2.0.0",
+    "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^7.0.0"
   }
 }
