@@ -1,6 +1,9 @@
 const fs = require('fs-extra');
 const path = require('path');
-const extractFrames = require('ffmpeg-extract-frames');
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpeg_path = require('ffmpeg-static-electron').path;
+
+ffmpeg.setFfmpegPath(ffmpeg_path);
 
 async function extract_frames(video_path) {
     const session_path = path.dirname(video_path);
@@ -9,9 +12,13 @@ async function extract_frames(video_path) {
 
     await fs.emptyDir(frames_path);
 
-    return extractFrames({
-        input: video_path,
-        output: frames_format
+    return new Promise((resolve, reject) => {
+        ffmpeg(video_path)
+            .on('start', () => {})
+            .on('end', () => resolve(frames_format))
+            .on('error', (err) => reject(err))
+            .output(frames_format)
+            .run();
     });
 }
 
