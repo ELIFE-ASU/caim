@@ -5,7 +5,17 @@
   "main": "main.js",
   "scripts": {
     "test": "jest --detectOpenHandles",
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "pack:mac": "electron-builder --dir --mac",
+    "pack:linux": "electron-builder --dir --linux",
+    "pack:win": "electron-builder --dir --win",
+    "pack:mwl": "electron-builder --dir --mwl",
+    "dist": "electron-builder",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux",
+    "dist:win": "electron-builder --win",
+    "dist:mwl": "electron-builder --mwl"
   },
   "repository": {
     "type": "git",
@@ -23,14 +33,112 @@
     "url": "https://github.com/dglmoore/caim/issues"
   },
   "homepage": "https://dglmoore.com/caim",
+  "build": {
+    "appId": "com.dglmoore.caim",
+    "asar": false,
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!test/",
+      "!docs/",
+      "!dist/",
+      "node_modules/ffmpeg-static-electron/bin/${os}/${arch}/ffmpeg",
+      "node_modules/ffmpeg-static-electron/index.js",
+      "node_modules/ffmpeg-static-electron/package.json",
+      "node_modules/ffprobe-static-electron/bin/${os}/${arch}/ffmpeg",
+      "node_modules/ffprobe-static-electron/index.js",
+      "node_modules/ffprobe-static-electron/package.json"
+    ],
+    "linux": {
+      "packageCategory": "Science;Biology;Math;Image Processing",
+      "description": "Caim Desktop Client for Linux",
+      "maintainer": "Douglas G. Moore <doug@dglmoore.com>",
+      "icon": "build/caim.png",
+      "target": [
+        {
+          "target": "deb",
+          "arch": "x64"
+        },
+        {
+          "target": "tar.gz",
+          "arch": "x64"
+        }
+      ],
+      "files": [
+        "!node_modules/ffmpeg-static-electron/bin/linux/ia32${/*}",
+        "!node_modules/ffmpeg-static-electron/bin/win${/*}",
+        "!node_modules/ffmpeg-static-electron/bin/mac${/*}",
+        "!node_modules/ffprobe-static-electron/bin/linux/ia32${/*}",
+        "!node_modules/ffprobe-static-electron/bin/win${/*}",
+        "!node_modules/ffprobe-static-electron/bin/mac${/*}"
+      ]
+    },
+    "deb": {
+      "synopsis": "Caim Desktop App"
+    },
+    "mac": {
+      "category": "public.app-category.education",
+      "files": [
+        "!node_modules/ffmpeg-static-electron/bin/win${/*}",
+        "!node_modules/ffmpeg-static-electron/bin/linux${/*}",
+        "!node_modules/ffprobe-static-electron/bin/win${/*}",
+        "!node_modules/ffprobe-static-electron/bin/linux${/*}"
+      ],
+      "target": [
+        {
+          "target": "dmg",
+          "arch": "x64"
+        }
+      ]
+    },
+    "dmg": {
+      "icon": "build/caim.icns",
+      "iconSize": 128,
+      "contents": [
+        {
+          "x": 448,
+          "y": 340,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 192,
+          "y": 340,
+          "type": "file"
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": "x64"
+        }
+      ],
+      "icon": "build/caim.ico",
+      "files": [
+        "node_modules/ffmpeg-static-electron/bin/win/${arch}/ffmpeg",
+        "!node_modules/ffmpeg-static-electron/bin/win/ia32${/*}",
+        "!node_modules/ffmpeg-static-electron/bin/linux${/*}",
+        "!node_modules/ffmpeg-static-electron/bin/mac${/*}",
+        "node_modules/ffprobe-static-electron/bin/win/${arch}/ffprobe",
+        "!node_modules/ffprobe-static-electron/bin/win/ia32${/*}",
+        "!node_modules/ffprobe-static-electron/bin/linux${/*}",
+        "!node_modules/ffprobe-static-electron/bin/mac${/*}"
+      ]
+    }
+  },
   "devDependencies": {
+    "electron": "^2.0.11",
     "electron-builder": "^20.28.4",
     "eslint": "^5.6.1",
     "eslint-plugin-jest": "^21.24.1",
     "jest": "^23.6.0"
   },
   "dependencies": {
-    "electron": "^2.0.11",
     "ffmpeg-static-electron": "^2.0.1",
     "ffprobe-static-electron": "^2.0.0",
     "fluent-ffmpeg": "^2.1.2",

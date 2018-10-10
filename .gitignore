@@ -62,3 +62,6 @@ typings/
 
 # VS Code directory
 .vscode
+
+# electron distribution
+dist
