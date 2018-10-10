@@ -180,7 +180,16 @@ async function import_video(video_path) {
                 message: 'Too many paths selected, select only one'
             });
         } else {
-            await session.import_video(video_path[0]);
+            try {
+                await session.import_video(video_path[0]);
+            } catch (err) {
+                error_dialog({
+                    title: 'Import Video Error',
+                    message: 'Failed to import video',
+                    detail: err.toString()
+                });
+                console.log(err.stack);
+            }
         }
     }
 }
