@@ -14,6 +14,12 @@ env:
     - ELECTRON_CACHE=$HOME/.cache/electron
     - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
 
+cache:
+  directories:
+    - node_modules
+    - $ELECTRON_CACHE
+    - $ELECTRON_BUILDER_CACHE
+
 script:
   - npm test
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run dist:mwl:publish; fi
