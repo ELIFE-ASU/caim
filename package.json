@@ -10,13 +10,13 @@
     "pack:mac": "electron-builder --dir --mac",
     "pack:linux": "electron-builder --dir --linux",
     "pack:win": "electron-builder --dir --win",
-    "pack:mwl": "electron-builder --dir --mwl",
+    "pack:mwl": "electron-builder --dir -mwl",
     "dist": "electron-builder",
     "dist:mac": "electron-builder --mac",
     "dist:linux": "electron-builder --linux",
     "dist:win": "electron-builder --win",
-    "dist:mwl": "electron-builder --mwl",
-    "dist:mwl:publish": "electron-builder --mwl --publish onTag"
+    "dist:mwl": "electron-builder -mwl",
+    "dist:mwl:publish": "electron-builder -mwl --publish onTag"
   },
   "repository": {
     "type": "git",
