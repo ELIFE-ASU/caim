@@ -39,7 +39,10 @@
       "provider": "github"
     },
     "appId": "com.dglmoore.caim",
-    "asar": false,
+    "asarUnpack": [
+      "**/app/node_modules/ffmpeg-electron-static/*",
+      "**/app/node_modules/ffprobe-electron-static/*"
+    ],
     "directories": {
       "buildResources": "build",
       "output": "dist"
