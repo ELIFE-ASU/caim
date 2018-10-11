@@ -16,4 +16,4 @@ env:
 
 script:
   - npm test
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run dist:mwl:publish fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run dist:mwl:publish; fi
