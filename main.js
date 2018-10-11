@@ -188,7 +188,6 @@ async function import_video(video_path) {
                     message: 'Failed to import video',
                     detail: err.toString()
                 });
-                console.log(err.stack);
             }
         }
     }
