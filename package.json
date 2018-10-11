@@ -15,7 +15,8 @@
     "dist:mac": "electron-builder --mac",
     "dist:linux": "electron-builder --linux",
     "dist:win": "electron-builder --win",
-    "dist:mwl": "electron-builder --mwl"
+    "dist:mwl": "electron-builder --mwl",
+    "dist:mwl:publish": "electron-builder --mwl --publish onTag"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,9 @@
   },
   "homepage": "https://dglmoore.com/caim",
   "build": {
+    "publish": {
+      "provider": "github"
+    },
     "appId": "com.dglmoore.caim",
     "asar": false,
     "directories": {
