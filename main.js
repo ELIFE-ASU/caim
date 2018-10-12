@@ -52,7 +52,7 @@ function create_window() {
         }
     ]));
 
-    win.loadFile('assets/startup.html');
+    win.loadFile('assets/index.html');
 
     win.on('closed', () => win = null);
 }
@@ -115,9 +115,9 @@ function new_session(session_path) {
         session = Session(session_path);
         session.save();
 
-        win.loadFile('assets/session.html');
-
         app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
+
+        win.webContents.send('load-session');
     }
 }
 
@@ -150,14 +150,13 @@ async function open_session(session_file) {
 
         try {
             session = await load_session(session_path);
-
-            win.loadFile('assets/session.html');
             app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
+            win.webContents.send('load-session');
         } catch(err) {
             error_dialog({
                 title: 'Open Session Error',
                 message: 'Cannot open session file',
-                detail: err
+                detail: err.toString()
             });
         }
     }
