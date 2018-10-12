@@ -39,6 +39,11 @@ function create_window() {
             label: 'View',
             submenu: [
                 {
+                    label: 'Developer Tools',
+                    id: 'devtools',
+                    role: 'toggleDevTools'
+                },
+                {
                     label: 'Fullscreen',
                     id: 'fullscreen',
                     role: 'toggleFullScreen'
