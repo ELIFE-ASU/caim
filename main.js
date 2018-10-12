@@ -1,4 +1,4 @@
-const {app, dialog, BrowserWindow, Menu} = require('electron');
+const {app, dialog, BrowserWindow, Menu, ipcMain} = require('electron');
 const fs = require('fs-extra');
 const path = require('path');
 const {Session, load_session} = require('./src/session');
@@ -206,3 +206,11 @@ function error_dialog(options) {
 
     dialog.showMessageBox(options);
 }
+
+ipcMain.on('new-session', function() {
+    new_session_dialog(null, win);
+});
+
+ipcMain.on('open-session', function() {
+    open_session_dialog(null, win);
+});

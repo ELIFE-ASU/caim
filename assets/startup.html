@@ -1,24 +1,28 @@
 <!doctype html>
 <head>
-	<meta charset="UTF-8">
-	<title>Caim: Information Theoretic Analysis of Videographic Data</title>
+    <meta charset="UTF-8">
+    <title>Caim: Information Theoretic Analysis of Videographic Data</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-	<header>
+    <header>
         <h1>Caim</h1>
-	</header>
+    </header>
 
-    <div>
-        <p>
-            Welcome to Caim. To get started, select a directory in the
-            <span class='code'>File&nbsp;&#x27f6;&nbsp;New&nbsp;Session</span>
-            dialog. Your new session will be created in the chosen directory.
-        </p>
-    </div>
+    <h2>Getting Started</h2>
+    <ul>
+        <li><a href="#" onclick="new_session();">New Session</a></li>
+        <li><a href="#" onclick="open_session();">Open Session</a></li>
+    </ul>
 
     <footer>
         <p>Copyright © 2018, <a href="http://emergence.asu.edu">Emergence@ASU</a></p>
     </footer>
+
+    <script>
+        const {ipcRenderer} = require('electron');
+        const new_session = () => ipcRenderer.send('new-session');
+        const open_session = () => ipcRenderer.send('open-session');
+    </script>
 </body>
 <html>
