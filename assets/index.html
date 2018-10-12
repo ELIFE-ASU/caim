@@ -19,11 +19,13 @@
     </div>
 
     <div id="session">
-        <p>
-            Welcome to Caim. To get started, import a video file from the
-            <span class='code'>File&nbsp;&#x27f6;&nbsp;Import&nbsp;Video</span>
-            dialog. Your new session will be created in the chosen directory.
-        </p>
+        <h2></h2>
+        <div id="import-video">
+            <a href="#" onclick="import_video();">Import Video</a>
+        </div>
+        <div id="selection">
+            <p>Select Some Features</p>
+        </div>
     </div>
 
     <footer>
@@ -37,10 +39,24 @@
 
         const open_session = () => ipcRenderer.send('open-session');
 
-        ipcRenderer.on('load-session', function(event, data) {
+        const import_video = () => ipcRenderer.send('import-video');
+
+        ipcRenderer.on('load-session', function(event, path, video) {
             d3.select("#startup").style('display', 'none');
             d3.select("#session").style('display', 'block');
+            d3.select("#session").select("h2")
+                .text(() => `Session Path: ${path}`);
+            if (video === undefined || video === null) {
+                d3.select("#import-video").style('display', 'block');
+            } else {
+                d3.select("#selection").style('display', 'block')
+            }
+        });
+
+        ipcRenderer.on('load-selector', function (event) {
+            d3.select("#import-video").style('display', 'none');
+            d3.select("#selection").style('display', 'block');
         });
     </script>
 </body>
-<html>
+</html>

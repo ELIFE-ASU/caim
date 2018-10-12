@@ -163,6 +163,7 @@ async function import_video_dialog(menuItem, browserWindow) {
         if (video_path.length === 1) {
             try {
                 await session.import_video(video_path[0]);
+                browserWindow.webContents.send('load-selector');
             } catch (err) {
                 error_dialog({
                     title: 'Import Video Error',
@@ -194,4 +195,8 @@ ipcMain.on('new-session', function() {
 
 ipcMain.on('open-session', function() {
     open_session_dialog(null, win);
+});
+
+ipcMain.on('import-video', function() {
+    import_video_dialog(null, win);
 });
