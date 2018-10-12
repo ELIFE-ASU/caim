@@ -74,55 +74,44 @@ app.on('window-all-closed', function() {
 let session = null;
 
 function new_session_dialog(menuItem, browserWindow) {
-    dialog.showOpenDialog(browserWindow, {
+    let session_path = dialog.showOpenDialog(browserWindow, {
         title: 'Choose New Session Directory',
         properties: [
             'openDirectory',
             'createDirectory',
             'promptToCreate'
         ]
-    }, new_session);
-}
+    });
 
-function new_session(session_path) {
     if (session_path !== undefined) {
-        if (session_path.length !== 1) {
+        if (session_path.length === 1) {
+            session_path = session_path[0];
+
+            fs.ensureDirSync(session_path);
+
+            if (fs.readdirSync(session_path).length != 0) {
+                error_dialog({
+                    title: 'New Session Error',
+                    message: `Requested session path (${session_path}) is not empty`,
+                });
+            } else {
+                session = Session(session_path);
+                session.save();
+
+                app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
+                browserWindow.send('load-session', session.path, session.data.video);
+            }
+        } else {
             error_dialog({
                 title: 'New Session Error',
                 message: 'Too many paths selected, select only one'
             });
-            return;
         }
-        session_path = session_path[0];
-
-        if (!fs.existsSync(session_path)) {
-            fs.mkdirSync(session_path);
-        } else if (!fs.statSync(session_path).isDirectory()) {
-            error_dialog({
-                title: 'New Session Error',
-                message: `Requested session path (${session_path}) is not a directory`,
-                detail: 'Please report this error the maintainer Douglas G. Moore <doug@dglmoore.com>',
-            });
-            return;
-        } else if (fs.readdirSync(session_path).length != 0) {
-            error_dialog({
-                title: 'New Session Error',
-                message: `Requested session path (${session_path}) is not empty`,
-            });
-            return;
-        }
-
-        session = Session(session_path);
-        session.save();
-
-        app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
-
-        win.webContents.send('load-session');
     }
 }
 
-function open_session_dialog(menuItem, browserWindow) {
-    dialog.showOpenDialog(browserWindow, {
+async function open_session_dialog(menuItem, browserWindow) {
+    const session_file = dialog.showOpenDialog(browserWindow, {
         title: 'Choose a Caim Session File',
         buttonLabel: 'Open',
         filters: [
@@ -132,38 +121,33 @@ function open_session_dialog(menuItem, browserWindow) {
         properties: [
             'openFile'
         ]
-    }, open_session);
-}
+    });
 
-async function open_session(session_file) {
     if (session_file !== undefined) {
-        if (session_file.length !== 1) {
+        if (session_file.length === 1) {
+            try {
+                const session_path = path.dirname(session_file[0]);
+                session = await load_session(session_path);
+                app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
+                browserWindow.send('load-session', session.path, session.data.video);
+            } catch(err) {
+                error_dialog({
+                    title: 'Open Session Error',
+                    message: 'Cannot open session file',
+                    detail: err.toString()
+                });
+            }
+        } else {
             error_dialog({
                 title: 'Open Session Error',
                 message: 'Too many paths selected, select only one'
-            });
-            return;
-        }
-        session_file = session_file[0];
-
-        let session_path = path.dirname(session_file);
-
-        try {
-            session = await load_session(session_path);
-            app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
-            win.webContents.send('load-session');
-        } catch(err) {
-            error_dialog({
-                title: 'Open Session Error',
-                message: 'Cannot open session file',
-                detail: err.toString()
             });
         }
     }
 }
 
-function import_video_dialog(menuItem, browserWindow) {
-    dialog.showOpenDialog(browserWindow, {
+async function import_video_dialog(menuItem, browserWindow) {
+    const video_path = dialog.showOpenDialog(browserWindow, {
         title: 'Choose a Video to Import',
         buttonLabel: 'Import',
         filters: [
@@ -173,17 +157,10 @@ function import_video_dialog(menuItem, browserWindow) {
         properties: [
             'openFile'
         ]
-    }, import_video);
-}
+    });
 
-async function import_video(video_path) {
     if (video_path !== undefined) {
-        if (video_path.length !== 1) {
-            error_dialog({
-                title: 'Import Video Error',
-                message: 'Too many paths selected, select only one'
-            });
-        } else {
+        if (video_path.length === 1) {
             try {
                 await session.import_video(video_path[0]);
             } catch (err) {
@@ -193,6 +170,11 @@ async function import_video(video_path) {
                     detail: err.toString()
                 });
             }
+        } else {
+            error_dialog({
+                title: 'Import Video Error',
+                message: 'Too many paths selected, select only one'
+            });
         }
     }
 }
