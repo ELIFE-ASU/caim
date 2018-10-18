@@ -17,27 +17,6 @@ body div {
     display: none;
 }
 
-header {
-    padding: 1em;
-    color: white;
-    background-color: #8c1d40;
-    clear: none;
-    text-align: center;
-}
-
-footer {
-    color: black;
-    background-color: #ffc267;
-    clear: none;
-    text-align: center;
-    font-size: 14px;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    padding: 13px 0px;
-}
-
 span.code {
     font-family: monospace;
 }
