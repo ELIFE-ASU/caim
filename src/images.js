@@ -1,7 +1,8 @@
-const fs = require('fs-extra');
-const path = require('path');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpeg_path = require('ffmpeg-static-electron').path;
+const fs = require('fs-extra');
+const jimp = require('jimp');
+const path = require('path');
 
 ffmpeg.setFfmpegPath(ffmpeg_path.replace('app.asar', 'app.asar.unpacked'));
 
@@ -22,6 +23,18 @@ async function extract_frames(video_path) {
     });
 }
 
+async function load_frame(filename) {
+    return jimp.read(filename);
+}
+
+async function load_frames(frames_path) {
+    const filenames = await fs.readdir(frames_path);
+    return Promise.all(filenames.map(function(filename) {
+        return load_frame(path.join(frames_path, filename));
+    }));
+}
+
 module.exports = {
-    extract_frames: extract_frames
+    extract_frames: extract_frames,
+    load_frames: load_frames
 };
