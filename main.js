@@ -146,7 +146,7 @@ async function open_session_dialog(menuItem, browserWindow) {
     }
 }
 
-async function import_video_dialog(menuItem, browserWindow) {
+function import_video_dialog(menuItem, browserWindow) {
     const video_path = dialog.showOpenDialog(browserWindow, {
         title: 'Choose a Video to Import',
         buttonLabel: 'Import',
@@ -161,16 +161,16 @@ async function import_video_dialog(menuItem, browserWindow) {
 
     if (video_path !== undefined) {
         if (video_path.length === 1) {
-            try {
-                await session.import_video(video_path[0]);
-                browserWindow.webContents.send('load-selector');
-            } catch (err) {
-                error_dialog({
-                    title: 'Import Video Error',
-                    message: 'Failed to import video',
-                    detail: err.toString()
+            session.import_video(video_path[0])
+                .then(() => session.load_frames())
+                .then(() => browserWindow.webContents.send('load-selector'))
+                .catch(function(err) {
+                    error_dialog({
+                        title: 'Import Video Error',
+                        message: 'Failed to import video',
+                        detail: err.toString()
+                    });
                 });
-            }
         } else {
             error_dialog({
                 title: 'Import Video Error',
