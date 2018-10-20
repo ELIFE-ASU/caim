@@ -128,8 +128,11 @@ async function open_session_dialog(menuItem, browserWindow) {
             try {
                 const session_path = path.dirname(session_file[0]);
                 session = await load_session(session_path);
+                if (session.metadata.hasOwnProperty('video')) {
+                    await session.load_frames();
+                }
                 app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
-                browserWindow.send('load-session', session.path, session.data.video);
+                browserWindow.send('load-session', session.path, session.metadata.video);
             } catch(err) {
                 error_dialog({
                     title: 'Open Session Error',
