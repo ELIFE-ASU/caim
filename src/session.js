@@ -2,21 +2,21 @@ const fs = require('fs-extra');
 const path = require('path');
 const images = require('./images');
 
-const Session = function(session_path, data={ }) {
+const Session = function(session_path, metadata={ }) {
     if (session_path === undefined || session_path === null || session_path.trim() === '') {
         throw new Error('session path is required');
     }
 
     const session = {
         path: session_path,
-        data: data
+        metadata: metadata
     };
 
     session.save = function() {
         const session = this;
         const session_file = path.join(session.path, 'session.json');
         return new Promise(function(resolve, reject) {
-            fs.writeFile(session_file, JSON.stringify(session.data), 'utf8',
+            fs.writeFile(session_file, JSON.stringify(session.metadata), 'utf8',
                 function(err) {
                     if (err !== null) {
                         reject(err);
@@ -35,7 +35,7 @@ const Session = function(session_path, data={ }) {
 
         fs.copyFileSync(video_path, local_video_path);
 
-        this.data.video = video_filename;
+        this.metadata.video = video_filename;
         this.save();
 
         return images.extract_frames(local_video_path);

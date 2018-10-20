@@ -99,7 +99,7 @@ function new_session_dialog(menuItem, browserWindow) {
                 session.save();
 
                 app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
-                browserWindow.send('load-session', session.path, session.data.video);
+                browserWindow.send('load-session', session.path, session.metadata.video);
             }
         } else {
             error_dialog({
