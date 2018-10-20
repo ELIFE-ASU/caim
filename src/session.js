@@ -9,6 +9,7 @@ const Session = function(session_path, metadata={ }) {
 
     const session = {
         path: session_path,
+        active_frames: null,
         metadata: metadata
     };
 
@@ -39,6 +40,12 @@ const Session = function(session_path, metadata={ }) {
         this.save();
 
         return images.extract_frames(local_video_path);
+    };
+
+    session.load_frames = async function() {
+        const frames_path = path.join(this.path, 'frames');
+        this.active_frames = images.load_frames(frames_path);
+        return this.active_frames;
     };
 
     return session;
