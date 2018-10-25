@@ -1,3 +1,4 @@
+const Frame = require('./frame');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpeg_path = require('ffmpeg-static-electron').path;
 const fs = require('fs-extra');
@@ -24,7 +25,21 @@ async function extract_frames(video_path) {
 }
 
 async function load_frame(filename) {
-    return jimp.read(filename);
+    let img = await jimp.read(filename),
+        width = img.bitmap.width,
+        height = img.bitmap.height,
+        data = img.bitmap.data;
+
+    let frame = new Frame(width, height);
+    img.scan(0, 0, width, height, function(x, y, idx) {
+        let r = data[idx + 0],
+            g = data[idx + 1],
+            b = data[idx + 2];
+
+        frame.data[idx % 4] = Math.max(r, g, b);
+    });
+
+    return frame;
 }
 
 async function load_frames(frames_path) {
@@ -38,3 +53,4 @@ module.exports = {
     extract_frames: extract_frames,
     load_frames: load_frames
 };
+
