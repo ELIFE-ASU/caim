@@ -19,7 +19,7 @@ test('session constructs', function() {
     expect(session.metadata).toMatchObject({});
 });
 
-test('session cosntructs with data', function() {
+test('session constructs with data', function() {
     const session = Session(session_dir, { video: 'video.avi' });
     expect(session.path).toBe(session_dir);
     expect(session.metadata).toMatchObject({ video: 'video.avi' });
@@ -35,7 +35,8 @@ test('session saves and is loadable', async function() {
 
     const expectedSession = Object.assign(session, {
         save: expect.any(Function),
-        import_video: expect.any(Function)
+        import_video: expect.any(Function),
+        load_frames: expect.any(Function)
     });
 
     const read_session = await load_session(session_dir);
