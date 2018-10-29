@@ -2,6 +2,11 @@ const fs = require('fs-extra');
 const path = require('path');
 const images = require('./images');
 
+const Meta = {
+    video: null,
+    frames: false
+};
+
 const Session = function(session_path, metadata={ }) {
     if (session_path === undefined || session_path === null || session_path.trim() === '') {
         throw new Error('session path is required');
@@ -10,7 +15,7 @@ const Session = function(session_path, metadata={ }) {
     const session = {
         path: session_path,
         active_frames: null,
-        metadata: metadata
+        metadata: Object.assign({}, Meta, metadata)
     };
 
     session.save = function() {
