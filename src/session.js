@@ -33,19 +33,15 @@ const Session = function(session_path, metadata={ }) {
         const ext = path.extname(video_path);
         const video_filename = 'video' + ext;
         const local_video_path = path.join(this.path, video_filename);
+        const frames_path = path.join(this.path, 'frames');
 
         fs.copyFileSync(video_path, local_video_path);
 
+        await images.extract_frames(local_video_path);
+        this.active_frames = await images.load_frames(frames_path);
+
         this.metadata.video = video_filename;
-        this.save();
-
-        return images.extract_frames(local_video_path);
-    };
-
-    session.load_frames = async function() {
-        const frames_path = path.join(this.path, 'frames');
-        this.active_frames = images.load_frames(frames_path);
-        return this.active_frames;
+        this.metadata.frames = true;
     };
 
     return session;
