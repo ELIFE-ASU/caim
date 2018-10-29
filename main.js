@@ -1,7 +1,6 @@
 const {app, dialog, BrowserWindow, Menu, ipcMain} = require('electron');
 const fs = require('fs-extra');
-const path = require('path');
-const {Session, load_session} = require('./src/session');
+const {Session} = require('./src/session');
 
 let win = null;
 
@@ -16,11 +15,6 @@ function create_window() {
                     label: 'New Session',
                     id: 'new-session',
                     click: new_session_dialog
-                },
-                {
-                    label: 'Open Session',
-                    id: 'open-session',
-                    click: open_session_dialog
                 },
                 {
                     label: 'Import Video',
@@ -110,45 +104,6 @@ function new_session_dialog(menuItem, browserWindow) {
     }
 }
 
-async function open_session_dialog(menuItem, browserWindow) {
-    const session_file = dialog.showOpenDialog(browserWindow, {
-        title: 'Choose a Caim Session File',
-        buttonLabel: 'Open',
-        filters: [
-            {name: 'JSON', extensions: ['json']},
-            {name: 'All Files', extensions: ['*']}
-        ],
-        properties: [
-            'openFile'
-        ]
-    });
-
-    if (session_file !== undefined) {
-        if (session_file.length === 1) {
-            try {
-                const session_path = path.dirname(session_file[0]);
-                session = await load_session(session_path);
-                if (session.metadata.hasOwnProperty('video')) {
-                    await session.load_frames();
-                }
-                app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
-                browserWindow.send('load-session', session.path, session.metadata.video);
-            } catch(err) {
-                error_dialog({
-                    title: 'Open Session Error',
-                    message: 'Cannot open session file',
-                    detail: err.toString()
-                });
-            }
-        } else {
-            error_dialog({
-                title: 'Open Session Error',
-                message: 'Too many paths selected, select only one'
-            });
-        }
-    }
-}
-
 function import_video_dialog(menuItem, browserWindow) {
     const video_path = dialog.showOpenDialog(browserWindow, {
         title: 'Choose a Video to Import',
@@ -194,10 +149,6 @@ function error_dialog(options) {
 
 ipcMain.on('new-session', function() {
     new_session_dialog(null, win);
-});
-
-ipcMain.on('open-session', function() {
-    open_session_dialog(null, win);
 });
 
 ipcMain.on('import-video', function() {
