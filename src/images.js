@@ -64,21 +64,7 @@ async function extract_frames(video_path) {
 }
 
 async function load_frame(filename) {
-    let img = await jimp.read(filename),
-        width = img.bitmap.width,
-        height = img.bitmap.height,
-        data = img.bitmap.data;
-
-    let frame = new Frame(width, height);
-    img.scan(0, 0, width, height, function(x, y, idx) {
-        let r = data[idx + 0],
-            g = data[idx + 1],
-            b = data[idx + 2];
-
-        frame.data[idx % 4] = Math.max(r, g, b);
-    });
-
-    return frame;
+    return jimp.read(filename).then(Frame.from_image);
 }
 
 async function load_frames(frames_path) {
