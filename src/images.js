@@ -32,6 +32,20 @@ Frame.from_image = function(img) {
     return frame;
 };
 
+Frame.prototype.to_image = async function() {
+    let img = await (new jimp(this.width, this.height)),
+        data = this.data;
+
+    img.scan(0, 0, this.width, this.height, function(x, y, idx) {
+        this.bitmap.data[idx + 0] = data[idx / 4];
+        this.bitmap.data[idx + 1] = data[idx / 4];
+        this.bitmap.data[idx + 2] = data[idx / 4];
+        this.bitmap.data[idx + 3] = 0xff;
+    });
+
+    return img;
+};
+
 async function extract_frames(video_path) {
     const session_path = path.dirname(video_path);
     const frames_path = path.join(session_path, 'frames');

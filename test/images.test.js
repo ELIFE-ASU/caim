@@ -34,3 +34,33 @@ test('Frame.from_image', async function() {
     expect(frame.width).toBe(4);
     expect(frame.height).toBe(2);
 });
+
+test('Frame.to_image', async function() {
+    let frame = new Frame(4, 2);
+    [1, 3, 6, 7].forEach(function(i) {
+        frame.data[i] = 0xff;
+    });
+
+    let img = await frame.to_image(),
+        data = Buffer.from([
+            0,0,0,0xff,0xff,0xff,0xff,0xff,0,0,0,0xff,0xff,0xff,0xff,0xff,
+            0,0,0,0xff,0,0,0,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
+        ]);
+
+    expect(img.bitmap.data).toEqual(data);
+    expect(img.bitmap.width).toEqual(4);
+    expect(img.bitmap.height).toEqual(2);
+});
+
+test('Frame.to_frame(frame.to_image()) == frame', async function() {
+    let expected = new Frame(4, 2);
+    [1, 3, 6, 7].forEach(function(i) {
+        expected.data[i] = 0xff;
+    });
+
+    let got = await expected.to_image().then(Frame.from_image);
+
+    expect(got.data).toEqual(expected.data);
+    expect(got.width).toEqual(expected.width);
+    expect(got.height).toEqual(expected.height);
+});
