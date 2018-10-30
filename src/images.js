@@ -16,6 +16,22 @@ const Frame = function(width, height) {
     this.height = height;
 };
 
+Frame.from_image = function(img) {
+    let width = img.bitmap.width,
+        height = img.bitmap.height,
+        frame = new Frame(width, height);
+
+    img.scan(0, 0, width, height, function(x, y, idx) {
+        let r = this.bitmap.data[idx + 0],
+            g = this.bitmap.data[idx + 1],
+            b = this.bitmap.data[idx + 2];
+
+        frame.data[idx / 4] = Math.max(r, g, b);
+    });
+
+    return frame;
+};
+
 async function extract_frames(video_path) {
     const session_path = path.dirname(video_path);
     const frames_path = path.join(session_path, 'frames');
