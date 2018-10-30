@@ -1,4 +1,3 @@
-const Frame = require('./frame');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpeg_path = require('ffmpeg-static-electron').path;
 const fs = require('fs-extra');
@@ -6,6 +5,16 @@ const jimp = require('jimp');
 const path = require('path');
 
 ffmpeg.setFfmpegPath(ffmpeg_path.replace('app.asar', 'app.asar.unpacked'));
+
+const Frame = function(width, height) {
+    if (width < 1 || height < 1) {
+        throw new Error(`invalid frame dimensions ${width}x${height}`);
+    }
+
+    this.data = new Buffer(width * height);
+    this.width = width;
+    this.height = height;
+};
 
 async function extract_frames(video_path) {
     const session_path = path.dirname(video_path);
@@ -50,6 +59,7 @@ async function load_frames(frames_path) {
 }
 
 module.exports = {
+    Frame: Frame,
     extract_frames: extract_frames,
     load_frames: load_frames
 };

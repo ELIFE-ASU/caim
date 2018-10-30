@@ -1,4 +1,4 @@
-const Frame = require('../src/frame');
+const {Frame} = require('../src/images');
 
 test('Frame requires positive width', function() {
     expect(() => new Frame(-1, 5)).toThrow(Error);
