@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
-const images = require('./images');
+const {Frame} = require('./images');
 
 const Meta = {
     video: null,
@@ -38,12 +38,10 @@ const Session = function(session_path, metadata={ }) {
         const ext = path.extname(video_path);
         const video_filename = 'video' + ext;
         const local_video_path = path.join(this.path, video_filename);
-        const frames_path = path.join(this.path, 'frames');
 
         fs.copyFileSync(video_path, local_video_path);
 
-        await images.extract_frames(local_video_path);
-        this.active_frames = await images.load_frames(frames_path);
+        this.active_frames = await Frame.extract(local_video_path);
 
         this.metadata.video = video_filename;
         this.metadata.frames = true;

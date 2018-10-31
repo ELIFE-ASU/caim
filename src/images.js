@@ -50,14 +50,14 @@ Frame.prototype.image = async function() {
     return img;
 };
 
-async function extract_frames(video_path) {
+Frame.extract = async function(video_path) {
     const session_path = path.dirname(video_path);
     const frames_path = path.join(session_path, 'frames');
     const frames_format = path.join(frames_path, '%06d.bmp');
 
     await fs.emptyDir(frames_path);
 
-    return new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
         ffmpeg(video_path)
             .on('start', () => {})
             .on('end', () => resolve(frames_format))
@@ -65,18 +65,16 @@ async function extract_frames(video_path) {
             .output(frames_format)
             .run();
     });
-}
 
-async function load_frames(frames_path) {
     const filenames = await fs.readdir(frames_path);
+
     return Promise.all(filenames.map(function(filename) {
         return Frame.from(path.join(frames_path, filename));
     }));
-}
+};
+
 
 module.exports = {
-    Frame: Frame,
-    extract_frames: extract_frames,
-    load_frames: load_frames
+    Frame: Frame
 };
 
