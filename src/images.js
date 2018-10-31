@@ -16,12 +16,16 @@ const Frame = function(width, height) {
     this.height = height;
 };
 
-Frame.from = function(img) {
-    let width = img.bitmap.width,
-        height = img.bitmap.height,
+Frame.from = function(value) {
+    if (typeof value === 'string') {
+        return Jimp.read(value).then(Frame.from);
+    }
+
+    let width = value.bitmap.width,
+        height = value.bitmap.height,
         frame = new Frame(width, height);
 
-    img.scan(0, 0, width, height, function(x, y, idx) {
+    value.scan(0, 0, width, height, function(x, y, idx) {
         let r = this.bitmap.data[idx + 0],
             g = this.bitmap.data[idx + 1],
             b = this.bitmap.data[idx + 2];
@@ -63,14 +67,10 @@ async function extract_frames(video_path) {
     });
 }
 
-async function load_frame(filename) {
-    return Jimp.read(filename).then(Frame.from);
-}
-
 async function load_frames(frames_path) {
     const filenames = await fs.readdir(frames_path);
     return Promise.all(filenames.map(function(filename) {
-        return load_frame(path.join(frames_path, filename));
+        return Frame.from(path.join(frames_path, filename));
     }));
 }
 
