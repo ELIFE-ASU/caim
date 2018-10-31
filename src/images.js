@@ -16,7 +16,7 @@ const Frame = function(width, height) {
     this.height = height;
 };
 
-Frame.from_image = function(img) {
+Frame.from = function(img) {
     let width = img.bitmap.width,
         height = img.bitmap.height,
         frame = new Frame(width, height);
@@ -64,7 +64,7 @@ async function extract_frames(video_path) {
 }
 
 async function load_frame(filename) {
-    return Jimp.read(filename).then(Frame.from_image);
+    return Jimp.read(filename).then(Frame.from);
 }
 
 async function load_frames(frames_path) {
