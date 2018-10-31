@@ -1,6 +1,6 @@
 const {app, dialog, BrowserWindow, Menu, ipcMain} = require('electron');
 const fs = require('fs-extra');
-const {Session} = require('./src/session');
+const Session = require('./src/session');
 
 let win = null;
 
@@ -89,7 +89,7 @@ function new_session_dialog(menuItem, browserWindow) {
                     message: `Requested session path (${session_path}) is not empty`,
                 });
             } else {
-                session = Session(session_path);
+                session = new Session(session_path);
                 session.save();
 
                 app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
