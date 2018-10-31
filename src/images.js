@@ -1,7 +1,7 @@
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpeg_path = require('ffmpeg-static-electron').path;
 const fs = require('fs-extra');
-const jimp = require('jimp');
+const Jimp = require('jimp');
 const path = require('path');
 
 ffmpeg.setFfmpegPath(ffmpeg_path.replace('app.asar', 'app.asar.unpacked'));
@@ -33,7 +33,7 @@ Frame.from_image = function(img) {
 };
 
 Frame.prototype.to_image = async function() {
-    let img = await (new jimp(this.width, this.height)),
+    let img = await (new Jimp(this.width, this.height)),
         data = this.data;
 
     img.scan(0, 0, this.width, this.height, function(x, y, idx) {
@@ -64,7 +64,7 @@ async function extract_frames(video_path) {
 }
 
 async function load_frame(filename) {
-    return jimp.read(filename).then(Frame.from_image);
+    return Jimp.read(filename).then(Frame.from_image);
 }
 
 async function load_frames(frames_path) {
