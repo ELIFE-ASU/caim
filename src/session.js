@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
-const {Frame} = require('./images');
+const Frame = require('./images');
 
 const Meta = {
     video: null,

@@ -74,7 +74,4 @@ Frame.extract = async function(video_path) {
 };
 
 
-module.exports = {
-    Frame: Frame
-};
-
+module.exports = Frame;

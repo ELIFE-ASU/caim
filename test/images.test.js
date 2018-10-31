@@ -1,4 +1,4 @@
-const {Frame} = require('../src/images');
+const Frame = require('../src/images');
 const Jimp = require('jimp');
 
 test('Frame requires positive width', function() {
