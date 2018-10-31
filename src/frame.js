@@ -6,12 +6,17 @@ const path = require('path');
 
 ffmpeg.setFfmpegPath(ffmpeg_path.replace('app.asar', 'app.asar.unpacked'));
 
-const Frame = function(width, height) {
+const Frame = function(width, height, data=null) {
     if (width < 1 || height < 1) {
         throw new Error(`invalid frame dimensions ${width}x${height}`);
     }
 
-    this.data = new Buffer(width * height);
+    if (data === null) {
+        this.data = new Buffer(width * height);
+    } else {
+        this.data = Buffer.from(data);
+    }
+
     this.width = width;
     this.height = height;
 };
@@ -48,6 +53,10 @@ Frame.prototype.image = async function() {
     });
 
     return img;
+};
+
+Frame.prototype.copy = function() {
+    return new Frame(this.width, this.height, this.data);
 };
 
 Frame.extract = async function(video_path) {
