@@ -4,7 +4,8 @@ const Frame = require('./frame');
 
 const Meta = {
     video: null,
-    frames: false
+    frames: false,
+    range: false
 };
 
 function Session(session_path, metadata={ }) {
@@ -14,6 +15,7 @@ function Session(session_path, metadata={ }) {
 
     this.path = session_path;
     this.active_frames = null;
+    this.range_image = null;
     this.metadata = Object.assign({}, Meta, metadata);
 }
 
@@ -37,13 +39,17 @@ Session.prototype.import_video = async function(video_path) {
     const ext = path.extname(video_path);
     const video_filename = 'video' + ext;
     const local_video_path = path.join(this.path, video_filename);
+    const range_path = path.join(this.path, 'range.bmp');
 
     fs.copyFileSync(video_path, local_video_path);
 
     this.active_frames = await Frame.extract(local_video_path);
+    this.range_image = await Frame.rangeImage(this.active_frames);
+    await this.range_image.write(range_path);
 
     this.metadata.video = video_filename;
     this.metadata.frames = true;
+    this.metadata.range = true;
 };
 
 Session.load = function(session_path) {
