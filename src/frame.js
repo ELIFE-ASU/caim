@@ -82,5 +82,28 @@ Frame.extract = async function(video_path) {
     }));
 };
 
+Frame.rangeImage = async function(frames) {
+    let first = frames[0],
+        max_frame = first.copy(),
+        min = Buffer.from(first.data),
+        max = max_frame.data;
+
+    frames.forEach(function(frame) {
+        frame.data.forEach(function(x, idx) {
+            min[idx] = Math.min(min[idx], x);
+            max[idx] = Math.max(max[idx], x);
+        });
+    });
+
+    let max_value = 0x0;
+    max.forEach(function(_, idx) {
+        max[idx] -= min[idx];
+        max_value = Math.max(max_value, max[idx]);
+    });
+
+    max.map((x) => Math.round(0xff * (x / max_value)));
+
+    return max_frame.image();
+};
 
 module.exports = Frame;
