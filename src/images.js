@@ -32,7 +32,7 @@ Frame.from = function(img) {
     return frame;
 };
 
-Frame.prototype.to_image = async function() {
+Frame.prototype.image = async function() {
     let img = await (new Jimp(this.width, this.height)),
         data = this.data;
 
