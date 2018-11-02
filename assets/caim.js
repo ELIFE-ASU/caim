@@ -1,44 +1,44 @@
+/* global Image */
 const {ipcRenderer} = require('electron');
+const d3 = require('d3');
 
-const new_session = () => ipcRenderer.send('new-session');
+function Caim() {
+    let caim = this,
+        canvas = d3.select('#selection canvas').node();
 
-const open_session = () => ipcRenderer.send('open-session');
+    this.canvas = canvas;
+    this.context = this.canvas.getContext('2d');
+    this.background = new Image();
+    this.background.onload = function() {
+        d3.select('#import-video').style('display', 'none');
+        d3.select('#selection').style('display', 'block');
 
-const import_video = () => ipcRenderer.send('import-video');
-
-ipcRenderer.on('load-session', function(event, path, video) {
-    d3.select("#startup").style('display', 'none');
-    d3.select("#session").style('display', 'block');
-    d3.select("#session").select("h2")
-        .text(() => `Session Path: ${path}`);
-    if (video === undefined || video === null) {
-        d3.select("#import-video").style('display', 'block');
-    } else {
-        d3.select("#selection").style('display', 'block')
-    }
-});
-
-ipcRenderer.on('load-selector', async function(event, uri) {
-    let background = new Image();
-
-    background.addEventListener('load', function() {
-        d3.select("#import-video").style('display', 'none');
-        d3.select("#selection").style('display', 'block');
-
-        let canvas = d3.select("#selection canvas").node(),
-            context = canvas.getContext("2d");
-
-        if (background.naturalHeight && background.naturalWidth) {
-            canvas.width = background.naturalWidth;
-            canvas.height = background.naturalHeight;
+        if (this.naturalHeight && this.naturalWidth) {
+            canvas.width = this.naturalWidth;
+            canvas.height = this.naturalHeight;
         } else {
-            canvas.width = background.width;
-            canvas.height = background.height;
+            canvas.width = this.width;
+            canvas.height = this.height;
         }
 
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(background, 0, 0);
-    });
+        caim.redraw();
+    };
+}
 
-    background.src = uri;
-});
+Caim.prototype.init = function(uri) {
+    this.background.src = uri;
+};
+
+Caim.prototype.redraw = function() {
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.context.drawImage(this.background, 0, 0);
+};
+
+Caim.prototype.new_session = function() {
+    ipcRenderer.send('new-session');
+};
+
+Caim.prototype.import_video = function() {
+    ipcRenderer.send('import-video');
+};
+

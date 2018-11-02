@@ -3,25 +3,26 @@
     <meta charset="UTF-8">
     <title>Caim: Information Theoretic Analysis of Videographic Data</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="caim.js"></script>
 </head>
 <body>
     <div id="startup">
         <h2>Getting Started</h2>
         <ul>
-            <li><a href="#" onclick="new_session();">New Session</a></li>
+            <li><a href="#" onclick="caim.new_session();">New Session</a></li>
         </ul>
     </div>
 
     <div id="session">
         <h2></h2>
         <div id="import-video">
-            <a href="#" onclick="import_video();">Import Video</a>
+            <a href="#" onclick="caim.import_video();">Import Video</a>
         </div>
         <div id="selection">
             <canvas/>
         </div>
     </div>
+
+    <script src="app.js"></script>
 </body>
 </html>
