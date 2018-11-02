@@ -5,8 +5,7 @@ var caim = new Caim();
 ipcRenderer.on('load-session', function(event, path, video) {
     d3.select('#startup').style('display', 'none');
     d3.select('#session').style('display', 'block');
-    d3.select('#session').select('h2')
-        .text(() => `Session Path: ${path}`);
+    d3.select('#session').select('h2').text('Session Path: ' + path);
     if (video === undefined || video === null) {
         d3.select('#import-video').style('display', 'block');
     } else {
