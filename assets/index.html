@@ -19,7 +19,7 @@
             <a href="#" onclick="import_video();">Import Video</a>
         </div>
         <div id="selection">
-            <p>Select Some Features</p>
+            <canvas/>
         </div>
     </div>
 
@@ -44,9 +44,29 @@
             }
         });
 
-        ipcRenderer.on('load-selector', function (event) {
-            d3.select("#import-video").style('display', 'none');
-            d3.select("#selection").style('display', 'block');
+        ipcRenderer.on('load-selector', async function(event, uri) {
+            let background = new Image();
+
+            background.addEventListener('load', function() {
+                d3.select("#import-video").style('display', 'none');
+                d3.select("#selection").style('display', 'block');
+
+                let canvas = d3.select("#selection canvas").node(),
+                    context = canvas.getContext("2d");
+
+                if (background.naturalHeight && background.naturalWidth) {
+                    canvas.width = background.naturalWidth;
+                    canvas.height = background.naturalHeight;
+                } else {
+                    canvas.width = background.width;
+                    canvas.height = background.height;
+                }
+
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                context.drawImage(background, 0, 0);
+            });
+
+            background.src = uri;
         });
     </script>
 </body>

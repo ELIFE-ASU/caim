@@ -122,7 +122,10 @@ async function import_video_dialog(menuItem, browserWindow) {
             try {
                 await session.import_video(video_path[0]);
                 await session.save();
-                await browserWindow.webContents.send('load-selector');
+
+                let uri = await session.range_image.getBase64Async('image/png');
+
+                browserWindow.webContents.send('load-selector', uri);
             } catch(err) {
                 error_dialog({
                     title: 'Import Video Error',
