@@ -62,7 +62,7 @@ Frame.prototype.copy = function() {
 Frame.extract = async function(video_path) {
     const session_path = path.dirname(video_path);
     const frames_path = path.join(session_path, 'frames');
-    const frames_format = path.join(frames_path, '%06d.bmp');
+    const frames_format = path.join(frames_path, '%06d.png');
 
     await fs.emptyDir(frames_path);
 

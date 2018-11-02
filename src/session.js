@@ -39,7 +39,7 @@ Session.prototype.import_video = async function(video_path) {
     const ext = path.extname(video_path);
     const video_filename = 'video' + ext;
     const local_video_path = path.join(this.path, video_filename);
-    const range_path = path.join(this.path, 'range.bmp');
+    const range_path = path.join(this.path, 'range.png');
 
     fs.copyFileSync(video_path, local_video_path);
 
