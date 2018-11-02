@@ -3,26 +3,25 @@ const {ipcRenderer} = require('electron');
 const d3 = require('d3');
 
 function Caim() {
-    let caim = this,
-        canvas = d3.select('#selection canvas').node();
-
-    this.canvas = canvas;
+    this.canvas = d3.select('#selection canvas').node();
     this.context = this.canvas.getContext('2d');
     this.background = new Image();
-    this.background.onload = function() {
-        d3.select('#import-video').style('display', 'none');
-        d3.select('#selection').style('display', 'block');
+    this.background.onload = (function(caim) {
+        return function() {
+            d3.select('#import-video').style('display', 'none');
+            d3.select('#selection').style('display', 'block');
 
-        if (this.naturalHeight && this.naturalWidth) {
-            canvas.width = this.naturalWidth;
-            canvas.height = this.naturalHeight;
-        } else {
-            canvas.width = this.width;
-            canvas.height = this.height;
-        }
+            if (this.naturalHeight && this.naturalWidth) {
+                caim.canvas.width = this.naturalWidth;
+                caim.canvas.height = this.naturalHeight;
+            } else {
+                caim.canvas.width = this.width;
+                caim.canvas.height = this.height;
+            }
 
-        caim.redraw();
-    };
+            caim.redraw();
+        };
+    })(this);
 }
 
 Caim.prototype.init = function(uri) {
