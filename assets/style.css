@@ -24,3 +24,8 @@ span.code {
 #startup {
     display: block;
 }
+
+#selection div {
+    margin: 0px auto;
+    display: inline-block;
+}
