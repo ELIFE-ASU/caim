@@ -1,7 +1,9 @@
 const Session = require('../src/session');
 const fs = require('fs-extra');
+const path = require('path');
 
 const session_dir = 'test/session';
+const session_path = path.join(session_dir, 'session.json');
 
 beforeEach(() => fs.emptyDirSync(session_dir));
 
@@ -38,6 +40,6 @@ test('session saves and is loadable', async function() {
         import_video: expect.any(Function),
     });
 
-    const read_session = await Session.load(session_dir);
+    const read_session = await Session.load(session_path);
     expect(read_session).toMatchObject(expectedSession);
 });

@@ -17,6 +17,11 @@ function create_window() {
                     click: new_session_dialog
                 },
                 {
+                    label: 'Open Session',
+                    id: 'open-session',
+                    click: open_session_dialog
+                },
+                {
                     label: 'Import Video',
                     id: 'import-video',
                     enabled: false,
@@ -93,12 +98,46 @@ function new_session_dialog(menuItem, browserWindow) {
                 session.save();
 
                 app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
-                browserWindow.send('load-session', session.path, session.metadata.video);
+                browserWindow.send('load-session', session.path);
             }
         } else {
             error_dialog({
                 title: 'New Session Error',
                 message: 'Too many paths selected, select only one'
+            });
+        }
+    }
+}
+
+async function open_session_dialog(menuItem, browserWindow) {
+    let session_filename = dialog.showOpenDialog(browserWindow, {
+        title: 'Choose Session File',
+        buttonLabel: 'Open',
+        filters: [
+            {name: 'JSON', extensions: ['json']},
+            {name: 'All Files', extensions: ['*']}
+        ],
+        properties: [
+            'openFile',
+        ]
+    });
+
+    if (session_filename !== undefined) {
+        if (session_filename.length === 1) {
+            session = await Session.load(session_filename[0]);
+
+            app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
+
+            let uri = undefined;
+            if (session.range_image !== null) {
+                uri = await session.range_image.getBase64Async('image/png');
+            }
+
+            browserWindow.send('load-session', session.path, uri);
+        } else {
+            error_dialog({
+                title: 'Open Session Error',
+                message: 'Too many files selected, select only one'
             });
         }
     }
@@ -153,6 +192,10 @@ function error_dialog(options) {
 
 ipcMain.on('new-session', function() {
     new_session_dialog(null, win);
+});
+
+ipcMain.on('open-session', function() {
+    open_session_dialog(null, win);
 });
 
 ipcMain.on('import-video', function() {

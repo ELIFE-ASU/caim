@@ -37,6 +37,10 @@ Caim.prototype.new_session = function() {
     ipcRenderer.send('new-session');
 };
 
+Caim.prototype.open_session = function() {
+    ipcRenderer.send('open-session');
+};
+
 Caim.prototype.import_video = function() {
     ipcRenderer.send('import-video');
 };

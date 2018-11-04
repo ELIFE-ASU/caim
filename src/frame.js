@@ -75,6 +75,10 @@ Frame.extract = async function(video_path) {
             .run();
     });
 
+    return Frame.load(frames_path);
+};
+
+Frame.load = async function(frames_path) {
     const filenames = await fs.readdir(frames_path);
 
     return Promise.all(filenames.map(function(filename) {

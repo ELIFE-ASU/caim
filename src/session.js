@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const Frame = require('./frame');
+const Jimp = require('jimp');
 
 const Meta = {
     video: null,
@@ -52,21 +53,23 @@ Session.prototype.import_video = async function(video_path) {
     this.metadata.range = true;
 };
 
-Session.load = function(session_path) {
-    const session_file = path.join(session_path, 'session.json');
-    return new Promise(function(resolve, reject) {
-        fs.readFile(session_file, function(err, data) {
-            if (err !== null) {
-                reject(err);
-            } else {
-                try {
-                    resolve(new Session(session_path, JSON.parse(data)));
-                } catch (err) {
-                    reject(err);
-                }
-            }
-        });
-    });
+Session.load = async function(session_filename) {
+    const session_path = path.dirname(session_filename);
+    const data = await fs.readFile(session_filename);
+
+    let session = new Session(session_path, JSON.parse(data));
+
+    if (session.metadata.frames) {
+        const frames_path = path.join(session.path, 'frames');
+        session.active_frames = await Frame.load(frames_path);
+    }
+
+    if (session.metadata.range) {
+        const range_path = path.join(session.path, 'range.png');
+        session.range_image = await Jimp.read(range_path);
+    }
+
+    return session;
 };
 
 module.exports = Session;
