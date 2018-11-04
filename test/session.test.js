@@ -2,7 +2,7 @@ const Session = require('../src/session');
 const fs = require('fs-extra');
 const path = require('path');
 
-const session_dir = 'test/session';
+const session_dir = path.join('test','session');
 const session_path = path.join(session_dir, 'session.json');
 
 beforeEach(() => fs.emptyDirSync(session_dir));
