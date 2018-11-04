@@ -20,7 +20,25 @@ const BoundingBox = function(a, b) {
     }), {tl, br});
 };
 
+const Rectangle = function(a, b) {
+    let box = BoundingBox(a, b);
+
+    return Object.assign(Object.create({
+        add_point(b) {
+            this.boundary.b = b;
+            this.box = BoundingBox(this.boundary.a, this.boundary.b);
+        },
+
+        draw(context) {
+            context.beginPath();
+            context.rect(this.box.tl.x, this.box.tl.y, this.box.width, this.box.height);
+            context.stroke();
+        }
+    }), { boundary: { a, b }, box });
+};
+
 module.exports = {
     Point: Point,
-    BoundingBox: BoundingBox
+    BoundingBox: BoundingBox,
+    Rectangle: Rectangle
 };
