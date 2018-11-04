@@ -7,6 +7,7 @@ function Caim() {
     this.canvas = d3.select('#selection canvas').node();
     this.context = this.canvas.getContext('2d');
     this.shapes = new Array();
+    this.undone_shapes = new Array();
     this.color_scheme = d3.scaleOrdinal(d3.schemeCategory10);
     this.background = new Image();
     this.background.onload = (function(caim) {
@@ -25,6 +26,10 @@ function Caim() {
             let paint = false;
 
             let add_click = function(x, y, start) {
+                if (caim.undone_shapes.length !== 0) {
+                    caim.undone_shapes = new Array();
+                }
+
                 if (start) {
                     caim.shapes.push(Rectangle(Point(x, y), Point(x, y)));
                 } else {
@@ -78,11 +83,32 @@ Caim.prototype.redraw = function() {
     this.context.drawImage(this.background, 0, 0);
     this.context.lineJoint = 'round';
     this.context.lineWidth = 5;
+
     this.shapes.forEach((shape, idx) => {
         this.context.strokeStyle = this.color_scheme(idx);
         this.context.fillStyle = this.color_scheme(idx);
         shape.draw(this.context);
     });
+};
+
+Caim.prototype.clear = function() {
+    this.shapes = new Array();
+    this.undone_shapes = new Array();
+    this.redraw();
+};
+
+Caim.prototype.undo = function() {
+    if (this.shapes.length !== 0) {
+        this.undone_shapes.push(this.shapes.pop());
+        this.redraw();
+    }
+};
+
+Caim.prototype.redo = function() {
+    if (this.undone_shapes.length !== 0) {
+        this.shapes.push(this.undone_shapes.pop());
+        this.redraw();
+    }
 };
 
 Caim.prototype.new_session = function() {
