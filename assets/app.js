@@ -19,3 +19,5 @@ ipcRenderer.on('load-selector', (event, uri) => caim.init(uri));
 d3.select('#clear').on('click', () => caim.clear());
 d3.select('#undo').on('click', () => caim.undo());
 d3.select('#redo').on('click', () => caim.redo());
+
+d3.select('#rectangle').property('checked', true);
