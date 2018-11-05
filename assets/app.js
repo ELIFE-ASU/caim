@@ -1,4 +1,4 @@
-/* global ipcRenderer, d3, Caim */
+/* global ipcRenderer, d3, Caim, Toolset */
 
 var caim = new Caim();
 
@@ -20,4 +20,15 @@ d3.select('#clear').on('click', () => caim.clear());
 d3.select('#undo').on('click', () => caim.undo());
 d3.select('#redo').on('click', () => caim.redo());
 
-d3.select('#rectangle').property('checked', true);
+let tools = d3.select('#tools');
+for (let tool in Toolset) {
+    let label = tools.append('label');
+
+    label.append('input')
+        .attr('type', 'radio')
+        .attr('id', tool)
+        .attr('name', 'tool')
+        .property('checked', Toolset[tool].checked);
+
+    label.append('text').text(Toolset[tool].label);
+}
