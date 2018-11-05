@@ -66,9 +66,23 @@ const Circle = function(a, b) {
     }), { center: a, radius: radius, box: box });
 };
 
+const Toolset = {
+    rectangle: {
+        label: 'Rectangle',
+        factory: Rectangle,
+        checked: true
+    },
+    circle: {
+        label: 'Circle',
+        factory: Circle,
+        checked: false
+    }
+};
+
 module.exports = {
     Point: Point,
     BoundingBox: BoundingBox,
     Rectangle: Rectangle,
-    Circle: Circle
+    Circle: Circle,
+    Toolset: Toolset
 };

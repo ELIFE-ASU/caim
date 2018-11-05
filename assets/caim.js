@@ -1,18 +1,12 @@
 /* global Image */
 const {ipcRenderer} = require('electron');
 const d3 = require('d3');
-const {Point, Rectangle, Circle} = require('../src/selection');
-
-const toolset = {
-    rectangle: { factory: Rectangle, checked: true },
-    circle: { factory: Circle, checked: false },
-};
+const {Point, Toolset} = require('../src/selection');
 
 function Caim() {
     this.canvas = d3.select('#selection canvas').node();
     this.context = this.canvas.getContext('2d');
     this.shapes = new Array();
-    this.Shape = Rectangle;
     this.undone_shapes = new Array();
     this.color_scheme = d3.scaleOrdinal(d3.schemeCategory10);
     this.background = new Image();
@@ -38,7 +32,7 @@ function Caim() {
 
                 if (start) {
                     let tool = d3.select('input[name="tool"]:checked').attr('id'),
-                        Shape = toolset[tool].factory;
+                        Shape = Toolset[tool].factory;
                     caim.shapes.push(Shape(Point(x, y), Point(x, y)));
                 } else {
                     caim.shapes[caim.shapes.length - 1].add_point(Point(x, y));
