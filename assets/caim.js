@@ -3,6 +3,11 @@ const {ipcRenderer} = require('electron');
 const d3 = require('d3');
 const {Point, Rectangle, Circle} = require('../src/selection');
 
+const toolset = {
+    rectangle: { factory: Rectangle, checked: true },
+    circle: { factory: Circle, checked: false },
+};
+
 function Caim() {
     this.canvas = d3.select('#selection canvas').node();
     this.context = this.canvas.getContext('2d');
@@ -32,7 +37,9 @@ function Caim() {
                 }
 
                 if (start) {
-                    caim.shapes.push(caim.Shape(Point(x, y), Point(x, y)));
+                    let tool = d3.select('input[name="tool"]:checked').attr('id'),
+                        Shape = toolset[tool].factory;
+                    caim.shapes.push(Shape(Point(x, y), Point(x, y)));
                 } else {
                     caim.shapes[caim.shapes.length - 1].add_point(Point(x, y));
                 }
@@ -109,17 +116,6 @@ Caim.prototype.redo = function() {
     if (this.undone_shapes.length !== 0) {
         this.shapes.push(this.undone_shapes.pop());
         this.redraw();
-    }
-};
-
-Caim.prototype.settool = function() {
-    let tool = d3.select('input[name="tool"]:checked').attr('id');
-    if (tool === 'rectangle') {
-        this.Shape = Rectangle;
-    } else if (tool === 'circle') {
-        this.Shape = Circle;
-    } else {
-        throw new Error(`tool "${tool}" is not implemented`);
     }
 };
 

@@ -21,4 +21,3 @@ d3.select('#undo').on('click', () => caim.undo());
 d3.select('#redo').on('click', () => caim.redo());
 
 d3.select('#rectangle').property('checked', true);
-d3.selectAll('input[name="tool"]').on('change', () => caim.settool());
