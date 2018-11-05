@@ -16,6 +16,22 @@ const BoundingBox = function(a, b) {
 
         get height() {
             return this.br.y - this.tl.y;
+        },
+
+        is_inside(p) {
+            let { x, y } = p;
+            return x >= this.tl.x && x <= this.br.x && y >= this.tl.y && y <= this.br.y;
+        },
+
+        include(p) {
+            let { x, y } = p;
+
+            this.tl.x = Math.min(this.tl.x, x);
+            this.tl.y = Math.min(this.tl.y, y);
+            this.br.x = Math.max(this.br.x, x);
+            this.br.y = Math.max(this.br.y, y);
+
+            return this;
         }
     }), {tl, br});
 };
