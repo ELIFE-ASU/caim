@@ -82,17 +82,53 @@ const Circle = function(a, b) {
     }), { center: a, radius: radius, box: box });
 };
 
+const FreeForm = function(a) {
+    let boundary = [a],
+        box = BoundingBox(a, a);
+
+    return Object.assign(Object.create({
+        add_point(b) {
+            this.boundary.push(b);
+            this.box.include(b);
+        },
+
+        draw(context) {
+            let points = this.boundary;
+            for (let i = 0; i < points.length - 1; ++i) {
+                context.beginPath();
+                context.moveTo(points[i].x, points[i].y);
+                context.lineTo(points[i+1].x, points[i+1].y);
+                context.closePath();
+                context.stroke();
+            }
+            if (points.length > 1) {
+                let end = points.length - 1;
+                context.beginPath();
+                context.moveTo(points[end].x, points[end].y);
+                context.lineTo(points[0].x, points[0].y);
+                context.closePath();
+                context.stroke();
+            }
+        }
+    }), { boundary, box });
+};
+
 const Toolset = {
+    freeform: {
+        label: 'Free Form',
+        factory: FreeForm,
+        checked: true
+    },
     rectangle: {
         label: 'Rectangle',
         factory: Rectangle,
-        checked: true
+        checked: false
     },
     circle: {
         label: 'Circle',
         factory: Circle,
         checked: false
-    }
+    },
 };
 
 module.exports = {
@@ -100,5 +136,6 @@ module.exports = {
     BoundingBox: BoundingBox,
     Rectangle: Rectangle,
     Circle: Circle,
+    FreeForm: FreeForm,
     Toolset: Toolset
 };
