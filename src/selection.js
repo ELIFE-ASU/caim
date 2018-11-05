@@ -37,8 +37,38 @@ const Rectangle = function(a, b) {
     }), { boundary: { a, b }, box });
 };
 
+const Circle = function(a, b) {
+    let radius = Math.sqrt((b.x - a.x)**2 + (b.y - a.y)**2),
+        r = Math.ceil(radius),
+        tl = Point(a.x - r, a.y - r),
+        br = Point(a.x + r, a.y + r),
+        box = BoundingBox(tl, br);
+
+    return Object.assign(Object.create({
+        add_point(b) {
+            let { x, y } = this.center,
+                radius = Math.sqrt((b.x - x)**2 + (b.y - y)**2),
+                r = Math.ceil(radius);
+
+            this.radius = radius;
+            this.box = BoundingBox(Point(x - r, y - r), Point(x + r, y + r));
+        },
+
+        draw(context) {
+            context.beginPath();
+            context.arc(this.center.x, this.center.y, this.radius, 0, 2*Math.PI);
+            context.stroke();
+
+            context.beginPath();
+            context.arc(this.center.x, this.center.y, 1, 0, 2*Math.PI);
+            context.fill();
+        }
+    }), { center: a, radius: radius, box: box });
+};
+
 module.exports = {
     Point: Point,
     BoundingBox: BoundingBox,
-    Rectangle: Rectangle
+    Rectangle: Rectangle,
+    Circle: Circle
 };
