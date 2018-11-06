@@ -1,6 +1,7 @@
 const {app, dialog, BrowserWindow, Menu, ipcMain} = require('electron');
 const fs = require('fs-extra');
 const Session = require('./src/session');
+const {Toolset} = require('./src/selection');
 
 let win = null;
 
@@ -200,4 +201,10 @@ ipcMain.on('open-session', function() {
 
 ipcMain.on('import-video', function() {
     import_video_dialog(null, win);
+});
+
+ipcMain.on('selection', function(event, shapes) {
+    shapes.forEach(function(shape, idx, array) {
+        array[idx] = Toolset[shape.tool].factory.from(shape.shape);
+    });
 });

@@ -72,14 +72,18 @@ function Caim() {
             };
 
             caim.canvas.onmouseup = function() {
-                paint = false;
-                if (caim.shapes.length !== 0) {
-                    let shape = caim.shapes[caim.shapes.length - 1].shape;
-                    if (shape.box.width === 0 || shape.box.height == 0) {
-                        caim.shapes.pop();
+                if (paint) {
+                    paint = false;
+                    if (caim.shapes.length !== 0) {
+                        let shape = caim.shapes[caim.shapes.length - 1].shape;
+                        if (shape.box.width === 0 || shape.box.height == 0) {
+                            caim.shapes.pop();
+                        } else {
+                            ipcRenderer.send('selection', caim.shapes);
+                        }
                     }
+                    caim.redraw();
                 }
-                caim.redraw();
             };
 
             caim.canvas.onmouseleave = caim.canvas.onmouseup;
@@ -107,14 +111,20 @@ Caim.prototype.redraw = function() {
 };
 
 Caim.prototype.clear = function() {
+    let already_empty = this.shapes.length === 0;
+
     this.shapes = new Array();
     this.undone_shapes = new Array();
+    if (!already_empty) {
+        ipcRenderer.send('selection', this.shapes);
+    }
     this.redraw();
 };
 
 Caim.prototype.undo = function() {
     if (this.shapes.length !== 0) {
         this.undone_shapes.push(this.shapes.pop());
+        ipcRenderer.send('selection', this.shapes);
         this.redraw();
     }
 };
@@ -122,6 +132,7 @@ Caim.prototype.undo = function() {
 Caim.prototype.redo = function() {
     if (this.undone_shapes.length !== 0) {
         this.shapes.push(this.undone_shapes.pop());
+        ipcRenderer.send('selection', this.shapes);
         this.redraw();
     }
 };
