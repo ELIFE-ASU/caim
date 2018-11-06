@@ -3,6 +3,19 @@ const {ipcRenderer} = require('electron');
 const d3 = require('d3');
 const {Point, Toolset} = require('../src/selection');
 
+const Shape = function(tool, point) {
+    let shape = Toolset[tool].factory(point, point);
+    return Object.assign(Object.create({
+        add_point(p) {
+            return this.shape.add_point(p);
+        },
+
+        draw(context) {
+            return this.shape.draw(context);
+        }
+    }), { tool, shape });
+};
+
 function Caim() {
     this.canvas = d3.select('#selection canvas').node();
     this.context = this.canvas.getContext('2d');
@@ -31,11 +44,11 @@ function Caim() {
                 }
 
                 if (start) {
-                    let tool = d3.select('input[name="tool"]:checked').attr('id'),
-                        Shape = Toolset[tool].factory;
-                    caim.shapes.push(Shape(Point(x, y), Point(x, y)));
+                    let tool = d3.select('input[name="tool"]:checked').attr('id');
+                    caim.shapes.push(Shape(tool, Point(x, y)));
                 } else {
-                    caim.shapes[caim.shapes.length - 1].add_point(Point(x, y));
+                    let shape = caim.shapes[caim.shapes.length - 1].shape;
+                    shape.add_point(Point(x, y));
                 }
             };
 
@@ -61,7 +74,7 @@ function Caim() {
             caim.canvas.onmouseup = function() {
                 paint = false;
                 if (caim.shapes.length !== 0) {
-                    let shape = caim.shapes[caim.shapes.length - 1];
+                    let shape = caim.shapes[caim.shapes.length - 1].shape;
                     if (shape.box.width === 0 || shape.box.height == 0) {
                         caim.shapes.pop();
                     }
