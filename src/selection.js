@@ -36,82 +36,98 @@ const BoundingBox = function(a, b) {
     }), {tl, br});
 };
 
+const Rectangular = {
+    add_point(b) {
+        this.boundary.b = b;
+        this.box = BoundingBox(this.boundary.a, this.boundary.b);
+    },
+
+    draw(context) {
+        context.beginPath();
+        context.rect(this.box.tl.x, this.box.tl.y, this.box.width, this.box.height);
+        context.stroke();
+    }
+};
+
 const Rectangle = function(a, b) {
-    let box = BoundingBox(a, b);
+    return Object.assign(Object.create(Rectangular), {
+        boundary: { a, b },
+        box: BoundingBox(a, b)
+    });
+};
 
-    return Object.assign(Object.create({
-        add_point(b) {
-            this.boundary.b = b;
-            this.box = BoundingBox(this.boundary.a, this.boundary.b);
-        },
+Rectangle.from = (data) => Object.assign(Object.create(Rectangular), data);
 
-        draw(context) {
-            context.beginPath();
-            context.rect(this.box.tl.x, this.box.tl.y, this.box.width, this.box.height);
-            context.stroke();
-        }
-    }), { boundary: { a, b }, box });
+const Circular = {
+    add_point(b) {
+        let { x, y } = this.center,
+            radius = Math.sqrt((b.x - x)**2 + (b.y - y)**2),
+            r = Math.ceil(radius);
+
+        this.radius = radius;
+        this.box = BoundingBox(Point(x - r, y - r), Point(x + r, y + r));
+    },
+
+    draw(context) {
+        context.beginPath();
+        context.arc(this.center.x, this.center.y, this.radius, 0, 2*Math.PI);
+        context.stroke();
+
+        context.beginPath();
+        context.arc(this.center.x, this.center.y, 1, 0, 2*Math.PI);
+        context.fill();
+    }
 };
 
 const Circle = function(a, b) {
     let radius = Math.sqrt((b.x - a.x)**2 + (b.y - a.y)**2),
         r = Math.ceil(radius),
         tl = Point(a.x - r, a.y - r),
-        br = Point(a.x + r, a.y + r),
-        box = BoundingBox(tl, br);
+        br = Point(a.x + r, a.y + r);
 
-    return Object.assign(Object.create({
-        add_point(b) {
-            let { x, y } = this.center,
-                radius = Math.sqrt((b.x - x)**2 + (b.y - y)**2),
-                r = Math.ceil(radius);
+    return Object.assign(Object.create(Circular), {
+        center: a,
+        radius: radius,
+        box: BoundingBox(tl, br)
+    });
+};
 
-            this.radius = radius;
-            this.box = BoundingBox(Point(x - r, y - r), Point(x + r, y + r));
-        },
+Circle.from = (data) => Object.assign(Object.create(Circular), data);
 
-        draw(context) {
+const Formular = {
+    add_point(b) {
+        this.boundary.push(b);
+        this.box.include(b);
+    },
+
+    draw(context) {
+        let points = this.boundary;
+        for (let i = 0; i < points.length - 1; ++i) {
             context.beginPath();
-            context.arc(this.center.x, this.center.y, this.radius, 0, 2*Math.PI);
+            context.moveTo(points[i].x, points[i].y);
+            context.lineTo(points[i+1].x, points[i+1].y);
+            context.closePath();
             context.stroke();
-
-            context.beginPath();
-            context.arc(this.center.x, this.center.y, 1, 0, 2*Math.PI);
-            context.fill();
         }
-    }), { center: a, radius: radius, box: box });
+        if (points.length > 1) {
+            let end = points.length - 1;
+            context.beginPath();
+            context.moveTo(points[end].x, points[end].y);
+            context.lineTo(points[0].x, points[0].y);
+            context.closePath();
+            context.stroke();
+        }
+    }
 };
 
 const FreeForm = function(a) {
-    let boundary = [a],
-        box = BoundingBox(a, a);
-
-    return Object.assign(Object.create({
-        add_point(b) {
-            this.boundary.push(b);
-            this.box.include(b);
-        },
-
-        draw(context) {
-            let points = this.boundary;
-            for (let i = 0; i < points.length - 1; ++i) {
-                context.beginPath();
-                context.moveTo(points[i].x, points[i].y);
-                context.lineTo(points[i+1].x, points[i+1].y);
-                context.closePath();
-                context.stroke();
-            }
-            if (points.length > 1) {
-                let end = points.length - 1;
-                context.beginPath();
-                context.moveTo(points[end].x, points[end].y);
-                context.lineTo(points[0].x, points[0].y);
-                context.closePath();
-                context.stroke();
-            }
-        }
-    }), { boundary, box });
+    return Object.assign(Object.create(Formular), {
+        boundary: [a],
+        box: BoundingBox(a, a)
+    });
 };
+
+FreeForm.from = (data) => Object.assign(Object.create(Formular), data);
 
 const Toolset = {
     freeform: {
