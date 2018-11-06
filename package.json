@@ -140,9 +140,9 @@
   },
   "devDependencies": {
     "electron": "^2.0.13",
-    "electron-builder": "^20.29.0",
+    "electron-builder": "^20.31.2",
     "eslint": "^5.8.0",
-    "eslint-plugin-jest": "^21.26.2",
+    "eslint-plugin-jest": "^21.27.1",
     "jest": "^23.6.0"
   },
   "dependencies": {
