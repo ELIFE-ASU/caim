@@ -5,36 +5,40 @@ const Point = function(x, y) {
     return { x, y };
 };
 
+const Box = {
+    get width() {
+        return this.br.x - this.tl.x;
+    },
+
+    get height() {
+        return this.br.y - this.tl.y;
+    },
+
+    is_inside(p) {
+        let { x, y } = p;
+        return x >= this.tl.x && x <= this.br.x && y >= this.tl.y && y <= this.br.y;
+    },
+
+    include(p) {
+        let { x, y } = p;
+
+        this.tl.x = Math.min(this.tl.x, x);
+        this.tl.y = Math.min(this.tl.y, y);
+        this.br.x = Math.max(this.br.x, x);
+        this.br.y = Math.max(this.br.y, y);
+
+        return this;
+    }
+};
+
 const BoundingBox = function(a, b) {
     let tl = Point(Math.min(a.x, b.x), Math.min(a.y, b.y)),
         br = Point(Math.max(a.x, b.x), Math.max(a.y, b.y));
 
-    return Object.assign(Object.create({
-        get width() {
-            return this.br.x - this.tl.x;
-        },
-
-        get height() {
-            return this.br.y - this.tl.y;
-        },
-
-        is_inside(p) {
-            let { x, y } = p;
-            return x >= this.tl.x && x <= this.br.x && y >= this.tl.y && y <= this.br.y;
-        },
-
-        include(p) {
-            let { x, y } = p;
-
-            this.tl.x = Math.min(this.tl.x, x);
-            this.tl.y = Math.min(this.tl.y, y);
-            this.br.x = Math.max(this.br.x, x);
-            this.br.y = Math.max(this.br.y, y);
-
-            return this;
-        }
-    }), {tl, br});
+    return Object.assign(Object.create(Box), {tl, br});
 };
+
+BoundingBox.from = ({ tl, br }) => Object.assign(Object.create(Box), { tl, br });
 
 const Rectangular = {
     add_point(b) {
@@ -57,7 +61,9 @@ const Rectangle = function(a, b) {
     });
 };
 
-Rectangle.from = (data) => Object.assign(Object.create(Rectangular), data);
+Rectangle.from = (data) => Object.assign(Object.create(Rectangular), data, {
+    box: BoundingBox.from(data.box)
+});
 
 const Circular = {
     add_point(b) {
@@ -94,7 +100,9 @@ const Circle = function(a, b) {
     });
 };
 
-Circle.from = (data) => Object.assign(Object.create(Circular), data);
+Circle.from = (data) => Object.assign(Object.create(Circular), data, {
+    box: BoundingBox.from(data.box)
+});
 
 const Formular = {
     add_point(b) {
@@ -130,7 +138,9 @@ const FreeForm = function(a) {
     });
 };
 
-FreeForm.from = (data) => Object.assign(Object.create(Formular), data);
+FreeForm.from = (data) => Object.assign(Object.create(Formular), data, {
+    box: BoundingBox.from(data.box)
+});
 
 const Toolset = Object.create({
     freeform: {
