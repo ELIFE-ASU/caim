@@ -205,6 +205,7 @@ ipcMain.on('import-video', function() {
 
 ipcMain.on('selection', function(event, shapes) {
     shapes.forEach(function(shape, idx, array) {
-        array[idx] = Toolset[shape.tool].factory.from(shape.shape);
+        array[idx] = Toolset.from(shape);
+        console.log(array[idx]);
     });
 });

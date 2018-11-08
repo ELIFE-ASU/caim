@@ -51,6 +51,7 @@ const Rectangular = {
 
 const Rectangle = function(a, b) {
     return Object.assign(Object.create(Rectangular), {
+        type: 'rectangle',
         boundary: { a, b },
         box: BoundingBox(a, b)
     });
@@ -86,6 +87,7 @@ const Circle = function(a, b) {
         br = Point(a.x + r, a.y + r);
 
     return Object.assign(Object.create(Circular), {
+        type: 'circle',
         center: a,
         radius: radius,
         box: BoundingBox(tl, br)
@@ -122,6 +124,7 @@ const Formular = {
 
 const FreeForm = function(a) {
     return Object.assign(Object.create(Formular), {
+        type: 'freeform',
         boundary: [a],
         box: BoundingBox(a, a)
     });
@@ -129,23 +132,42 @@ const FreeForm = function(a) {
 
 FreeForm.from = (data) => Object.assign(Object.create(Formular), data);
 
-const Toolset = {
+const Toolset = Object.create({
     freeform: {
         label: 'Free Form',
         factory: FreeForm,
         checked: true
     },
+
     rectangle: {
         label: 'Rectangle',
         factory: Rectangle,
         checked: false
     },
+
     circle: {
         label: 'Circle',
         factory: Circle,
         checked: false
     },
-};
+}, {
+    shape: {
+        value: function(type, point) {
+            let shape = this[type].factory(point, point);
+            return shape;
+        },
+        enumerable: false,
+        writable: false
+    },
+
+    from: {
+        value: function(data) {
+            return this[data.type].factory.from(data);
+        },
+        enumerable: false,
+        writable: false
+    }
+});
 
 module.exports = {
     Point: Point,
