@@ -78,8 +78,15 @@ function Caim() {
     })(this);
 }
 
-Caim.prototype.init = function(uri) {
-    this.shapes = new Array();
+Caim.prototype.init = function(metadata, uri) {
+    if (metadata.shapes === null) {
+        this.shapes = new Array();
+    } else {
+        metadata.shapes.forEach(function(shapes, idx, array) {
+            array[idx] = Toolset.from(shapes);
+        });
+        this.shapes = metadata.shapes;
+    }
     this.undone_shapes = new Array();
     this.background.src = uri;
 };

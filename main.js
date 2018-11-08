@@ -99,7 +99,7 @@ function new_session_dialog(menuItem, browserWindow) {
                 session.save();
 
                 app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
-                browserWindow.send('load-session', session.path);
+                browserWindow.send('load-session', session.path, session.metadata);
             }
         } else {
             error_dialog({
@@ -134,7 +134,7 @@ async function open_session_dialog(menuItem, browserWindow) {
                 uri = await session.range_image.getBase64Async('image/png');
             }
 
-            browserWindow.send('load-session', session.path, uri);
+            browserWindow.send('load-session', session.path, session.metadata, uri);
         } else {
             error_dialog({
                 title: 'Open Session Error',
