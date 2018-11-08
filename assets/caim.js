@@ -6,8 +6,6 @@ const {Point, Toolset} = require('../src/selection');
 function Caim() {
     this.canvas = d3.select('#selection canvas').node();
     this.context = this.canvas.getContext('2d');
-    this.shapes = new Array();
-    this.undone_shapes = new Array();
     this.color_scheme = d3.scaleOrdinal(d3.schemeCategory10);
     this.background = new Image();
     this.background.onload = (function(caim) {
@@ -81,6 +79,8 @@ function Caim() {
 }
 
 Caim.prototype.init = function(uri) {
+    this.shapes = new Array();
+    this.undone_shapes = new Array();
     this.background.src = uri;
 };
 
