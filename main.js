@@ -204,8 +204,11 @@ ipcMain.on('import-video', function() {
 });
 
 ipcMain.on('selection', function(event, shapes) {
-    shapes.forEach(function(shape, idx, array) {
-        array[idx] = Toolset.from(shape);
-        console.log(array[idx]);
-    });
+    if (session !== null) {
+        shapes.forEach(function(shape, idx, array) {
+            array[idx] = Toolset.from(shape);
+        });
+        session.metadata.shapes = shapes;
+        session.save();
+    }
 });

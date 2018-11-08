@@ -6,7 +6,8 @@ const Jimp = require('jimp');
 const Meta = {
     video: null,
     frames: false,
-    range: false
+    range: false,
+    shapes: null
 };
 
 function Session(session_path, metadata={ }) {
