@@ -165,7 +165,7 @@ async function import_video_dialog(menuItem, browserWindow) {
 
                 let uri = await session.range_image.getBase64Async('image/png');
 
-                browserWindow.webContents.send('load-selector', uri);
+                browserWindow.webContents.send('load-session', session.path, uri);
             } catch(err) {
                 error_dialog({
                     title: 'Import Video Error',
