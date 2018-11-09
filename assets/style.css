@@ -29,3 +29,7 @@ span.code {
     margin: 0px auto;
     display: inline-block;
 }
+
+#signal, #signal div {
+    display: block;
+}

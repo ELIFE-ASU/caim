@@ -213,5 +213,6 @@ ipcMain.on('selection', function(event, shapes) {
             return shape.timeseries(session.active_frames);
         });
         session.save();
+        win.send('plot-timeseries', session.metadata.timeseries);
     }
 });

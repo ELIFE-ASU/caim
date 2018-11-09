@@ -15,6 +15,10 @@ ipcRenderer.on('load-session', function(event, path, metadata, uri) {
     }
 });
 
+ipcRenderer.on('plot-timeseries', function(event, timeseries) {
+    caim.render_timeseries(timeseries);
+});
+
 d3.select('#clear').on('click', () => caim.clear());
 d3.select('#undo').on('click', () => caim.undo());
 d3.select('#redo').on('click', () => caim.redo());

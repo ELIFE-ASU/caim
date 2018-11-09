@@ -13,6 +13,8 @@ function Caim() {
             d3.select('#import-video').style('display', 'none');
             d3.select('#selection').style('display', 'block');
 
+            caim.render_timeseries();
+
             if (this.naturalHeight && this.naturalWidth) {
                 caim.canvas.width = this.naturalWidth;
                 caim.canvas.height = this.naturalHeight;
@@ -73,12 +75,15 @@ function Caim() {
 
             caim.canvas.onmouseleave = caim.canvas.onmouseup;
 
+            console.log('redrawing...');
             caim.redraw();
+            console.log('done');
         };
     })(this);
 }
 
 Caim.prototype.init = function(metadata, uri) {
+    console.log('Shapes');
     if (metadata.shapes === null) {
         this.shapes = new Array();
     } else {
@@ -87,7 +92,14 @@ Caim.prototype.init = function(metadata, uri) {
         });
         this.shapes = metadata.shapes;
     }
+    console.log('Timeseries');
+    if (metadata.timeseries === null) {
+        this.timeseries = new Array();
+    } else {
+        this.timeseries = metadata.timeseries;
+    }
     this.undone_shapes = new Array();
+    console.log('Background');
     this.background.src = uri;
 };
 
@@ -143,3 +155,110 @@ Caim.prototype.import_video = function() {
     ipcRenderer.send('import-video');
 };
 
+Caim.prototype.render_timeseries = function(timeseries) {
+    if (timeseries) {
+        this.timeseries = timeseries;
+    }
+
+    if (this.timeseries && this.timeseries.length !== 0) {
+        let container = d3.select('#timeseries').html('').attr('display', 'block');
+
+        this.multiple_curves(container, {
+            width: 1024,
+            height: 284,
+            margins: {top: 20, right: 30, bottom: 30, left: 50},
+            title: 'Brightness Timeseries by Feature',
+            xlabel: 'Timesteps',
+            ylabel: 'Average Brightness',
+            labels: this.timeseries.map((_, i) => 'Feature ' + (i+1)),
+        }, this.timeseries);
+    } else {
+        d3.select('#timeseries').html('').attr('display', 'none');
+    }
+};
+
+Caim.prototype.multiple_curves = function(container, fmt, data) {
+    let width = fmt.width - fmt.margins.left - fmt.margins.right,
+        height = fmt.height - fmt.margins.top - fmt.margins.bottom;
+
+    let x = d3.scaleLinear().rangeRound([0, width]),
+        y = d3.scaleLinear().rangeRound([height, 0]);
+
+    x.domain((fmt.xrange) ? fmt.xrange : [0, d3.max(data.map((d) => d.length)) - 1]);
+
+    if (fmt.yrange) {
+        y.domain(fmt.yrange);
+    } else {
+        let ymin = d3.min(data.map((d) => d3.min(d))),
+            ymax = d3.max(data.map((d) => d3.max(d)));
+        y.domain([ymin, ymax]);
+    }
+
+    let line = d3.line()
+        .x((d,i) => x(i))
+        .y(y);
+
+    let svg = container.append('svg')
+        .attr('title', fmt.title)
+        .attr('version', 1.1)
+        .attr('xmlns', 'http://www.w3.org/2000/svg')
+        .attr('width', fmt.width)
+        .attr('height', fmt.height);
+
+    let g = svg.append('g')
+        .attr('transform', 'translate(' + fmt.margins.left + ',' + fmt.margins.top + ')');
+
+    let bottom = g.append('g')
+        .attr('transform', 'translate(0,' + height + ')')
+        .call(d3.axisBottom(x));
+
+    bottom.append('text')
+        .attr('fill', '#000000')
+        .attr('x', width)
+        .attr('y', 7*fmt.margins.bottom/8)
+        .attr('text-anchor', 'end')
+        .text(fmt.xlabel);
+
+    g.append('g')
+        .call(d3.axisLeft(y))
+        .append('text')
+        .attr('fill', '#000000')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', -3*fmt.margins.left/4)
+        .attr('text-anchor', 'end')
+        .text(fmt.ylabel);
+
+    g.selectAll('.series')
+        .data(data)
+        .enter().append('path')
+        .attr('fill', 'none')
+        .attr('d', line)
+        .attr('stroke', (_, i) => this.color_scheme(i));
+
+    svg.append('text')
+        .attr('x', fmt.margins.left + width/2)
+        .attr('y', fmt.margins.top/3)
+        .attr('dy', '1em')
+        .attr('text-anchor', 'middle')
+        .text(fmt.title);
+
+    this.downloadable(svg, fmt.width - fmt.margins.right, fmt.margins.top/3, '1em');
+};
+
+Caim.prototype.downloadable = function(svg, x, y, dy) {
+    let clean_svg = svg.node().cloneNode(true),
+        html = clean_svg.outerHTML,
+        data = 'data:image/svg+xml;base64,\n' + Buffer.from(html).toString('base64');
+
+    svg.append('a')
+        .attr('href-lang', 'image/svg+xml')
+        .attr('href', data)
+        .append('text')
+        .attr('font-size', 10)
+        .attr('font-family', 'sans-serif')
+        .attr('x', x)
+        .attr('y', y)
+        .attr('dy', dy)
+        .attr('text-anchor', 'end')
+        .text('Right click to download');
+};
