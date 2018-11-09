@@ -51,6 +51,25 @@ const Feature = {
             }
         }
         return points;
+    },
+
+    timeseries(frames) {
+        let mean = new Array(frames.length).fill(0),
+            points = this.interior;
+
+        if (points.length !== 0) {
+            frames.forEach(function(frame, t) {
+                let N = 0.0;
+                points.forEach(function(p) {
+                    if (0 <= p.x && p.x < frame.width && 0 <= p.y && p.y < frame.height) {
+                        N += 1.0;
+                        mean[t] += frame.data[p.x + frame.width * p.y] / 255;
+                    }
+                });
+                mean[t] /= N;
+            });
+        }
+        return mean;
     }
 };
 

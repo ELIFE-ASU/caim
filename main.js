@@ -209,6 +209,9 @@ ipcMain.on('selection', function(event, shapes) {
             array[idx] = Toolset.from(shape);
         });
         session.metadata.shapes = shapes;
+        session.metadata.timeseries = session.metadata.shapes.map(function(shape) {
+            return shape.timeseries(session.active_frames);
+        });
         session.save();
     }
 });

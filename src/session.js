@@ -7,7 +7,8 @@ const Meta = {
     video: null,
     frames: false,
     range: false,
-    shapes: null
+    shapes: null,
+    timeseries: null
 };
 
 function Session(session_path, metadata={ }) {
