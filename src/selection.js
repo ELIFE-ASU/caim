@@ -40,7 +40,21 @@ const BoundingBox = function(a, b) {
 
 BoundingBox.from = ({ tl, br }) => Object.assign(Object.create(Box), { tl, br });
 
-const Rectangular = {
+const Feature = {
+    get interior() {
+        let points = new Array();
+        for (let x = this.box.tl.x; x < this.box.br.x; ++x) {
+            for (let y = this.box.tl.y; y < this.box.br.y; ++y) {
+                if (this.is_inside(x, y)) {
+                    points.push(Point(x, y));
+                }
+            }
+        }
+        return points;
+    }
+};
+
+const Rectangular =  Object.assign(Object.create(Feature), {
     add_point(b) {
         this.boundary.b = b;
         this.box = BoundingBox(this.boundary.a, this.boundary.b);
@@ -50,8 +64,13 @@ const Rectangular = {
         context.beginPath();
         context.rect(this.box.tl.x, this.box.tl.y, this.box.width, this.box.height);
         context.stroke();
+    },
+
+    is_inside(x, y) {
+        let {tl, br} = this.box;
+        return tl.x <= x && x <= br.x && tl.y <= y && y <= br.y;
     }
-};
+});
 
 const Rectangle = function(a, b) {
     return Object.assign(Object.create(Rectangular), {
@@ -65,7 +84,7 @@ Rectangle.from = (data) => Object.assign(Object.create(Rectangular), data, {
     box: BoundingBox.from(data.box)
 });
 
-const Circular = {
+const Circular = Object.assign(Object.create(Feature), {
     add_point(b) {
         let { x, y } = this.center,
             radius = Math.sqrt((b.x - x)**2 + (b.y - y)**2),
@@ -83,8 +102,14 @@ const Circular = {
         context.beginPath();
         context.arc(this.center.x, this.center.y, 1, 0, 2*Math.PI);
         context.fill();
+    },
+
+    is_inside(x, y) {
+        let rx = x - this.center.x,
+            ry = y - this.center.y;
+        return Math.sqrt(rx**2 + ry**2) <= this.radius;
     }
-};
+});
 
 const Circle = function(a, b) {
     let radius = Math.sqrt((b.x - a.x)**2 + (b.y - a.y)**2),
@@ -104,7 +129,7 @@ Circle.from = (data) => Object.assign(Object.create(Circular), data, {
     box: BoundingBox.from(data.box)
 });
 
-const Formular = {
+const Formular = Object.assign(Object.create(Feature), {
     add_point(b) {
         this.boundary.push(b);
         this.box.include(b);
@@ -127,8 +152,24 @@ const Formular = {
             context.closePath();
             context.stroke();
         }
+    },
+
+    is_inside(x, y) {
+        let inside = false;
+        this.boundary.forEach(function(p, i, points) {
+            let q = points[(i + 1 < points.length) ? i + 1 : 0];
+            if ((p.y <= y && q.y > y) || (p.y > y && q.y <= y)) {
+                let v = (y - p.y) / (q.y - p.y),
+                    z = p.x + v * (q.x - p.x);
+
+                if (x < z) {
+                    inside = !inside;
+                }
+            }
+        });
+        return inside;
     }
-};
+});
 
 const FreeForm = function(a) {
     return Object.assign(Object.create(Formular), {
