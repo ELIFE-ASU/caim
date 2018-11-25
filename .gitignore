@@ -65,3 +65,5 @@ typings/
 
 # electron distribution
 dist
+
+test/session
