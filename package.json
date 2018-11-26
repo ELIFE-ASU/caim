@@ -6,6 +6,8 @@
   "scripts": {
     "test": "jest --detectOpenHandles",
     "start": "electron .",
+    "repl": "node",
+    "debug": "node inspect",
     "pack": "electron-builder --dir",
     "pack:mac": "electron-builder --dir --mac",
     "pack:linux": "electron-builder --dir --linux",
