@@ -58,16 +58,18 @@ const Feature = {
             points = this.interior;
 
         if (points.length !== 0) {
-            frames.forEach(function(frame, t) {
+            for (let t = 0, frame_count = frames.length; t < frame_count; ++t) {
+                const frame = frames[t];
                 let N = 0.0;
-                points.forEach(function(p) {
+                for (let i = 0, point_count = points.length; i < point_count; ++i) {
+                    const p = points[i];
                     if (0 <= p.x && p.x < frame.width && 0 <= p.y && p.y < frame.height) {
                         N += 1.0;
                         mean[t] += frame.data[p.x + frame.width * p.y] / 255;
                     }
-                });
+                }
                 mean[t] /= N;
-            });
+            }
         }
         return mean;
     }
