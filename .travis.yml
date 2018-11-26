@@ -20,6 +20,13 @@ cache:
     - $ELECTRON_CACHE
     - $ELECTRON_BUILDER_CACHE
 
+install:
+- npm install
+- npm install -g codecov
+
 script:
   - npm test
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run dist:mwl:publish; fi
+
+after_success:
+- bash <(curl -s https://codecov.io/bash) -e TRAVIS_NODE_VERSION

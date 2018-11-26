@@ -36,6 +36,10 @@
     "url": "https://github.com/dglmoore/caim/issues"
   },
   "homepage": "https://dglmoore.com/caim",
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
+  },
   "build": {
     "publish": {
       "provider": "github"
