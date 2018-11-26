@@ -92,18 +92,20 @@ Frame.rangeImage = async function(frames) {
         min = Buffer.from(first.data),
         max = max_frame.data;
 
-    frames.forEach(function(frame) {
-        frame.data.forEach(function(x, idx) {
-            min[idx] = Math.min(min[idx], x);
-            max[idx] = Math.max(max[idx], x);
-        });
-    });
+    for (let t = 0, frame_count = frames.length; t < frame_count; ++t) {
+        const frame = frames[t];
+        for (let i = 0, len = frame.data.length; i < len; ++i) {
+            let x = frame.data[i];
+            min[i] = Math.min(min[i], x);
+            max[i] = Math.max(max[i], x);
+        }
+    }
 
     let max_value = 0x0;
-    max.forEach(function(_, idx) {
-        max[idx] -= min[idx];
-        max_value = Math.max(max_value, max[idx]);
-    });
+    for (let i = 0, len = max.length; i < len; ++i) {
+        max[i] -= min[i];
+        max_value = Math.max(max_value, max[i]);
+    }
 
     max.map((x) => Math.round(0xff * (x / max_value)));
 
