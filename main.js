@@ -203,16 +203,51 @@ ipcMain.on('import-video', function() {
     import_video_dialog(null, win);
 });
 
-ipcMain.on('selection', function(event, shapes) {
+ipcMain.on('clear-shapes', function() {
     if (session !== null) {
-        shapes.forEach(function(shape, idx, array) {
-            array[idx] = Toolset.from(shape);
-        });
-        session.metadata.shapes = shapes;
-        session.metadata.timeseries = session.metadata.shapes.map(function(shape) {
-            return shape.timeseries(session.active_frames);
-        });
+        session.metadata.shapes = new Array();
+        session.metadata.timeseries = new Array();
         session.save();
+        win.send('plot-timeseries', session.metadata.timeseries);
+    }
+});
+
+ipcMain.on('push-shape', function(event, shape) {
+    if (session && session.active_frames) {
+        shape = Toolset.from(shape);
+
+        let timeseries = shape.timeseries(session.active_frames);
+
+        if (!session.metadata.shapes) {
+            session.metadata.shapes = [ shape ];
+        } else {
+            session.metadata.shapes.push(shape);
+        }
+
+        if (!session.metadata.timeseries) {
+            session.metadata.timeseries = [timeseries];
+        } else {
+            session.metadata.timeseries.push(timeseries);
+        }
+
+        session.save();
+
+        win.send('plot-timeseries', session.metadata.timeseries);
+    }
+});
+
+ipcMain.on('pop-shape', function() {
+    if (session && session.active_frames) {
+        if (session.metadata.shapes) {
+            session.metadata.shapes.pop();
+        }
+
+        if (session.metadata.timeseries) {
+            session.metadata.timeseries.pop();
+        }
+
+        session.save();
+
         win.send('plot-timeseries', session.metadata.timeseries);
     }
 });
