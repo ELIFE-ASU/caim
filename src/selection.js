@@ -177,8 +177,9 @@ const Formular = Object.assign(Object.create(Feature), {
 
     is_inside(x, y) {
         let inside = false;
-        this.boundary.forEach(function(p, i, points) {
-            let q = points[(i + 1 < points.length) ? i + 1 : 0];
+        for (let i = 0, len = this.boundary.length; i < len; ++i) {
+            let p = this.boundary[i],
+                q = this.boundary[(i + 1 < len) ? i + 1 : 0];
             if ((p.y <= y && q.y > y) || (p.y > y && q.y <= y)) {
                 let v = (y - p.y) / (q.y - p.y),
                     z = p.x + v * (q.x - p.x);
@@ -187,7 +188,7 @@ const Formular = Object.assign(Object.create(Feature), {
                     inside = !inside;
                 }
             }
-        });
+        }
         return inside;
     }
 });
