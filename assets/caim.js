@@ -75,15 +75,12 @@ function Caim() {
 
             caim.canvas.onmouseleave = caim.canvas.onmouseup;
 
-            console.log('redrawing...');
             caim.redraw();
-            console.log('done');
         };
     })(this);
 }
 
 Caim.prototype.init = function(metadata, uri) {
-    console.log('Shapes');
     if (metadata.shapes === null) {
         this.shapes = new Array();
     } else {
@@ -92,14 +89,12 @@ Caim.prototype.init = function(metadata, uri) {
         });
         this.shapes = metadata.shapes;
     }
-    console.log('Timeseries');
     if (metadata.timeseries === null) {
         this.timeseries = new Array();
     } else {
         this.timeseries = metadata.timeseries;
     }
     this.undone_shapes = new Array();
-    console.log('Background');
     this.background.src = uri;
 };
 
