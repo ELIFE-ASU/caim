@@ -2,6 +2,7 @@ const {app, dialog, BrowserWindow, Menu, ipcMain} = require('electron');
 const fs = require('fs-extra');
 const Session = require('./src/session');
 const {Toolset} = require('./src/selection');
+const Binners = require('./src/binners.js');
 
 let win = null;
 
@@ -207,12 +208,16 @@ ipcMain.on('clear-shapes', function() {
     if (session !== null) {
         session.metadata.shapes = new Array();
         session.metadata.timeseries = new Array();
+        session.metadata.binned = new Array();
         session.save();
-        win.send('plot-timeseries', session.metadata.timeseries);
+        win.send('plot-timeseries', {
+            timeseries: session.metadata.timeseries,
+            binned: session.metadata.binned
+        });
     }
 });
 
-ipcMain.on('push-shape', function(event, shape) {
+ipcMain.on('push-shape', function(event, shape, binner) {
     if (session && session.active_frames) {
         shape = Toolset.from(shape);
 
@@ -230,9 +235,20 @@ ipcMain.on('push-shape', function(event, shape) {
             session.metadata.timeseries.push(timeseries);
         }
 
+        session.metadata.binning_method = binner;
+
+        if (!session.metadata.binned) {
+            session.metadata.binned = [ Binners.bin(binner, timeseries) ];
+        } else {
+            session.metadata.binned.push(Binners.bin(binner, timeseries));
+        }
+
         session.save();
 
-        win.send('plot-timeseries', session.metadata.timeseries);
+        win.send('plot-timeseries', {
+            timeseries: session.metadata.timeseries,
+            binned: session.metadata.binned
+        });
     }
 });
 
@@ -246,8 +262,15 @@ ipcMain.on('pop-shape', function() {
             session.metadata.timeseries.pop();
         }
 
+        if (session.metadata.binned) {
+            session.metadata.binned.pop();
+        }
+
         session.save();
 
-        win.send('plot-timeseries', session.metadata.timeseries);
+        win.send('plot-timeseries', {
+            timeseries: session.metadata.timeseries,
+            binned: session.metadata.binned
+        });
     }
 });

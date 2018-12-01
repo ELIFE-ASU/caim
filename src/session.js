@@ -8,7 +8,9 @@ const Meta = {
     frames: false,
     range: false,
     shapes: null,
-    timeseries: null
+    timeseries: null,
+    binning_method: null,
+    binned: null
 };
 
 function Session(session_path, metadata={ }) {
