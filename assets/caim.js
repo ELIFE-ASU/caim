@@ -8,12 +8,11 @@ function Caim() {
     this.context = this.canvas.getContext('2d');
     this.color_scheme = d3.scaleOrdinal(d3.schemeCategory10);
     this.background = new Image();
+    this.binning_method = 'moving-extremes';
     this.background.onload = (function(caim) {
         return function() {
             d3.select('#import-video').style('display', 'none');
             d3.select('#selection').style('display', 'block');
-
-            caim.render_timeseries();
 
             if (this.naturalHeight && this.naturalWidth) {
                 caim.canvas.width = this.naturalWidth;
@@ -22,6 +21,8 @@ function Caim() {
                 caim.canvas.width = this.width;
                 caim.canvas.height = this.height;
             }
+
+            caim.render_series();
 
             let paint = false;
 
@@ -66,7 +67,7 @@ function Caim() {
                         if (shape.box.width === 0 || shape.box.height == 0) {
                             caim.shapes.pop();
                         } else {
-                            ipcRenderer.send('push-shape', shape);
+                            ipcRenderer.send('push-shape', shape, caim.binning_method);
                         }
                     }
                     caim.redraw();
@@ -93,6 +94,11 @@ Caim.prototype.init = function(metadata, uri) {
         this.timeseries = new Array();
     } else {
         this.timeseries = metadata.timeseries;
+    }
+    if (metadata.binned === null) {
+        this.binned = new Array();
+    } else {
+        this.binned = metadata.binned;
     }
     this.undone_shapes = new Array();
     this.background.src = uri;
@@ -134,7 +140,7 @@ Caim.prototype.redo = function() {
     if (this.undone_shapes.length !== 0) {
         let shape = this.undone_shapes.pop();
         this.shapes.push(shape);
-        ipcRenderer.send('push-shape', shape);
+        ipcRenderer.send('push-shape', shape, this.binning_method);
         this.redraw();
     }
 };
@@ -151,13 +157,31 @@ Caim.prototype.import_video = function() {
     ipcRenderer.send('import-video');
 };
 
-Caim.prototype.render_timeseries = function(timeseries) {
+Caim.prototype.render_series = function(timeseries, binned) {
     if (timeseries) {
         this.timeseries = timeseries;
     }
 
-    if (this.timeseries && this.timeseries.length !== 0) {
-        let container = d3.select('#timeseries').html('').attr('display', 'block');
+    if (binned) {
+        this.binned = binned;
+    }
+
+    if (this.timeseries && this.binned) {
+        if (this.render_timeseries() && this.render_binned()) {
+            d3.select('#signal').style('display', 'block');
+        } else {
+            d3.select('#signal').style('display', 'none');
+        }
+    } else if (!this.timeseries && !this.binned) {
+        d3.select('#signal').style('display', 'none');
+    } else {
+        throw new Error('binned or unbinned timeseries is missing');
+    }
+};
+
+Caim.prototype.render_timeseries = function() {
+    if (this.timeseries.length !== 0) {
+        let container = d3.select('#timeseries').html('');
 
         this.multiple_curves(container, {
             width: 1024,
@@ -166,11 +190,106 @@ Caim.prototype.render_timeseries = function(timeseries) {
             title: 'Brightness Timeseries by Feature',
             xlabel: 'Timesteps',
             ylabel: 'Average Brightness',
-            labels: this.timeseries.map((_, i) => 'Feature ' + (i+1)),
         }, this.timeseries);
+
+        return true;
     } else {
-        d3.select('#timeseries').html('').attr('display', 'none');
+        return false;
     }
+};
+
+Caim.prototype.render_binned = function() {
+    if (this.binned.length !== 0) {
+        let container = d3.select('#binned').html('');
+
+        this.spike_trains(container, {
+            width: 1024,
+            height: 284,
+            margins: {top: 20, right: 30, bottom: 30, left: 50},
+            title: 'Binned Brightness by Feature',
+            xlabel: 'Timesteps',
+            ylabel: 'Binned Brightness',
+        }, this.binned);
+
+        return true;
+    } else {
+        return false;
+    }
+};
+
+Caim.prototype.spike_trains = function(container, fmt, data) {
+    const width = fmt.width - fmt.margins.left - fmt.margins.right;
+    const height = fmt.height - fmt.margins.top - fmt.margins.bottom;
+
+    const x = d3.scaleLinear().rangeRound([0, width]);
+    const y = d3.scaleLinear().rangeRound([height, 0]);
+
+    x.domain([0, d3.max(data.map((d) => d.length))-1]);
+    y.domain([0, data.length+1]);
+
+    let svg = container.append('svg')
+        .attr('title', fmt.title)
+        .attr('version', 1.1)
+        .attr('xmlns', 'http://www.w3.org/2000/svg')
+        .attr('width', fmt.width)
+        .attr('height', fmt.height);
+
+    let g = svg.append('g')
+        .attr('transform', 'translate(' + fmt.margins.left + ',' + fmt.margins.top + ')');
+
+    g.append('g')
+        .attr('transform', 'translate(0,' + height + ')')
+        .call(d3.axisBottom(x))
+        .append('text')
+        .attr('fill', '#000000')
+        .attr('x', width)
+        .attr('y', 7*fmt.margins.bottom/8)
+        .attr('text-anchor', 'end')
+        .text(fmt.xlabel);
+
+    let left = null;
+    if (data.length == 1) {
+        left = g.append('g').call(d3.axisLeft(y).ticks(2));
+    } else {
+        left = g.append('g').call(d3.axisLeft(y).ticks(Math.max(3, data.length)));
+    }
+
+    left.append('text')
+        .attr('fill', '#000000')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', -3*fmt.margins.left/4)
+        .attr('text-anchor', 'end')
+        .text(fmt.ylabel);
+
+    left.selectAll('.tick')
+        .each(function(d) {
+            if (d == 0 || d == data.length + 1) {
+                this.remove();
+            }
+        });
+
+    data.forEach((d, i) => {
+        g.selectAll('.train')
+            .append('g')
+            .data(d)
+            .enter().append('line')
+            .attr('x1', (_, j) => x(j))
+            .attr('y1', y(i + 1.4))
+            .attr('x2', (_, j) => x(j))
+            .attr('y2', y(i + 0.6))
+            .attr('stroke', this.color_scheme(i))
+            .attr('stroke-opacity', (d) => d)
+            .attr('stroke-width', 2);
+    });
+
+    svg.append('text')
+        .text(fmt.title)
+        .attr('x', fmt.margins.left + width/2)
+        .attr('y', fmt.margins.top/3)
+        .attr('dy', '1em')
+        .attr('text-anchor', 'middle');
+
+    this.downloadable(svg, fmt.width - fmt.margins.right, fmt.margins.top/3, '1em');
 };
 
 Caim.prototype.multiple_curves = function(container, fmt, data) {

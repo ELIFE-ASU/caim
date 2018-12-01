@@ -15,8 +15,8 @@ ipcRenderer.on('load-session', function(event, path, metadata, uri) {
     }
 });
 
-ipcRenderer.on('plot-timeseries', function(event, timeseries) {
-    caim.render_timeseries(timeseries);
+ipcRenderer.on('plot-timeseries', function(event, data) {
+    caim.render_series(data.timeseries, data.binned);
 });
 
 d3.select('#clear').on('click', () => caim.clear());
@@ -35,3 +35,14 @@ for (let tool in Toolset) {
 
     label.append('text').text(Toolset[tool].label);
 }
+
+const select_signal = function(){
+    d3.selectAll('input[name="signal-selector"]').each(function(){
+        const signal_name = this.id.replace('select-', '');
+        const display_style = (this.checked) ? 'block' : 'none';
+        d3.select('#' + signal_name).style('display', display_style);
+    });
+};
+
+d3.selectAll('input[name="signal-selector"]').on('change', () => select_signal());
+select_signal();
