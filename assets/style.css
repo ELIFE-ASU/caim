@@ -30,6 +30,10 @@ span.code {
     display: inline-block;
 }
 
-#signal, #signal div {
+#signal {
+    display: none;
+}
+
+#signal div {
     display: block;
 }
