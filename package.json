@@ -157,6 +157,7 @@
     "ffprobe-static-electron": "^2.0.0",
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^7.0.1",
-    "jimp": "^0.5.6"
+    "jimp": "^0.5.6",
+    "statistics": "^3.3.0"
   }
 }
