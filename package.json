@@ -146,9 +146,9 @@
   },
   "devDependencies": {
     "electron": "^2.0.14",
-    "electron-builder": "^20.36.2",
+    "electron-builder": "^20.38.2",
     "eslint": "^5.9.0",
-    "eslint-plugin-jest": "^22.0.0",
+    "eslint-plugin-jest": "^22.1.0",
     "jest": "^23.6.0"
   },
   "dependencies": {
@@ -157,7 +157,7 @@
     "ffprobe-static-electron": "^2.0.0",
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^7.0.1",
-    "jimp": "^0.5.6",
+    "jimp": "^0.6.0",
     "statistics": "^3.3.0"
   }
 }
