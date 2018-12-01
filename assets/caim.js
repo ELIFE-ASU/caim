@@ -288,8 +288,6 @@ Caim.prototype.spike_trains = function(container, fmt, data) {
         .attr('y', fmt.margins.top/3)
         .attr('dy', '1em')
         .attr('text-anchor', 'middle');
-
-    this.downloadable(svg, fmt.width - fmt.margins.right, fmt.margins.top/3, '1em');
 };
 
 Caim.prototype.multiple_curves = function(container, fmt, data) {
@@ -356,24 +354,4 @@ Caim.prototype.multiple_curves = function(container, fmt, data) {
         .attr('dy', '1em')
         .attr('text-anchor', 'middle')
         .text(fmt.title);
-
-    this.downloadable(svg, fmt.width - fmt.margins.right, fmt.margins.top/3, '1em');
-};
-
-Caim.prototype.downloadable = function(svg, x, y, dy) {
-    let clean_svg = svg.node().cloneNode(true),
-        html = clean_svg.outerHTML,
-        data = 'data:image/svg+xml;base64,\n' + Buffer.from(html).toString('base64');
-
-    svg.append('a')
-        .attr('href-lang', 'image/svg+xml')
-        .attr('href', data)
-        .append('text')
-        .attr('font-size', 10)
-        .attr('font-family', 'sans-serif')
-        .attr('x', x)
-        .attr('y', y)
-        .attr('dy', dy)
-        .attr('text-anchor', 'end')
-        .text('Right click to download');
 };
