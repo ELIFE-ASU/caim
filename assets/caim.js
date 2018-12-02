@@ -11,9 +11,6 @@ function Caim() {
     this.binning_method = 'moving-extremes';
     this.background.onload = (function(caim) {
         return function() {
-            d3.select('#import-video').style('display', 'none');
-            d3.select('#selection').style('display', 'block');
-
             if (this.naturalHeight && this.naturalWidth) {
                 caim.canvas.width = this.naturalWidth;
                 caim.canvas.height = this.naturalHeight;
