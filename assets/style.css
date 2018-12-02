@@ -4,6 +4,12 @@ html {
     font-family: 'Roboto', sans-serif;
 }
 
+.phase {
+    width: 80%;
+    min-width: 1024px;
+    margin: 0px auto;
+}
+
 .phase--hidden {
     display: none;
 }
