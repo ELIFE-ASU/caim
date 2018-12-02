@@ -40,7 +40,7 @@ const select_signal = function(){
     d3.selectAll('input[name="signal-selector"]').each(function(){
         const signal_name = this.id.replace('select-', '');
         const display_style = (this.checked) ? 'block' : 'none';
-        d3.select('#' + signal_name).style('display', display_style);
+        d3.select('#' + signal_name).classed('display', display_style);
     });
 };
 

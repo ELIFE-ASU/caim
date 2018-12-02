@@ -165,12 +165,12 @@ Caim.prototype.render_series = function(timeseries, binned) {
 
     if (this.timeseries && this.binned) {
         if (this.render_timeseries() && this.render_binned()) {
-            d3.select('#signal').style('display', 'block');
+            d3.select('#signal').classed('phase__plots--hidden', false);
         } else {
-            d3.select('#signal').style('display', 'none');
+            d3.select('#signal').classed('phase__plots--hidden', true);
         }
     } else if (!this.timeseries && !this.binned) {
-        d3.select('#signal').style('display', 'none');
+        d3.select('#signal').classed('phase__plots--hidden', true);
     } else {
         throw new Error('binned or unbinned timeseries is missing');
     }

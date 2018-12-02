@@ -62,3 +62,11 @@ body {
     display: flex;
     justify-content: left;
 }
+
+.phase__plots {
+    display: inline-block;
+}
+
+.phase__plots--hidden {
+    display: none;
+}
