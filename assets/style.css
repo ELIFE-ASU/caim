@@ -52,3 +52,8 @@ body {
 .phase__selection {
     display: inline-block;
 }
+
+.phase__toolbar {
+    display: flex;
+    justify-content: left;
+}
