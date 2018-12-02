@@ -12,6 +12,7 @@ body {
     width: 80%;
     min-width: 1024px;
     margin: 0px auto;
+    text-align: center;
 }
 
 .phase--hidden {
@@ -29,6 +30,7 @@ body {
 }
 
 .phase__menu-item {
+    text-align: left;
     margin: 0.2em 0em;
 }
 
@@ -45,4 +47,8 @@ body {
 .phase__menu-link:active {
     color: #3689e6;
     font-weight: normal;
+}
+
+.phase__selection {
+    display: inline-block;
 }
