@@ -17,3 +17,22 @@ html {
     margin-right: 0;
     font-weight: bold;
 }
+
+.phase__menu-item {
+    margin: 0.2em 0em;
+}
+
+.phase__menu-link:link, .phase__menu-link:visited {
+    color: #0e141f;
+    text-decoration: none;
+}
+
+.phase__menu-link:hover {
+    color: #485a6c;
+    font-weight: bold;
+}
+
+.phase__menu-link:active {
+    color: #3689e6;
+    font-weight: normal;
+}

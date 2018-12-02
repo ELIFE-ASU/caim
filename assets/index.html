@@ -8,16 +8,22 @@
 <body>
     <section id="startup" class="phase">
         <h1 class="phase__title">Getting Started</h1>
-        <ul>
-            <li><a href="#" onclick="caim.new_session();">New Session</a></li>
-            <li><a href="#" onclick="caim.open_session();">Open Session</a></li>
+        <ul class="phase__menu">
+            <li class="phase__menu-item">
+                <a class="phase__menu-link" href="#" onclick="caim.new_session();">New Session</a>
+            </li>
+            <li class="phase__menu-item">
+                <a class="phase__menu-link" href="#" onclick="caim.open_session();">Open Session</a>
+            </li>
         </ul>
     </section>
 
     <section id="import" class="phase phase--hidden">
         <h1 class="phase__title">Session Name</h1>
-        <ul>
-            <li><a href="#" onclick="caim.import_video();">Import Video</a></li>
+        <ul class="phase__menu">
+            <li class="phase__menu-item">
+                <a class="phase__menu-link" href="#" onclick="caim.import_video();">Import Video</a>
+            </li>
         </ul>
     </section>
 
