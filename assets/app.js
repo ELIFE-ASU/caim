@@ -3,14 +3,14 @@
 var caim = new Caim();
 
 ipcRenderer.on('load-session', function(event, path, metadata, uri) {
-    d3.select('#startup').style('display', 'none');
+    d3.select('#startup').classed('phase--hidden', true);
     d3.select('#import').select('h2').text('Session Path: ' + path);
     d3.select('#session').select('h2').text('Session Path: ' + path);
     if (uri === undefined || uri === null) {
-        d3.select('#import').style('display', 'block');
+        d3.select('#import').classed('phase--hidden', false);
     } else {
-        d3.select('#import').style('display', 'none');
-        d3.select('#session').style('display', 'block');
+        d3.select('#import').classed('phase--hidden', true);
+        d3.select('#session').classed('phase--hidden', false);
         caim.init(metadata, uri);
     }
 });

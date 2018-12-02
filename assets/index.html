@@ -6,7 +6,7 @@
     <script src="caim.js"></script>
 </head>
 <body>
-    <section id="startup">
+    <section id="startup" class="phase">
         <h2>Getting Started</h2>
         <ul>
             <li><a href="#" onclick="caim.new_session();">New Session</a></li>
@@ -14,14 +14,14 @@
         </ul>
     </section>
 
-    <section id="import">
+    <section id="import" class="phase phase--hidden">
         <h2>Session Name</h2>
         <ul>
             <li><a href="#" onclick="caim.import_video();">Import Video</a></li>
         </ul>
     </section>
 
-    <section id="session">
+    <section id="session" class="phase phase--hidden">
         <h2>Session Name</h2>
         <div id="selection">
             <canvas></canvas>
