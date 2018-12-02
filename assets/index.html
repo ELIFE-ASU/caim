@@ -31,7 +31,7 @@
         <h1 class="phase__title">Session Name</h1>
         <div id="selection" class="phase__selection">
             <canvas class="phase__canvas"></canvas>
-            <div id="tools" class="phase__toolbar"></div>
+            <div id="tools" class="phase__buttonbar"></div>
             <div id="controls" class="phase__controlbar">
                 <input type="submit" value="Clear" id="clear" class="phase__control" />
                 <input type="submit" value="Undo" id="undo" class="phase__control" />
@@ -39,7 +39,7 @@
             </div>
         </div>
         <div id="signal">
-            <div id="signal-selector">
+            <div id="signal-selector" class="phase__buttonbar">
                 <input type="radio" id="select-timeseries" name="signal-selector" checked />
                 <label for="select-timeseries">Timeseries</label>
                 <input type="radio" id="select-binned" name="signal-selector" />

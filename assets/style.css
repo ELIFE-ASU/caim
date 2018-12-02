@@ -53,7 +53,7 @@ body {
     display: inline-block;
 }
 
-.phase__toolbar {
+.phase__buttonbar {
     display: flex;
     justify-content: left;
 }
