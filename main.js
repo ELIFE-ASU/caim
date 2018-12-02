@@ -7,7 +7,7 @@ const Binners = require('./src/binners.js');
 let win = null;
 
 function create_window() {
-    win = new BrowserWindow();
+    win = new BrowserWindow({width: 1600, height: 900});
 
     Menu.setApplicationMenu(new Menu.buildFromTemplate([
         {
