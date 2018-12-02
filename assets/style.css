@@ -4,6 +4,10 @@ html {
     font-family: 'Roboto', sans-serif;
 }
 
+body {
+    background-color: #fafafa;
+}
+
 .phase {
     width: 80%;
     min-width: 1024px;
