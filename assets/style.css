@@ -70,3 +70,11 @@ body {
 .phase__plots--hidden {
     display: none;
 }
+
+.phase__plot {
+    display: inline-block;
+}
+
+.phase__plot--hidden {
+    display: none;
+}
