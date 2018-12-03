@@ -57,15 +57,18 @@ body {
 .phase__buttonbar {
     display: flex;
     justify-content: left;
+    margin: 0.2em auto 0em auto;
 }
 
 .phase__controlbar {
     display: flex;
     justify-content: left;
+    margin: 0.2em auto 0em auto;
 }
 
 .phase__plots {
     display: inline-block;
+    margin: 2em auto;
 }
 
 .phase__plots--hidden {
