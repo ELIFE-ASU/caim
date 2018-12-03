@@ -51,6 +51,7 @@ body {
 
 .phase__selection {
     display: inline-block;
+    min-width: 275px;
 }
 
 .phase__buttonbar {
