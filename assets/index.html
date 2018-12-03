@@ -29,24 +29,24 @@
 
     <section id="session" class="phase phase--hidden">
         <h1 class="phase__title">Session Name</h1>
-        <div id="selection" class="phase__selection">
-            <canvas class="phase__canvas"></canvas>
-            <div id="tools" class="phase__buttonbar"></div>
-            <div id="controls" class="phase__controlbar">
-                <input type="submit" value="Clear" id="clear" class="phase__control" />
-                <input type="submit" value="Undo" id="undo" class="phase__control" />
-                <input type="submit" value="Redo" id="redo" class="phase__control" />
+        <div id="selection" class="module module--narrow">
+            <canvas class="module__canvas"></canvas>
+            <div id="tools" class="module__buttonbar"></div>
+            <div id="controls" class="module__controlbar">
+                <input type="submit" value="Clear" id="clear" class="module__control" />
+                <input type="submit" value="Undo" id="undo" class="module__control" />
+                <input type="submit" value="Redo" id="redo" class="module__control" />
             </div>
         </div>
-        <div id="signal" class="phase__plots phase__plots--hidden">
-            <div id="signal-selector" class="phase__buttonbar">
-                <input type="radio" class="phase__plotbutton" id="select-timeseries" name="signal-selector" checked />
-                <label for="select-timeseries" class="phase__plotbutton-label">Timeseries</label>
-                <input type="radio" class="phase__plotbutton" id="select-binned" name="signal-selector" />
-                <label for="select-binned" class="phase__plotbutton-label">Binned</label>
+        <div id="signal" class="module module--hidden">
+            <div id="signal-selector" class="module__buttonbar">
+                <input type="radio" class="module__plotbutton" id="select-timeseries" name="signal-selector" checked />
+                <label for="select-timeseries" class="module__plotbutton-label">Timeseries</label>
+                <input type="radio" class="module__plotbutton" id="select-binned" name="signal-selector" />
+                <label for="select-binned" class="module__plotbutton-label">Binned</label>
             </div>
-            <div id="timeseries" class="phase__plot phase__plot--hidden"></div>
-            <div id="binned" class="phase__plot phase__plot--hidden"></div>
+            <div id="timeseries" class="module__plot module__plot--hidden"></div>
+            <div id="binned" class="module__plot module__plot--hidden"></div>
         </div>
     </section>
 

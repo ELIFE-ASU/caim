@@ -49,36 +49,35 @@ body {
     font-weight: normal;
 }
 
-.phase__selection {
-    display: inline-block;
-    min-width: 275px;
-}
-
-.phase__buttonbar {
-    display: flex;
-    justify-content: left;
-    margin: 0.2em auto 0em auto;
-}
-
-.phase__controlbar {
-    display: flex;
-    justify-content: left;
-    margin: 0.2em auto 0em auto;
-}
-
-.phase__plots {
+.module {
     display: inline-block;
     margin: 2em auto;
 }
 
-.phase__plots--hidden {
+.module--narrow {
+    min-width: 275px;
+}
+
+.module__buttonbar {
+    display: flex;
+    justify-content: left;
+    margin: 0.2em auto 0em auto;
+}
+
+.module__controlbar {
+    display: flex;
+    justify-content: left;
+    margin: 0.2em auto 0em auto;
+}
+
+.module--hidden {
     display: none;
 }
 
-.phase__plot {
+.module__plot {
     display: inline-block;
 }
 
-.phase__plot--hidden {
+.module__plot--hidden {
     display: none;
 }

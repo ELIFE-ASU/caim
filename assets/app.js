@@ -39,7 +39,7 @@ for (let tool in Toolset) {
 const select_signal = function(){
     d3.selectAll('input[name="signal-selector"]').each(function(){
         const signal_name = this.id.replace('select-', '');
-        d3.select('#' + signal_name).classed('phase__plot--hidden', !this.checked);
+        d3.select('#' + signal_name).classed('module__plot--hidden', !this.checked);
     });
 };
 
