@@ -57,18 +57,24 @@ body {
 }
 
 .module--narrow {
-    min-width: 275px;
+    min-width: 300px;
 }
 
 .module__buttonbar {
     display: flex;
     justify-content: left;
+    align-items: center;
     margin: 0.2em auto 0em auto;
+}
+
+.module__button-label {
+    margin-right: 1em;
 }
 
 .module__controlbar {
     display: flex;
     justify-content: left;
+    align-items: center;
     margin: 0.2em auto 0em auto;
 }
 

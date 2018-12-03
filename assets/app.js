@@ -30,10 +30,12 @@ for (let tool in Toolset) {
     label.append('input')
         .attr('type', 'radio')
         .attr('id', tool)
+        .classed('module__button', true)
         .attr('name', 'tool')
         .property('checked', Toolset[tool].checked);
 
-    label.append('text').text(Toolset[tool].label);
+    label.classed('module__button-label', true)
+        .append('text').text(Toolset[tool].label);
 }
 
 const select_signal = function(){
