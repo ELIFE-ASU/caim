@@ -3,11 +3,11 @@ const fs = require('fs-extra');
 const Session = require('./src/session');
 const {Toolset} = require('./src/selection');
 
-let win = null;
+let windows = {
+    main: null
+};
 
 function create_window() {
-    win = new BrowserWindow({width: 1600, height: 900});
-
     Menu.setApplicationMenu(new Menu.buildFromTemplate([
         {
             label: 'File',
@@ -55,15 +55,26 @@ function create_window() {
         }
     ]));
 
-    win.loadFile('assets/index.html');
+    windows.main = new BrowserWindow({
+        width: 1600,
+        height: 900,
+        show: false
+    }).on('ready-to-show', function() {
+        this.show();
+    }).on('closed', function() {
+        BrowserWindow.getAllWindows().forEach((w) => w.close());
+        for (let w in windows) {
+            windows[w] = null;
+        }
+    });
 
-    win.on('closed', () => win = null);
+    windows.main.loadFile('assets/index.html');
 }
 
 app.on('ready', create_window);
 
 app.on('activate', function() {
-    if (win === null) {
+    if (windows.main === null) {
         create_window();
     }
 });
@@ -195,22 +206,22 @@ function error_dialog(options) {
 }
 
 ipcMain.on('new-session', function() {
-    new_session_dialog(null, win);
+    new_session_dialog(null, windows.main);
 });
 
 ipcMain.on('open-session', function() {
-    open_session_dialog(null, win);
+    open_session_dialog(null, windows.main);
 });
 
 ipcMain.on('import-video', function() {
-    import_video_dialog(null, win);
+    import_video_dialog(null, windows.main);
 });
 
 ipcMain.on('clear-shapes', function() {
     if (session !== null) {
         session.clear_shapes();
         session.save();
-        win.send('plot-timeseries', {
+        windows.main.send('plot-timeseries', {
             timeseries: session.metadata.timeseries,
             binned: session.metadata.binned
         });
@@ -224,7 +235,7 @@ ipcMain.on('push-shape', function(event, shape, binner) {
         session.push_shape(shape, binner);
         session.save();
 
-        win.send('plot-timeseries', {
+        windows.main.send('plot-timeseries', {
             timeseries: session.metadata.timeseries,
             binned: session.metadata.binned
         });
@@ -236,7 +247,7 @@ ipcMain.on('pop-shape', function() {
         session.pop_shape();
         session.save();
 
-        win.send('plot-timeseries', {
+        windows.main.send('plot-timeseries', {
             timeseries: session.metadata.timeseries,
             binned: session.metadata.binned
         });
@@ -248,7 +259,7 @@ ipcMain.on('rebin', function(event, binner) {
         session.rebin(binner);
         session.save();
 
-        win.send('plot-timeseries', {
+        windows.main.send('plot-timeseries', {
             timeseries: session.metadata.timeseries,
             binned: session.metadata.binned
         });
