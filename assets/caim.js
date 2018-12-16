@@ -2,6 +2,7 @@
 const {ipcRenderer} = require('electron');
 const d3 = require('d3');
 const {Point, Toolset} = require('../src/selection');
+const Binners = require('../src/binners');
 
 function Caim() {
     this.canvas = d3.select('#selection canvas').node();

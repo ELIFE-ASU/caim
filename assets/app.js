@@ -1,4 +1,4 @@
-/* global ipcRenderer, d3, Caim, Toolset */
+/* global ipcRenderer, d3, Caim, Toolset, Binners */
 
 var caim = new Caim();
 
@@ -36,6 +36,19 @@ for (let tool in Toolset) {
 
     label.classed('module__button-label', true)
         .append('text').text(Toolset[tool].label);
+}
+
+let binners = d3.select('#binners');
+for (let binner in Binners) {
+    let option = binners.append('option')
+        .attr('id', binner)
+        .classed('module__option', true)
+        .attr('value', binner)
+        .html(Binners[binner].label);
+
+    if (Binners[binner].selected) {
+        option.property('selected', true);
+    }
 }
 
 const select_signal = function(){
