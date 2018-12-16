@@ -4,7 +4,8 @@ const Session = require('./src/session');
 const {Toolset} = require('./src/selection');
 
 let windows = {
-    main: null
+    main: null,
+    mutual_info: null
 };
 
 function create_window() {
@@ -35,6 +36,18 @@ function create_window() {
                     label: 'Quit',
                     id: 'quit',
                     role: 'quit'
+                }
+            ]
+        },
+        {
+            label: 'Analysis',
+            submenu: [
+                {
+                    label: 'Mutual Information',
+                    id: 'mutual-info',
+                    click: mutual_info,
+                    accelerator: 'CommandOrControl+M',
+                    enabled: false
                 }
             ]
         },
@@ -143,6 +156,10 @@ async function open_session_dialog(menuItem, browserWindow) {
 
             app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
 
+            if (session.metadata.shapes && session.metadata.shapes.length !== 0) {
+                app.getApplicationMenu().getMenuItemById('mutual-info').enabled = true;
+            }
+
             let uri = undefined;
             if (session.range_image !== null) {
                 uri = await session.range_image.getBase64Async('image/png');
@@ -196,6 +213,24 @@ async function import_video_dialog(menuItem, browserWindow) {
     }
 }
 
+function mutual_info() {
+    if (!windows.mutual_info) {
+        windows.mutual_info = new BrowserWindow({
+            width: 800,
+            height: 800,
+            show: false
+        }).on('ready-to-show', function() {
+            windows.mutual_info.show();
+        }).on('closed', function() {
+            windows.mutual_info = null;
+            app.getApplicationMenu().getMenuItemById('mutual-info').enabled = true;
+        });
+
+        windows.mutual_info.loadURL('https://dglmoore.com');
+    }
+    app.getApplicationMenu().getMenuItemById('mutual-info').enabled = false;
+}
+
 function error_dialog(options) {
     options = Object.assign({
         type: 'error',
@@ -221,6 +256,11 @@ ipcMain.on('clear-shapes', function() {
     if (session !== null) {
         session.clear_shapes();
         session.save();
+        if (windows.mutual_info) {
+            windows.mutual_info.close();
+            windows.mutual_info = null;
+        }
+        app.getApplicationMenu().getMenuItemById('mutual-info').enabled = false;
         windows.main.send('plot-timeseries', {
             timeseries: session.metadata.timeseries,
             binned: session.metadata.binned
@@ -235,6 +275,8 @@ ipcMain.on('push-shape', function(event, shape, binner) {
         session.push_shape(shape, binner);
         session.save();
 
+        app.getApplicationMenu().getMenuItemById('mutual-info').enabled = true;
+
         windows.main.send('plot-timeseries', {
             timeseries: session.metadata.timeseries,
             binned: session.metadata.binned
@@ -246,6 +288,16 @@ ipcMain.on('pop-shape', function() {
     if (session && session.active_frames) {
         session.pop_shape();
         session.save();
+
+        if (session.metadata.shapes.length !== 0) {
+            if (windows.mutual_info) {
+                windows.mutual_info.close();
+                windows.mutual_info = null;
+            }
+            app.getApplicationMenu().getMenuItemById('mutual-info').enabled = true;
+        } else {
+            app.getApplicationMenu().getMenuItemById('mutual-info').enabled = false;
+        }
 
         windows.main.send('plot-timeseries', {
             timeseries: session.metadata.timeseries,
