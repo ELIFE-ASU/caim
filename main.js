@@ -15,18 +15,21 @@ function create_window() {
                 {
                     label: 'New Session',
                     id: 'new-session',
-                    click: new_session_dialog
+                    click: new_session_dialog,
+                    accelerator: 'CommandOrControl+N'
                 },
                 {
                     label: 'Open Session',
                     id: 'open-session',
-                    click: open_session_dialog
+                    click: open_session_dialog,
+                    accelerator: 'CommandOrControl+O'
                 },
                 {
                     label: 'Import Video',
                     id: 'import-video',
                     enabled: false,
-                    click: import_video_dialog
+                    click: import_video_dialog,
+                    accelerator: 'CommandOrControl+I'
                 },
                 {
                     label: 'Quit',
