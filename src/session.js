@@ -1,7 +1,8 @@
-const fs = require('fs-extra');
-const path = require('path');
+const Binners = require('./binners.js');
 const Frame = require('./frame');
 const Jimp = require('jimp');
+const fs = require('fs-extra');
+const path = require('path');
 
 const Meta = {
     video: null,
@@ -74,6 +75,50 @@ Session.load = async function(session_filename) {
     }
 
     return session;
+};
+
+Session.prototype.clear_shapes = function() {
+    this.metadata.shapes = new Array();
+    this.metadata.timeseries = new Array();
+    this.metadata.binned = new Array();
+};
+
+Session.prototype.push_shape = function(shape, binner) {
+    let timeseries = shape.timeseries(this.active_frames);
+
+    if (!this.metadata.shapes) {
+        this.metadata.shapes = [ shape ];
+    } else {
+        this.metadata.shapes.push(shape);
+    }
+
+    if (!this.metadata.timeseries) {
+        this.metadata.timeseries = [timeseries];
+    } else {
+        this.metadata.timeseries.push(timeseries);
+    }
+
+    this.metadata.binning_method = binner;
+
+    if (!this.metadata.binned) {
+        this.metadata.binned = [ Binners.bin(binner, timeseries) ];
+    } else {
+        this.metadata.binned.push(Binners.bin(binner, timeseries));
+    }
+};
+
+Session.prototype.pop_shape = function() {
+    if (this.metadata.shapes) {
+        this.metadata.shapes.pop();
+    }
+
+    if (this.metadata.timeseries) {
+        this.metadata.timeseries.pop();
+    }
+
+    if (this.metadata.binned) {
+        this.metadata.binned.pop();
+    }
 };
 
 module.exports = Session;

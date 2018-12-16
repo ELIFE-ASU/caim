@@ -2,7 +2,6 @@ const {app, dialog, BrowserWindow, Menu, ipcMain} = require('electron');
 const fs = require('fs-extra');
 const Session = require('./src/session');
 const {Toolset} = require('./src/selection');
-const Binners = require('./src/binners.js');
 
 let win = null;
 
@@ -206,9 +205,7 @@ ipcMain.on('import-video', function() {
 
 ipcMain.on('clear-shapes', function() {
     if (session !== null) {
-        session.metadata.shapes = new Array();
-        session.metadata.timeseries = new Array();
-        session.metadata.binned = new Array();
+        session.clear_shapes();
         session.save();
         win.send('plot-timeseries', {
             timeseries: session.metadata.timeseries,
@@ -221,28 +218,7 @@ ipcMain.on('push-shape', function(event, shape, binner) {
     if (session && session.active_frames) {
         shape = Toolset.from(shape);
 
-        let timeseries = shape.timeseries(session.active_frames);
-
-        if (!session.metadata.shapes) {
-            session.metadata.shapes = [ shape ];
-        } else {
-            session.metadata.shapes.push(shape);
-        }
-
-        if (!session.metadata.timeseries) {
-            session.metadata.timeseries = [timeseries];
-        } else {
-            session.metadata.timeseries.push(timeseries);
-        }
-
-        session.metadata.binning_method = binner;
-
-        if (!session.metadata.binned) {
-            session.metadata.binned = [ Binners.bin(binner, timeseries) ];
-        } else {
-            session.metadata.binned.push(Binners.bin(binner, timeseries));
-        }
-
+        session.push_shape(shape, binner);
         session.save();
 
         win.send('plot-timeseries', {
@@ -254,18 +230,7 @@ ipcMain.on('push-shape', function(event, shape, binner) {
 
 ipcMain.on('pop-shape', function() {
     if (session && session.active_frames) {
-        if (session.metadata.shapes) {
-            session.metadata.shapes.pop();
-        }
-
-        if (session.metadata.timeseries) {
-            session.metadata.timeseries.pop();
-        }
-
-        if (session.metadata.binned) {
-            session.metadata.binned.pop();
-        }
-
+        session.pop_shape();
         session.save();
 
         win.send('plot-timeseries', {
