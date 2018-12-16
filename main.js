@@ -81,7 +81,7 @@ function create_window() {
         }
     });
 
-    windows.main.loadFile('assets/index.html');
+    windows.main.loadFile('assets/caim.html');
 }
 
 app.on('ready', create_window);
