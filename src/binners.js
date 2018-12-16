@@ -115,11 +115,50 @@ const bin_mw_extremes = function(timeseries) {
     return bin_extremes(subtracted);
 };
 
+const bin_threshold = function(timeseries, threshold) {
+    if (isNaN(threshold)) {
+        throw new RangeError('threshold is NaN');
+    }
+
+    const binned = new Array(timeseries.length);
+    for (let i = 0, len = timeseries.length; i < len; ++i) {
+        binned[i] = (timeseries[i] < threshold) ? 0 : 1;
+    }
+
+    if (binned.some(isNaN)) {
+        throw new RangeError('binned has NaN value');
+    }
+
+    return binned;
+};
+
+const bin_mean = function(timeseries) {
+    if (!timeseries) {
+        throw new TypeError('time series is undefined');
+    } else if (timeseries.length === 0) {
+        throw new Error('time series has length 0');
+    } else if (timeseries.some(isNaN)) {
+        throw new RangeError('timeseries has NaN value');
+    }
+    const { mean } = timeseries.reduce(stats);
+    return bin_threshold(timeseries, mean);
+};
+
 module.exports = Object.create({
     'moving-extremes': {
         label: 'Extremes (Moving Window)',
         binner: bin_mw_extremes,
         selected: true
+    },
+    'extremes': {
+        label: 'Extremes (Global)',
+        binner: bin_extremes,
+        selected: false
+    },
+    'mean-threshold': {
+        label: 'Mean Threshold',
+        binner: bin_mean,
+        selected: false
     }
 }, {
     bin: {
