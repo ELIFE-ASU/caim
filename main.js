@@ -239,3 +239,15 @@ ipcMain.on('pop-shape', function() {
         });
     }
 });
+
+ipcMain.on('rebin', function(event, binner) {
+    if (session) {
+        session.rebin(binner);
+        session.save();
+
+        win.send('plot-timeseries', {
+            timeseries: session.metadata.timeseries,
+            binned: session.metadata.binned
+        });
+    }
+});

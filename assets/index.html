@@ -32,7 +32,6 @@
         <div id="selection" class="module module--narrow">
             <canvas class="module__canvas"></canvas>
             <div id="tools" class="module__buttonbar"></div>
-            <select id="binners" class="module__select"></select>
             <div id="controls" class="module__controlbar">
                 <input type="submit" value="Clear" id="clear" class="module__control" />
                 <input type="submit" value="Undo" id="undo" class="module__control" />
@@ -40,11 +39,14 @@
             </div>
         </div>
         <div id="signal" class="module module--hidden">
-            <div id="signal-selector" class="module__buttonbar">
-                <input type="radio" class="module__button" id="select-timeseries" name="signal-selector" checked />
-                <label for="select-timeseries" class="module__button-label">Timeseries</label>
-                <input type="radio" class="module__button" id="select-binned" name="signal-selector" />
-                <label for="select-binned" class="module__button-label">Binned</label>
+            <div class="module__toolbar">
+                <div id="signal-selector" class="module__buttonbar">
+                    <input type="radio" class="module__button" id="select-timeseries" name="signal-selector" checked />
+                    <label for="select-timeseries" class="module__button-label">Timeseries</label>
+                    <input type="radio" class="module__button" id="select-binned" name="signal-selector" />
+                    <label for="select-binned" class="module__button-label">Binned</label>
+                </div>
+                <select id="binners" class="module__select"></select>
             </div>
             <div id="timeseries" class="module__plot module__plot--hidden"></div>
             <div id="binned" class="module__plot module__plot--hidden"></div>

@@ -121,4 +121,19 @@ Session.prototype.pop_shape = function() {
     }
 };
 
+Session.prototype.rebin = function(binner) {
+    if (this.metadata.binning_method !== binner) {
+        this.metadata.binning_method = binner;
+
+        this.metadata.binned = new Array();
+
+        if (this.metadata.timeseries) {
+            for (let i = 0, len = this.metadata.timeseries.length; i < len; ++i) {
+                const timeseries = this.metadata.timeseries[i];
+                this.metadata.binned.push(Binners.bin(binner, timeseries));
+            }
+        }
+    }
+};
+
 module.exports = Session;

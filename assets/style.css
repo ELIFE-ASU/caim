@@ -64,7 +64,7 @@ body {
     display: flex;
     justify-content: left;
     align-items: center;
-    margin: 0.2em auto 0em auto;
+    margin-top: 0.2em;
 }
 
 .module__button-label {
@@ -88,4 +88,9 @@ body {
 
 .module__plot--hidden {
     display: none;
+}
+
+.module__toolbar {
+    display: flex;
+    justify-content: space-between;
 }

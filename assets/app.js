@@ -38,7 +38,9 @@ for (let tool in Toolset) {
         .append('text').text(Toolset[tool].label);
 }
 
-let binners = d3.select('#binners');
+let binners = d3.select('#binners').on('change', function() {
+    caim.rebin(this.value);
+});
 for (let binner in Binners) {
     let option = binners.append('option')
         .attr('id', binner)

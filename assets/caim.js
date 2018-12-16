@@ -9,7 +9,6 @@ function Caim() {
     this.context = this.canvas.getContext('2d');
     this.color_scheme = d3.scaleOrdinal(d3.schemeCategory10);
     this.background = new Image();
-    this.binning_method = 'moving-extremes';
     this.background.onload = (function(caim) {
         return function() {
             if (this.naturalHeight && this.naturalWidth) {
@@ -19,6 +18,9 @@ function Caim() {
                 caim.canvas.width = this.width;
                 caim.canvas.height = this.height;
             }
+
+            d3.select('#binners').selectAll('option').property('selected', null);
+            d3.select(`#${caim.binning_method}`).property('selected', true);
 
             caim.render_series();
 
@@ -88,16 +90,30 @@ Caim.prototype.init = function(metadata, uri) {
         });
         this.shapes = metadata.shapes;
     }
+
     if (metadata.timeseries === null) {
         this.timeseries = new Array();
     } else {
         this.timeseries = metadata.timeseries;
     }
+
+    if (metadata.binning_method === null) {
+        for (let binner in Binners) {
+            if (Binners[binner].selected) {
+                this.binning_method = binner;
+                break;
+            }
+        }
+    } else {
+        this.binning_method = metadata.binning_method;
+    }
+
     if (metadata.binned === null) {
         this.binned = new Array();
     } else {
         this.binned = metadata.binned;
     }
+
     this.undone_shapes = new Array();
     this.background.src = uri;
 };
@@ -153,6 +169,11 @@ Caim.prototype.open_session = function() {
 
 Caim.prototype.import_video = function() {
     ipcRenderer.send('import-video');
+};
+
+Caim.prototype.rebin = function(binner) {
+    this.binning_method = binner;
+    ipcRenderer.send('rebin', this.binning_method);
 };
 
 Caim.prototype.render_series = function(timeseries, binned) {
