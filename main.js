@@ -315,8 +315,6 @@ ipcMain.on('pop-shape', function() {
         }
         session.save();
 
-        menu_item_state('mutual-info', session.metadata.shapes.length !== 0);
-
         windows.main.send('plot-timeseries', {
             timeseries: session.metadata.timeseries,
             binned: session.metadata.binned
@@ -330,6 +328,8 @@ ipcMain.on('pop-shape', function() {
                 windows.mutual_info = null;
             }
         }
+
+        menu_item_state('mutual-info', session.metadata.shapes.length !== 0);
     }
 });
 
