@@ -13,7 +13,7 @@ const Meta = {
     timeseries: null,
     binning_method: null,
     binned: null,
-    mutual_info: null
+    analyses: {}
 };
 
 function Session(session_path, metadata={ }) {
@@ -83,6 +83,7 @@ Session.prototype.clear_shapes = function() {
     this.metadata.shapes = new Array();
     this.metadata.timeseries = new Array();
     this.metadata.binned = new Array();
+    this.metadata.analyses = {};
 };
 
 Session.prototype.push_shape = function(shape, binner) {
@@ -139,18 +140,19 @@ Session.prototype.rebin = function(binner) {
 };
 
 Session.prototype.mutual_info = function() {
-    if (this.metadata.binned) {
+    if (this.metadata.binned && this.metadata.binned.length !== 0) {
         const len = this.metadata.binned.length;
         const binned = this.metadata.binned;
-        this.metadata.mutual_info = new Array();
+        const mi = new Array();
         for (let source = 0; source < len; ++source) {
             for (let target = source; target < len; ++target) {
                 const value = mutual_info(binned[source], binned[target]);
-                this.metadata.mutual_info.push({ source, target, value });
+                mi.push({ source, target, value });
             }
         }
-    } else {
-        this.metadata.mutual_info = null;
+        this.metadata.analyses.mutual_info = mi;
+    } else if (this.metadata.analyses.mutual_info !== undefined) {
+        delete this.metadata.analyses.mutual_info;
     }
 };
 

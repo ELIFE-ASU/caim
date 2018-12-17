@@ -4,25 +4,27 @@ const { ipcRenderer } = require('electron');
 (function() {
     const color_scheme = d3.scaleOrdinal(d3.schemeCategory10);
 
-    var render_mutual_info = function(links) {
-        d3.select('#mutual-info').classed('phase--hidden', links.length === 0).html('');
+    let render_mutual_info = function(links) {
+        let section = d3.select('#mutual-info');
 
-        var nodes = [];
+        section.classed('phase--hidden', links.length === 0).html('');
+
+        let nodes = [];
         links.forEach(function(link) {
             link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
             link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
         });
 
-        var cell_width = 80,
+        let cell_width = 80,
             cell_height = 25,
             margin = 20,
             padding = 5,
             width = cell_width * (nodes.length + 1) + margin + padding,
             height = cell_height * (nodes.length + 1) + margin + padding;
 
-        var local_scheme = d3.interpolateGnBu;
+        let local_scheme = d3.interpolateGnBu;
 
-        var svg = d3.select('#mi-results').append('svg')
+        let svg = section.append('svg')
             .attr('title', 'Mutual Information')
             .attr('version', 1.1)
             .attr('xmlns', 'http://www.w3.org/2000/svg')
@@ -30,10 +32,10 @@ const { ipcRenderer } = require('electron');
             .attr('height', height)
             .attr('font-family', 'sans-serif');
 
-        var sources = svg.append('g')
+        let sources = svg.append('g')
             .attr('font-size', 12)
             .attr('transform', function() {
-                var x = margin, y = margin + cell_height + padding;
+                let x = margin, y = margin + cell_height + padding;
                 return 'translate(' + x + ',' + y + ')';
             });
 
@@ -53,10 +55,10 @@ const { ipcRenderer } = require('electron');
             .attr('text-anchor', 'end')
             .text('Source');
 
-        var targets = svg.append('g')
+        let targets = svg.append('g')
             .attr('font-size', 12)
             .attr('transform', function() {
-                var x = margin + cell_width + padding, y = margin;
+                let x = margin + cell_width + padding, y = margin;
                 return 'translate(' + x + ',' + y + ')';
             });
 
@@ -74,10 +76,10 @@ const { ipcRenderer } = require('electron');
             .attr('dy', '-0.5em')
             .text('Target');
 
-        var cells = svg.append('g')
+        let cells = svg.append('g')
             .attr('font-size', 12)
             .attr('transform', function() {
-                var x = margin + cell_width + padding,
+                let x = margin + cell_width + padding,
                     y = margin + cell_height + padding;
                 return 'translate(' + x + ',' + y + ')';
             });

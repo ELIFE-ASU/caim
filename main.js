@@ -125,7 +125,8 @@ function new_session_dialog(menuItem, browserWindow) {
                 session = new Session(session_path);
                 session.save();
 
-                app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
+                menu_item_state('import-video', true);
+
                 browserWindow.send('load-session', session.path, session.metadata);
             }
         } else {
@@ -154,10 +155,10 @@ async function open_session_dialog(menuItem, browserWindow) {
         if (session_filename.length === 1) {
             session = await Session.load(session_filename[0]);
 
-            app.getApplicationMenu().getMenuItemById('import-video').enabled = true;
+            menu_item_state('import-video', true);
 
             if (session.metadata.shapes && session.metadata.shapes.length !== 0) {
-                app.getApplicationMenu().getMenuItemById('mutual-info').enabled = true;
+                menu_item_state('mutual-info', true);
             }
 
             let uri = undefined;
@@ -214,21 +215,28 @@ async function import_video_dialog(menuItem, browserWindow) {
 }
 
 function mutual_info() {
-    if (!windows.mutual_info) {
-        windows.mutual_info = new BrowserWindow({
-            width: 800,
-            height: 800,
-            show: false
-        }).on('ready-to-show', function() {
-            windows.mutual_info.show();
-        }).on('closed', function() {
-            windows.mutual_info = null;
-            app.getApplicationMenu().getMenuItemById('mutual-info').enabled = true;
-        });
+    if (session) {
+        if (!windows.mutual_info) {
+            windows.mutual_info = new BrowserWindow({
+                width: 800,
+                height: 800,
+                show: false
+            }).on('ready-to-show', function() {
+                if (session.metadata.shapes && session.metadata.shapes.length !== 0) {
+                    session.mutual_info();
+                    session.save();
+                }
+                this.send('mi', session.metadata.analyses.mutual_info);
+                this.show();
+            }).on('closed', function() {
+                windows.mutual_info = null;
+                menu_item_state('mutual-info', true);
+            });
 
-        windows.mutual_info.loadURL('https://dglmoore.com');
+            windows.mutual_info.loadFile('assets/mutual_info.html');
+        }
     }
-    app.getApplicationMenu().getMenuItemById('mutual-info').enabled = false;
+    menu_item_state('mutual-info', false);
 }
 
 function error_dialog(options) {
@@ -256,15 +264,18 @@ ipcMain.on('clear-shapes', function() {
     if (session !== null) {
         session.clear_shapes();
         session.save();
-        if (windows.mutual_info) {
-            windows.mutual_info.close();
-            windows.mutual_info = null;
-        }
-        app.getApplicationMenu().getMenuItemById('mutual-info').enabled = false;
+
+        menu_item_state('mutual-info', session.metadata.shapes.length !== 0);
+
         windows.main.send('plot-timeseries', {
             timeseries: session.metadata.timeseries,
             binned: session.metadata.binned
         });
+
+        if (windows.mutual_info) {
+            windows.mutual_info.close();
+            windows.mutual_info = null;
+        }
     }
 });
 
@@ -273,47 +284,74 @@ ipcMain.on('push-shape', function(event, shape, binner) {
         shape = Toolset.from(shape);
 
         session.push_shape(shape, binner);
+        if (windows.mutual_info) {
+            session.mutual_info();
+        }
         session.save();
 
-        app.getApplicationMenu().getMenuItemById('mutual-info').enabled = true;
+        menu_item_state('mutual-info', session.metadata.shapes.length !== 0);
 
         windows.main.send('plot-timeseries', {
             timeseries: session.metadata.timeseries,
             binned: session.metadata.binned
         });
+
+        if (windows.mutual_info) {
+            if (session.metadata.shapes.length !== 0) {
+                windows.mutual_info.send('mi', session.metadata.analyses.mutual_info);
+            } else {
+                windows.mutual_info.close();
+                windows.mutual_info = null;
+            }
+        }
     }
 });
 
 ipcMain.on('pop-shape', function() {
     if (session && session.active_frames) {
         session.pop_shape();
+        if (windows.mutual_info) {
+            session.mutual_info();
+        }
         session.save();
 
-        if (session.metadata.shapes.length !== 0) {
-            if (windows.mutual_info) {
-                windows.mutual_info.close();
-                windows.mutual_info = null;
-            }
-            app.getApplicationMenu().getMenuItemById('mutual-info').enabled = true;
-        } else {
-            app.getApplicationMenu().getMenuItemById('mutual-info').enabled = false;
-        }
+        menu_item_state('mutual-info', session.metadata.shapes.length !== 0);
 
         windows.main.send('plot-timeseries', {
             timeseries: session.metadata.timeseries,
             binned: session.metadata.binned
         });
+
+        if (windows.mutual_info) {
+            if (session.metadata.shapes.length !== 0) {
+                windows.mutual_info.send('mi', session.metadata.analyses.mutual_info);
+            } else {
+                windows.mutual_info.close();
+                windows.mutual_info = null;
+            }
+        }
     }
 });
 
 ipcMain.on('rebin', function(event, binner) {
     if (session) {
         session.rebin(binner);
+        if (windows.mutual_info) {
+            session.mutual_info();
+        }
         session.save();
 
         windows.main.send('plot-timeseries', {
             timeseries: session.metadata.timeseries,
             binned: session.metadata.binned
         });
+
+        if (windows.mutual_info) {
+            windows.mutual_info.send('mi', session.metadata.analyses.mutual_info);
+        }
     }
 });
+
+const menu_item_state = function(id, state) {
+    app.getApplicationMenu().getMenuItemById(id).enabled = state;
+};
