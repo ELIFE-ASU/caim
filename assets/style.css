@@ -17,6 +17,11 @@ body {
     flex-direction: column;
 }
 
+.phase--fit {
+    width: 100%;
+    min-width: 100px;
+}
+
 .phase--hidden {
     display: none;
 }
