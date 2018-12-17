@@ -226,7 +226,7 @@ function mutual_info() {
                     session.mutual_info();
                     session.save();
                 }
-                this.send('mi', session.metadata.analyses.mutual_info);
+                this.send('mutual-info', session.metadata.analyses.mutual_info);
                 this.show();
             }).on('closed', function() {
                 windows.mutual_info = null;
@@ -298,7 +298,7 @@ ipcMain.on('push-shape', function(event, shape, binner) {
 
         if (windows.mutual_info) {
             if (session.metadata.shapes.length !== 0) {
-                windows.mutual_info.send('mi', session.metadata.analyses.mutual_info);
+                windows.mutual_info.send('mutual-info', session.metadata.analyses.mutual_info);
             } else {
                 windows.mutual_info.close();
                 windows.mutual_info = null;
@@ -324,7 +324,7 @@ ipcMain.on('pop-shape', function() {
 
         if (windows.mutual_info) {
             if (session.metadata.shapes.length !== 0) {
-                windows.mutual_info.send('mi', session.metadata.analyses.mutual_info);
+                windows.mutual_info.send('mutual-info', session.metadata.analyses.mutual_info);
             } else {
                 windows.mutual_info.close();
                 windows.mutual_info = null;
@@ -347,7 +347,7 @@ ipcMain.on('rebin', function(event, binner) {
         });
 
         if (windows.mutual_info) {
-            windows.mutual_info.send('mi', session.metadata.analyses.mutual_info);
+            windows.mutual_info.send('mutual-info', session.metadata.analyses.mutual_info);
         }
     }
 });

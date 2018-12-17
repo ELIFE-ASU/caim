@@ -106,8 +106,5 @@ const { ipcRenderer } = require('electron');
             .text((d) => (Math.round(d.value * 1000) / 1000) + ' bits');
     };
 
-    ipcRenderer.on('mi', (event, links) => {
-        console.log(links);
-        render_mutual_info(links);
-    });
+    ipcRenderer.on('mutual-info', (event, links) => render_mutual_info(links));
 }());
