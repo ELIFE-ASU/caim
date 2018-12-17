@@ -1,29 +1,19 @@
 const d3 = require('d3');
 const { ipcRenderer } = require('electron');
 
-(function() {
+const app = (function() {
     const color_scheme = d3.scaleOrdinal(d3.schemeCategory10);
 
-    let render_mutual_info = function(data) {
-        let links = new Array();
-        for (let source in data) {
-            for (let target in data[source]) {
-                const i = (data[source][target].length - 1) / 2;
-                const cc = data[source][target][i];
-                links.push({
-                    source: parseInt(source),
-                    target: parseInt(target),
-                    value: cc.y
-                });
-            }
-        }
+    let cross_correlation = null;
+    let mutual_info = null;
 
+    let render_mutual_info = function() {
         let section = d3.select('#mutual-info');
 
-        section.classed('phase--hidden', links.length === 0).html('');
+        section.classed('phase--hidden', mutual_info.length === 0).html('');
 
         let nodes = [];
-        links.forEach(function(link) {
+        mutual_info.forEach(function(link) {
             link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
             link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
         });
@@ -53,7 +43,7 @@ const { ipcRenderer } = require('electron');
             });
 
         sources.selectAll('rect')
-            .data(links)
+            .data(mutual_info)
             .enter().append('rect')
             .attr('y', (d) => cell_height * d.source.name)
             .attr('width', cell_width)
@@ -76,7 +66,7 @@ const { ipcRenderer } = require('electron');
             });
 
         targets.selectAll('rect')
-            .data(links)
+            .data(mutual_info)
             .enter().append('rect')
             .attr('x', (d) => cell_width * d.target.name)
             .attr('width', cell_width)
@@ -98,7 +88,7 @@ const { ipcRenderer } = require('electron');
             });
 
         cells.selectAll('rect')
-            .data(links)
+            .data(mutual_info)
             .enter().append('rect')
             .attr('class', 'mi-cell')
             .attr('id', (d) => 'mi-' + d.source.name + '-' + d.target.name)
@@ -110,7 +100,7 @@ const { ipcRenderer } = require('electron');
             .attr('stroke', 'black');
 
         cells.selectAll('text')
-            .data(links)
+            .data(mutual_info)
             .enter().append('text')
             .attr('x', (d) => cell_width * (d.target.name + 0.5))
             .attr('y', (d) => cell_height * (d.source.name + 0.5))
@@ -119,5 +109,27 @@ const { ipcRenderer } = require('electron');
             .text((d) => (Math.round(d.value * 1000) / 1000) + ' bits');
     };
 
-    ipcRenderer.on('mutual-info', (event, data) => render_mutual_info(data));
+    ipcRenderer.on('mutual-info', function(event, data) {
+        cross_correlation = data;
+
+        mutual_info = new Array();
+        for (let source in data) {
+            for (let target in data[source]) {
+                const i = (data[source][target].length - 1) / 2;
+                const cc = data[source][target][i];
+                mutual_info.push({
+                    source: parseInt(source),
+                    target: parseInt(target),
+                    value: cc.y
+                });
+            }
+        }
+
+        render_mutual_info();
+    });
+
+    return {
+        cross_correlation: () => cross_correlation,
+        mutual_info: () => mutual_info
+    };
 }());
