@@ -19,6 +19,10 @@ ipcRenderer.on('plot-timeseries', function(event, data) {
     caim.render_series(data.timeseries, data.binned);
 });
 
+d3.select('#new-session').on('click', () => caim.new_session());
+d3.select('#open-session').on('click', () => caim.open_session());
+d3.select('#import-video').on('click', () => caim.import_video());
+
 d3.select('#clear').on('click', () => caim.clear());
 d3.select('#undo').on('click', () => caim.undo());
 d3.select('#redo').on('click', () => caim.redo());
