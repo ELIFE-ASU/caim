@@ -1,8 +1,9 @@
-const Binners = require('./binners.js');
+const Binners = require('./binners');
 const Frame = require('./frame');
 const Jimp = require('jimp');
 const fs = require('fs-extra');
 const path = require('path');
+const { mutual_info } = require('./info');
 
 const Meta = {
     video: null,
@@ -11,7 +12,8 @@ const Meta = {
     shapes: null,
     timeseries: null,
     binning_method: null,
-    binned: null
+    binned: null,
+    mutual_info: null
 };
 
 function Session(session_path, metadata={ }) {
@@ -133,6 +135,22 @@ Session.prototype.rebin = function(binner) {
                 this.metadata.binned.push(Binners.bin(binner, timeseries));
             }
         }
+    }
+};
+
+Session.prototype.mutual_info = function() {
+    if (this.metadata.binned) {
+        const len = this.metadata.binned.length;
+        const binned = this.metadata.binned;
+        this.metadata.mutual_info = new Array();
+        for (let source = 0; source < len; ++source) {
+            for (let target = source; target < len; ++target) {
+                const value = mutual_info(binned[source], binned[target]);
+                this.metadata.mutual_info.push({ source, target, value });
+            }
+        }
+    } else {
+        this.metadata.mutual_info = null;
     }
 };
 
