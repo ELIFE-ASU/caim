@@ -1,9 +1,9 @@
 const Binners = require('./binners');
 const Frame = require('./frame');
+const Info = require('./info');
 const Jimp = require('jimp');
 const fs = require('fs-extra');
 const path = require('path');
-const { mutual_info } = require('./info');
 
 const Meta = {
     video: null,
@@ -143,11 +143,11 @@ Session.prototype.mutual_info = function() {
     if (this.metadata.binned && this.metadata.binned.length !== 0) {
         const len = this.metadata.binned.length;
         const binned = this.metadata.binned;
-        const mi = new Array();
+        const mi = {};
         for (let source = 0; source < len; ++source) {
+            mi[source] = {};
             for (let target = source; target < len; ++target) {
-                const value = mutual_info(binned[source], binned[target]);
-                mi.push({ source, target, value });
+                mi[source][target] = Info.cross_correlation(binned[source], binned[target]);
             }
         }
         this.metadata.analyses.mutual_info = mi;

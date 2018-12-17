@@ -4,7 +4,20 @@ const { ipcRenderer } = require('electron');
 (function() {
     const color_scheme = d3.scaleOrdinal(d3.schemeCategory10);
 
-    let render_mutual_info = function(links) {
+    let render_mutual_info = function(data) {
+        let links = new Array();
+        for (let source in data) {
+            for (let target in data[source]) {
+                const i = (data[source][target].length - 1) / 2;
+                const cc = data[source][target][i];
+                links.push({
+                    source: parseInt(source),
+                    target: parseInt(target),
+                    value: cc.y
+                });
+            }
+        }
+
         let section = d3.select('#mutual-info');
 
         section.classed('phase--hidden', links.length === 0).html('');
@@ -106,5 +119,5 @@ const { ipcRenderer } = require('electron');
             .text((d) => (Math.round(d.value * 1000) / 1000) + ' bits');
     };
 
-    ipcRenderer.on('mutual-info', (event, links) => render_mutual_info(links));
+    ipcRenderer.on('mutual-info', (event, data) => render_mutual_info(data));
 }());
