@@ -87,6 +87,12 @@ const app = (function() {
                 return 'translate(' + x + ',' + y + ')';
             });
 
+        let onclick = function(d) {
+            cells.selectAll('.mi-cell').attr('fill', (d) => local_scheme(d.value));
+            cells.select('#mi-' + d.source.name + '-' + d.target.name).attr('fill', '#ffff00');
+            render_correlation(d.source.name, d.target.name);
+        };
+
         cells.selectAll('rect')
             .data(mutual_info)
             .enter().append('rect')
@@ -97,7 +103,8 @@ const app = (function() {
             .attr('width', cell_width)
             .attr('height', cell_height)
             .attr('fill', (d) => local_scheme(d.value))
-            .attr('stroke', 'black');
+            .attr('stroke', 'black')
+            .on('click', onclick);
 
         cells.selectAll('text')
             .data(mutual_info)
@@ -106,7 +113,76 @@ const app = (function() {
             .attr('y', (d) => cell_height * (d.source.name + 0.5))
             .attr('dy', '0.25em')
             .attr('text-anchor', 'middle')
-            .text((d) => (Math.round(d.value * 1000) / 1000) + ' bits');
+            .text((d) => (Math.round(d.value * 1000) / 1000) + ' bits')
+            .on('click', onclick);
+    };
+
+    const render_correlation = function(source, target) {
+        d3.select('#cross-correlation').html('');
+        single_curve('#cross-correlation', {
+            width: 1024,
+            height: 284,
+            margins: {top: 20, right: 30, bottom: 30, left: 50},
+            title: 'Time-lagged Mutual Information',
+            xlabel: 'Temporal Offset',
+            ylabel: 'MI (bits)',
+        }, cross_correlation[source][target]);
+    };
+
+    let single_curve = function(container, fmt, data) {
+        let svg = d3.select(container).append('svg')
+            .attr('title', fmt.title)
+            .attr('version', 1.1)
+            .attr('xmlns', 'http://www.w3.org/2000/svg')
+            .attr('width', fmt.width)
+            .attr('height', fmt.height);
+
+        let width = fmt.width - fmt.margins.left - fmt.margins.right,
+            height = fmt.height - fmt.margins.top - fmt.margins.bottom;
+
+        let x = d3.scaleLinear().rangeRound([0, width]),
+            y = d3.scaleLinear().rangeRound([height, 0]);
+
+        x.domain((fmt.xrange) ? fmt.xrange : d3.extent(data, (d) => d.x));
+        y.domain((fmt.yrange) ? fmt.yrange : d3.extent(data, (d) => d.y));
+
+        let line = d3.line().curve(d3.curveBasis)
+            .x((d) => x(d.x))
+            .y((d) => y(d.y));
+
+        let g = svg.append('g')
+            .attr('transform', 'translate(' + fmt.margins.left + ',' + fmt.margins.top + ')');
+
+        g.append('g')
+            .attr('transform', 'translate(0,' + height + ')')
+            .call(d3.axisBottom(x))
+            .append('text')
+            .attr('fill', '#000000')
+            .attr('x', width)
+            .attr('y', 7*fmt.margins.bottom/8)
+            .attr('text-anchor', 'end')
+            .text(fmt.xlabel);
+
+        g.append('g')
+            .call(d3.axisLeft(y))
+            .append('text')
+            .attr('fill', '#000000')
+            .attr('transform', 'rotate(-90)')
+            .attr('y', -3*fmt.margins.left/4)
+            .attr('text-anchor', 'end')
+            .text(fmt.ylabel);
+
+        g.append('path').datum(data)
+            .attr('fill', 'none')
+            .attr('stroke', color_scheme(0))
+            .attr('d', line);
+
+        svg.append('text')
+            .text(fmt.title)
+            .attr('x', fmt.margins.left + width/2)
+            .attr('y', fmt.margins.top)
+            .attr('dy', '0.71em')
+            .attr('text-anchor', 'middle');
     };
 
     ipcRenderer.on('mutual-info', function(event, data) {
@@ -133,3 +209,5 @@ const app = (function() {
         mutual_info: () => mutual_info
     };
 }());
+
+app;
