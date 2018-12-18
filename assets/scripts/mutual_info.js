@@ -4,6 +4,7 @@ const { ipcRenderer } = require('electron');
 const app = (function() {
     const color_scheme = d3.scaleOrdinal(d3.schemeCategory10);
 
+    let num_features = 0;
     let cross_correlation = null;
     let mutual_info = null;
     let visible_cc = null;
@@ -131,6 +132,16 @@ const app = (function() {
             .attr('text-anchor', 'middle')
             .text((d) => (Math.round(d.value * 1000) / 1000) + ' bits')
             .on('click', onclick);
+
+        if (visible_cc) {
+            const { source, target } = visible_cc;
+            if (source >= num_features || target >= num_features) {
+                visible_cc = null;
+            } else {
+                cells.select(`#mi-${source}-${target}`).classed('cell--selected', true);
+            }
+            render_correlation();
+        }
     };
 
     const render_correlation = function() {
@@ -207,10 +218,13 @@ const app = (function() {
     };
 
     ipcRenderer.on('mutual-info', function(event, data) {
+        num_features = 0;
+
         cross_correlation = data;
 
         mutual_info = new Array();
         for (let source in data) {
+            num_features = Math.max(num_features, 1 + parseInt(source));
             for (let target in data[source]) {
                 const i = (data[source][target].length - 1) / 2;
                 const cc = data[source][target][i];
