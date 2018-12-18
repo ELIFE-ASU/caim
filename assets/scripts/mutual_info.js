@@ -178,7 +178,7 @@ const app = (function() {
         x.domain((fmt.xrange) ? fmt.xrange : d3.extent(data, (d) => d.x));
         y.domain((fmt.yrange) ? fmt.yrange : d3.extent(data, (d) => d.y));
 
-        let line = d3.line().curve(d3.curveBasis)
+        let line = d3.line()
             .x((d) => x(d.x))
             .y((d) => y(d.y));
 
