@@ -6,6 +6,7 @@ const app = (function() {
 
     let cross_correlation = null;
     let mutual_info = null;
+    let visible_cc = null;
 
     let render_mutual_info = function() {
         let section = d3.select('#mutual-info');
@@ -88,9 +89,24 @@ const app = (function() {
             });
 
         let onclick = function(d) {
-            cells.selectAll('.mi-cell').attr('fill', (d) => local_scheme(d.value));
-            cells.select('#mi-' + d.source.name + '-' + d.target.name).attr('fill', '#ffff00');
-            render_correlation(d.source.name, d.target.name);
+            if (visible_cc) {
+                let { source, target } = visible_cc;
+                cells.select(`#mi-${source}-${target}`).classed('cell--selected', false);
+                if (d.source.name === source && d.target.name === target) {
+                    visible_cc = null;
+                } else {
+                    source = d.source.name;
+                    target = d.target.name;
+                    visible_cc = { source, target };
+                    cells.select(`#mi-${source}-${target}`).classed('cell--selected', true);
+                }
+            } else {
+                const source = d.source.name;
+                const target = d.target.name;
+                visible_cc = { source, target };
+                cells.select(`#mi-${source}-${target}`).classed('cell--selected', true);
+            }
+            render_correlation();
         };
 
         cells.selectAll('rect')
@@ -117,16 +133,21 @@ const app = (function() {
             .on('click', onclick);
     };
 
-    const render_correlation = function(source, target) {
-        d3.select('#cross-correlation').html('');
-        single_curve('#cross-correlation', {
-            width: 1024,
-            height: 284,
-            margins: {top: 20, right: 30, bottom: 30, left: 50},
-            title: 'Time-lagged Mutual Information',
-            xlabel: 'Temporal Offset',
-            ylabel: 'MI (bits)',
-        }, cross_correlation[source][target]);
+    const render_correlation = function() {
+        if (visible_cc) {
+            let { source, target } = visible_cc;
+            d3.select('#cross-correlation').classed('phase--hidden', false).html('');
+            single_curve('#cross-correlation', {
+                width: 1024,
+                height: 284,
+                margins: {top: 20, right: 30, bottom: 30, left: 50},
+                title: 'Time-lagged Mutual Information',
+                xlabel: 'Temporal Offset',
+                ylabel: 'MI (bits)',
+            }, cross_correlation[source][target]);
+        } else {
+            d3.select('#cross-correlation').classed('phase--hidden', true);
+        }
     };
 
     let single_curve = function(container, fmt, data) {

@@ -99,3 +99,7 @@ body {
     display: flex;
     justify-content: space-between;
 }
+
+.cell--selected {
+    fill: #ffff00;
+}
