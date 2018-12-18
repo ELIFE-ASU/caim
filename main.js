@@ -218,7 +218,7 @@ function mutual_info() {
     if (session) {
         if (!windows.mutual_info) {
             windows.mutual_info = new BrowserWindow({
-                width: 800,
+                width: 1030,
                 height: 800,
                 show: false
             }).on('ready-to-show', function() {
