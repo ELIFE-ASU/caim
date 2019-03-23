@@ -145,14 +145,14 @@
     }
   },
   "devDependencies": {
-    "electron": "^2.0.15",
-    "electron-builder": "^20.38.3",
-    "eslint": "^5.10.0",
-    "eslint-plugin-jest": "^22.1.2",
+    "electron": "^2.0.18",
+    "electron-builder": "^20.39.0",
+    "eslint": "^5.15.3",
+    "eslint-plugin-jest": "^22.4.1",
     "jest": "^23.6.0"
   },
   "dependencies": {
-    "d3": "^5.7.0",
+    "d3": "^5.9.2",
     "ffmpeg-static-electron": "^2.0.1",
     "ffprobe-static-electron": "^2.0.0",
     "fluent-ffmpeg": "^2.1.2",
