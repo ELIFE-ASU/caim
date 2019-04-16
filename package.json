@@ -7,6 +7,7 @@
     "test": "jest --detectOpenHandles",
     "start": "electron .",
     "repl": "node",
+    "lint": "eslint main.js src assets test",
     "debug": "node inspect",
     "pack": "electron-builder --dir",
     "pack:mac": "electron-builder --dir --mac",
