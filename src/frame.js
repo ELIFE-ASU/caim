@@ -12,7 +12,7 @@ const Frame = function(width, height, data=null) {
     }
 
     if (data === null) {
-        this.data = new Buffer(width * height);
+        this.data = new Buffer.alloc(width * height);
     } else {
         this.data = Buffer.from(data);
     }
