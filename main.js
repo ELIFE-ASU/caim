@@ -89,7 +89,10 @@ function create_window() {
     windows.main = new BrowserWindow({
         width: 1600,
         height: 900,
-        show: false
+        show: false,
+        webPreferences: {
+            nodeIntegration: true
+        }
     }).on('ready-to-show', function() {
         this.show();
     }).on('closed', function() {
@@ -238,7 +241,10 @@ function mutual_info() {
             windows.mutual_info = new BrowserWindow({
                 width: 1030,
                 height: 800,
-                show: false
+                show: false,
+                webPreferences: {
+                    nodeIntegration: true
+                }
             }).on('ready-to-show', function() {
                 if (session.metadata.shapes && session.metadata.shapes.length !== 0) {
                     session.mutual_info();
