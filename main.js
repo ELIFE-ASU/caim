@@ -55,14 +55,32 @@ function create_window() {
             label: 'View',
             submenu: [
                 {
-                    label: 'Developer Tools',
-                    id: 'devtools',
-                    role: 'toggleDevTools'
-                },
-                {
                     label: 'Fullscreen',
                     id: 'fullscreen',
                     role: 'toggleFullScreen'
+                },
+                {
+                    label: 'Zoom In',
+                    id: 'zoomin',
+                    role: 'zoomin'
+                },
+                {
+                    label: 'Reset Zoom',
+                    id: 'resetzoom',
+                    role: 'resetzoom'
+                },
+                {
+                    label: 'Zoom Out',
+                    id: 'zoomout',
+                    role: 'zoomout'
+                },
+                {
+                    type: 'separator'
+                },
+                {
+                    label: 'Developer Tools',
+                    id: 'devtools',
+                    role: 'toggleDevTools'
                 }
             ]
         }
