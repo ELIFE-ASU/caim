@@ -154,7 +154,7 @@
     "jest": "^24.7.0"
   },
   "dependencies": {
-    "@dglmoore/imogen": "^2.0.0",
+    "@dglmoore/imogen": "^2.1.0",
     "d3": "^5.9.2",
     "ffmpeg-static-electron": "^2.0.1",
     "ffprobe-static-electron": "^2.0.0",
