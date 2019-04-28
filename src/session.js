@@ -147,7 +147,7 @@ Session.prototype.mutual_info = function() {
         for (let source = 0; source < len; ++source) {
             mi[source] = {};
             for (let target = source; target < len; ++target) {
-                mi[source][target] = Info.cross_correlation(binned[source], binned[target]);
+                mi[source][target] = Info.crossCorrelation(binned[source], binned[target]);
             }
         }
         this.metadata.analyses.mutual_info = mi;
