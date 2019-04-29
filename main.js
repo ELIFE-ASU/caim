@@ -5,7 +5,8 @@ const {Toolset} = require('./src/selection');
 
 let windows = {
     main: null,
-    mutual_info: null
+    mutual_info: null,
+    transfer_entropy: null
 };
 
 function create_window() {
@@ -47,6 +48,13 @@ function create_window() {
                     id: 'mutual-info',
                     click: mutual_info,
                     accelerator: 'CommandOrControl+M',
+                    enabled: false
+                },
+                {
+                    label: 'Transfer Entropy',
+                    id: 'transfer-entropy',
+                    click: transfer_entropy,
+                    accelerator: 'CommandOrControl+T',
                     enabled: false
                 }
             ]
@@ -181,6 +189,9 @@ async function open_session_dialog(menuItem, browserWindow) {
             if (session.metadata.shapes && session.metadata.shapes.length !== 0) {
                 menu_item_state('mutual-info', true);
             }
+            if (session.metadata.shapes && session.metadata.shapes.length !== 0) {
+                menu_item_state('transfer-entropy', true);
+            }
 
             let uri = undefined;
             if (session.range_image !== null) {
@@ -263,6 +274,34 @@ function mutual_info() {
     menu_item_state('mutual-info', false);
 }
 
+function transfer_entropy() {
+    if (session) {
+        if (!windows.transfer_entropy) {
+            windows.transfer_entropy = new BrowserWindow({
+                width: 1030,
+                height: 800,
+                show: false,
+                webPreferences: {
+                    nodeIntegration: true
+                }
+            }).on('ready-to-show', function() {
+                if (session.metadata.shapes && session.metadata.shapes.length !== 0) {
+                    session.transfer_entropy();
+                    session.save();
+                }
+                this.send('transfer-entropy', session.metadata.analyses.transfer_entropy);
+                this.show();
+            }).on('closed', function() {
+                windows.transfer_entropy = null;
+                menu_item_state('transfer-entropy', true);
+            });
+
+            windows.transfer_entropy.loadFile('assets/transfer_entropy.html');
+        }
+    }
+    menu_item_state('transfer-entropy', false);
+}
+
 function error_dialog(options) {
     options = Object.assign({
         type: 'error',
@@ -290,6 +329,7 @@ ipcMain.on('clear-shapes', function() {
         session.save();
 
         menu_item_state('mutual-info', session.metadata.shapes.length !== 0);
+        menu_item_state('transfer-entropy', session.metadata.shapes.length !== 0);
 
         windows.main.send('plot-timeseries', {
             timeseries: session.metadata.timeseries,
@@ -299,6 +339,10 @@ ipcMain.on('clear-shapes', function() {
         if (windows.mutual_info) {
             windows.mutual_info.close();
             windows.mutual_info = null;
+        }
+        if (windows.transfer_entropy) {
+            windows.transfer_entropy.close();
+            windows.transfer_entropy = null;
         }
     }
 });
@@ -311,9 +355,13 @@ ipcMain.on('push-shape', function(event, shape, binner) {
         if (windows.mutual_info) {
             session.mutual_info();
         }
+        if (windows.transfer_entropy) {
+            session.transfer_entropy();
+        }
         session.save();
 
         menu_item_state('mutual-info', session.metadata.shapes.length !== 0);
+        menu_item_state('transfer-entropy', session.metadata.shapes.length !== 0);
 
         windows.main.send('plot-timeseries', {
             timeseries: session.metadata.timeseries,
@@ -326,6 +374,14 @@ ipcMain.on('push-shape', function(event, shape, binner) {
             } else {
                 windows.mutual_info.close();
                 windows.mutual_info = null;
+            }
+        }
+        if (windows.transfer_entropy) {
+            if (session.metadata.shapes.length !== 0) {
+                windows.transfer_entropy.send('transfer-entropy', session.metadata.analyses.transfer_entropy);
+            } else {
+                windows.transfer_entropy.close();
+                windows.transfer_entropy = null;
             }
         }
     }
@@ -337,6 +393,9 @@ ipcMain.on('pop-shape', function() {
         if (windows.mutual_info) {
             session.mutual_info();
         }
+        if (windows.transfer_entropy) {
+            session.transfer_entropy();
+        }
         session.save();
 
         windows.main.send('plot-timeseries', {
@@ -352,8 +411,17 @@ ipcMain.on('pop-shape', function() {
                 windows.mutual_info = null;
             }
         }
+        if (windows.transfer_entropy) {
+            if (session.metadata.shapes.length !== 0) {
+                windows.transfer_entropy.send('transfer-entropy', session.metadata.analyses.transfer_entropy);
+            } else {
+                windows.transfer_entropy.close();
+                windows.transfer_entropy = null;
+            }
+        }
 
         menu_item_state('mutual-info', session.metadata.shapes.length !== 0);
+        menu_item_state('transfer-entropy', session.metadata.shapes.length !== 0);
     }
 });
 
@@ -362,6 +430,9 @@ ipcMain.on('rebin', function(event, binner) {
         session.rebin(binner);
         if (windows.mutual_info) {
             session.mutual_info();
+        }
+        if (windows.transfer_entropy) {
+            session.transfer_entropy();
         }
         session.save();
 
@@ -372,6 +443,9 @@ ipcMain.on('rebin', function(event, binner) {
 
         if (windows.mutual_info) {
             windows.mutual_info.send('mutual-info', session.metadata.analyses.mutual_info);
+        }
+        if (windows.transfer_entropy) {
+            windows.transfer_entropy.send('transfer-entropy', session.metadata.analyses.transfer_entropy);
         }
     }
 });

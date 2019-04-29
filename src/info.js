@@ -1,4 +1,4 @@
-const { mutualInfo } = require('@dglmoore/imogen').Series;
+const { mutualInfo, transferEntropy } = require('@dglmoore/imogen').Series;
 
 const crossCorrelation = function(xs, ys) {
     const N = xs.length;
@@ -15,4 +15,4 @@ const crossCorrelation = function(xs, ys) {
     return curve;
 };
 
-module.exports = { mutualInfo, crossCorrelation };
+module.exports = { mutualInfo, crossCorrelation, transferEntropy };

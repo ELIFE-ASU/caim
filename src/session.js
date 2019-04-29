@@ -156,4 +156,21 @@ Session.prototype.mutual_info = function() {
     }
 };
 
+Session.prototype.transfer_entropy = function() {
+    if (this.metadata.binned && this.metadata.binned.length !== 0) {
+        const len = this.metadata.binned.length;
+        const binned = this.metadata.binned;
+        const te = {};
+        for (let source = 0; source < len; ++source) {
+            te[source] = {};
+            for (let target = 0; target < len; ++target) {
+                te[source][target] = Info.transferEntropy(binned[source], binned[target], 2);
+            }
+        }
+        this.metadata.analyses.transfer_entropy = te;
+    } else if (this.metadata.analyses.transfer_entropy !== undefined) {
+        delete this.metadata.analyses.transfer_entropy;
+    }
+};
+
 module.exports = Session;
