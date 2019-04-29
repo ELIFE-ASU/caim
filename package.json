@@ -8,7 +8,7 @@
     "start": "electron .",
     "repl": "node",
     "lint": "eslint --format codeframe main.js src assets test",
-    "fix": "eslint --fix main.js src assets test",
+    "fix": "eslint --format codeframe --fix main.js src assets test",
     "debug": "node inspect",
     "pack": "electron-builder --dir",
     "pack:mac": "electron-builder --dir --mac",
