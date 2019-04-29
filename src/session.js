@@ -164,7 +164,7 @@ Session.prototype.transfer_entropy = function() {
         for (let source = 0; source < len; ++source) {
             te[source] = {};
             for (let target = 0; target < len; ++target) {
-                te[source][target] = Info.transferEntropy(binned[source], binned[target], 2);
+                te[source][target] = Info.transferEntropy(binned[target], binned[source]);
             }
         }
         this.metadata.analyses.transfer_entropy = te;

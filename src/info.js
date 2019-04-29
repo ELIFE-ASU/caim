@@ -1,6 +1,8 @@
 const { mutualInfo, transferEntropy } = require('@dglmoore/imogen').Series;
 
-const crossCorrelation = function(xs, ys) {
+module.exports.mutualInfo = mutualInfo;
+
+module.exports.crossCorrelation = function(xs, ys) {
     const N = xs.length;
     const M = Math.ceil(N / 4);
     const curve = new Array(2*M + 1);
@@ -15,4 +17,11 @@ const crossCorrelation = function(xs, ys) {
     return curve;
 };
 
-module.exports = { mutualInfo, crossCorrelation, transferEntropy };
+module.exports.transferEntropy = function(xs, ys) {
+    const K = Math.min(16, xs.length-1);
+    const curve = {};
+    for (let k=1; k < K; ++k) {
+        curve[k] = transferEntropy(xs, ys, k);
+    }
+    return curve;
+};

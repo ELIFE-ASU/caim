@@ -1,7 +1,7 @@
 const d3 = require('d3');
 const { ipcRenderer } = require('electron');
 
-const app = (function() {
+(function() {
     const color_scheme = d3.scaleOrdinal(d3.schemeCategory10);
 
     let num_features = 0;
@@ -245,4 +245,3 @@ const app = (function() {
     };
 }());
 
-app;
