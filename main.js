@@ -129,8 +129,8 @@ app.on('window-all-closed', function() {
 
 let session = null;
 
-function new_session_dialog(menuItem, browserWindow) {
-    let session_path = dialog.showOpenDialog(browserWindow, {
+async function new_session_dialog(menuItem, browserWindow) {
+    let { canceled, filePaths } = await dialog.showOpenDialog(browserWindow, {
         title: 'Choose New Session Directory',
         properties: [
             'openDirectory',
@@ -139,9 +139,9 @@ function new_session_dialog(menuItem, browserWindow) {
         ]
     });
 
-    if (session_path !== undefined) {
-        if (session_path.length === 1) {
-            session_path = session_path[0];
+    if (!canceled && filePaths !== undefined) {
+        if (filePaths.length === 1) {
+            session_path = filePaths[0];
 
             fs.ensureDirSync(session_path);
 
@@ -168,7 +168,7 @@ function new_session_dialog(menuItem, browserWindow) {
 }
 
 async function open_session_dialog(menuItem, browserWindow) {
-    let session_filename = dialog.showOpenDialog(browserWindow, {
+    let { canceled, filePaths } = await dialog.showOpenDialog(browserWindow, {
         title: 'Choose Session File',
         buttonLabel: 'Open',
         filters: [
@@ -180,9 +180,9 @@ async function open_session_dialog(menuItem, browserWindow) {
         ]
     });
 
-    if (session_filename !== undefined) {
-        if (session_filename.length === 1) {
-            session = await Session.load(session_filename[0]);
+    if (!canceled && filePaths !== undefined) {
+        if (filePaths.length === 1) {
+            session = await Session.load(filePaths[0]);
 
             menu_item_state('import-video', true);
 
@@ -209,7 +209,7 @@ async function open_session_dialog(menuItem, browserWindow) {
 }
 
 async function import_video_dialog(menuItem, browserWindow) {
-    const video_path = dialog.showOpenDialog(browserWindow, {
+    const { canceled, filePaths } = await dialog.showOpenDialog(browserWindow, {
         title: 'Choose a Video to Import',
         buttonLabel: 'Import',
         filters: [
@@ -221,10 +221,10 @@ async function import_video_dialog(menuItem, browserWindow) {
         ]
     });
 
-    if (video_path !== undefined) {
-        if (video_path.length === 1) {
+    if (!canceled && filePaths !== undefined) {
+        if (filePaths.length === 1) {
             try {
-                await session.import_video(video_path[0]);
+                await session.import_video(filePaths[0]);
                 await session.save();
 
                 let uri = await session.range_image.getBase64Async('image/png');
