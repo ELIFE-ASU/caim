@@ -147,20 +147,20 @@
     }
   },
   "devDependencies": {
-    "electron": "^5.0.0",
-    "electron-builder": "^20.40.2",
-    "eslint": "^5.16.0",
-    "eslint-plugin-jest": "^22.5.1",
-    "jest": "^24.7.0"
+    "electron": "^6.0.9",
+    "electron-builder": "^21.2.0",
+    "eslint": "^6.4.0",
+    "eslint-plugin-jest": "^22.17.0",
+    "jest": "^24.9.0"
   },
   "dependencies": {
-    "@dglmoore/imogen": "^2.1.0",
-    "d3": "^5.9.2",
+    "@dglmoore/imogen": "^3.0.0",
+    "d3": "^5.12.0",
     "ffmpeg-static-electron": "^2.0.1",
     "ffprobe-static-electron": "^2.0.0",
     "fluent-ffmpeg": "^2.1.2",
-    "fs-extra": "^7.0.1",
-    "jimp": "^0.6.4",
+    "fs-extra": "^8.1.0",
+    "jimp": "^0.8.2",
     "statistics": "^3.3.0"
   }
 }
