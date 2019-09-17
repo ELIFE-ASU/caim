@@ -10,6 +10,7 @@
     "lint": "eslint --format codeframe main.js src assets test",
     "fix": "eslint --format codeframe --fix main.js src assets test",
     "debug": "node inspect",
+    "postinstall": "electron-builder install-app-deps",
     "pack": "electron-builder --dir",
     "pack:mac": "electron-builder --dir --mac",
     "pack:linux": "electron-builder --dir --linux",
@@ -20,6 +21,9 @@
     "dist:linux": "electron-builder --linux",
     "dist:win": "electron-builder --win",
     "dist:mwl": "electron-builder -mwl",
+    "dist:mac:publish": "electron-builder --mac --publish onTag",
+    "dist:linux:publish": "electron-builder --linux --publish onTag",
+    "dist:win:publish": "electron-builder --win --publish onTag",
     "dist:mwl:publish": "electron-builder -mwl --publish onTag"
   },
   "repository": {
@@ -154,12 +158,12 @@
     "jest": "^24.9.0"
   },
   "dependencies": {
-    "@dglmoore/imogen": "^3.0.0",
     "d3": "^5.12.0",
     "ffmpeg-static-electron": "^2.0.1",
     "ffprobe-static-electron": "^2.0.0",
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^8.1.0",
+    "informjs": "^0.2.2",
     "jimp": "^0.8.2",
     "statistics": "^3.3.0"
   }

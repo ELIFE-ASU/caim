@@ -6,7 +6,7 @@ matrix:
 
 language: node_js
 node_js:
-  - "10.15.3"
+  - "12.10.0"
 sudo: required
 
 env:
@@ -23,10 +23,13 @@ cache:
 install:
 - npm install
 - npm install -g codecov
+- npm rebuild
 
 script:
   - npm test
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run dist:mwl:publish; fi
+  - npm run postinstall
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm run dist:linux:publish; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run dist:mac:publish; fi
 
 after_success:
 - bash <(curl -s https://codecov.io/bash) -e TRAVIS_NODE_VERSION

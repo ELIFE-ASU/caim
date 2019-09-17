@@ -1,11 +1,14 @@
 environment:
-  nodejs_version: "10.15.3"
+  nodejs_version: "12.10.0"
 
 install:
   - ps: Install-Product node $env:nodejs_version
   - npm install
+  - npm rebuild
 
 test_script:
   - npm test
+  - npm run postinstall
+  - npm run dist:win:publish
 
 build: off

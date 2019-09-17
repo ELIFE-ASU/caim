@@ -1,4 +1,4 @@
-const { mutualInfo, transferEntropy } = require('@dglmoore/imogen').Series;
+const { mutualInfo, transferEntropy } = require('informjs');
 
 module.exports.mutualInfo = mutualInfo;
 
