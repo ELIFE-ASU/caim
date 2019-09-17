@@ -286,10 +286,7 @@ function transfer_entropy() {
                 }
             }).on('ready-to-show', function() {
                 if (session.metadata.shapes && session.metadata.shapes.length !== 0) {
-                    const start = process.hrtime();
                     session.transfer_entropy();
-                    const elapsed = process.hrtime(start);
-                    process.stdout.write(`${elapsed[0] + 1e-9*elapsed[1]}s\n`);
                     session.save();
                 }
                 this.send('transfer-entropy', session.metadata.analyses.transfer_entropy);
