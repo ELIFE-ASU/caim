@@ -28,7 +28,7 @@ test('session constructs with data', function() {
 });
 
 test('session cannot save to invalid path', function() {
-    expect((new Session('does-not-exist')).save()).rejects.toThrow(/ENOENT/);
+    return expect((new Session('does-not-exist')).save()).rejects.toThrow(/ENOENT/);
 });
 
 test('session saves and is loadable', async function() {
