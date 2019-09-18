@@ -103,3 +103,7 @@ body {
 .cell--selected {
     fill: #ffff00;
 }
+
+.text--selected {
+    fill: #000000;
+}

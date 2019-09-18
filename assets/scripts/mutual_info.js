@@ -9,6 +9,16 @@ const { ipcRenderer } = require('electron');
     let mutual_info = null;
     let visible_cc = null;
 
+    let text_color = function(scheme, value, threshold=186) {
+        const [r, g, b] = scheme(value).slice(4,-1).split(', ').map(c => parseInt(c, 10));
+        const x = 0.299*r + 0.587*g + 0.114*b;
+        if (x <= threshold) {
+            return '#ffffff';
+        } else {
+            return '#000000';
+        }
+    };
+
     let render_mutual_info = function() {
         let section = d3.select('#mutual-info');
 
@@ -93,6 +103,7 @@ const { ipcRenderer } = require('electron');
             if (visible_cc) {
                 let { source, target } = visible_cc;
                 cells.select(`#mi-${source}-${target}`).classed('cell--selected', false);
+                cells.select(`#mi-text-${source}-${target}`).classed('text--selected', false);
                 if (d.source.name === source && d.target.name === target) {
                     visible_cc = null;
                 } else {
@@ -100,12 +111,14 @@ const { ipcRenderer } = require('electron');
                     target = d.target.name;
                     visible_cc = { source, target };
                     cells.select(`#mi-${source}-${target}`).classed('cell--selected', true);
+                    cells.select(`#mi-text-${source}-${target}`).classed('text--selected', true);
                 }
             } else {
                 const source = d.source.name;
                 const target = d.target.name;
                 visible_cc = { source, target };
                 cells.select(`#mi-${source}-${target}`).classed('cell--selected', true);
+                cells.select(`#mi-text-${source}-${target}`).classed('text--selected', true);
             }
             render_correlation();
         };
@@ -119,19 +132,26 @@ const { ipcRenderer } = require('electron');
             .attr('y', (d) => cell_height * d.source.name)
             .attr('width', cell_width)
             .attr('height', cell_height)
-            .attr('fill', (d) => local_scheme(d.value))
+            .attr('fill', (d) => local_scheme(1.0 - d.sig.p))
             .attr('stroke', 'black')
-            .on('click', onclick);
+            .on('click', onclick)
+            .append('title')
+            .text((d) => `p = ${d.sig.p.toFixed(3)}`);
 
         cells.selectAll('text')
             .data(mutual_info)
             .enter().append('text')
+            .attr('class', 'mi-cell-text')
+            .attr('id', (d) => 'mi-text-' + d.source.name + '-' + d.target.name)
             .attr('x', (d) => cell_width * (d.target.name + 0.5))
             .attr('y', (d) => cell_height * (d.source.name + 0.5))
             .attr('dy', '0.25em')
             .attr('text-anchor', 'middle')
-            .text((d) => (Math.round(d.value * 1000) / 1000) + ' bits')
-            .on('click', onclick);
+            .attr('fill', (d) => text_color(local_scheme, 1.0 - d.sig.p))
+            .text((d) => `${d.y.toFixed(3)} bits`)
+            .on('click', onclick)
+            .append('title')
+            .text((d) => `p = ${d.sig.p.toFixed(3)}`);
 
         if (visible_cc) {
             const { source, target } = visible_cc;
@@ -228,11 +248,10 @@ const { ipcRenderer } = require('electron');
             for (let target in data[source]) {
                 const i = (data[source][target].length - 1) / 2;
                 const cc = data[source][target][i];
-                mutual_info.push({
+                mutual_info.push(Object.assign({
                     source: parseInt(source),
-                    target: parseInt(target),
-                    value: cc.y
-                });
+                    target: parseInt(target)
+                }, cc));
             }
         }
 
