@@ -1,4 +1,4 @@
-/* global Image */
+/* global Image, multiple_curves, spike_trains */
 const {ipcRenderer} = require('electron');
 const d3 = require('d3');
 const {Point, Toolset} = require('../src/selection');
@@ -202,13 +202,14 @@ Caim.prototype.render_timeseries = function() {
     if (this.timeseries.length !== 0) {
         let container = d3.select('#timeseries').html('');
 
-        this.multiple_curves(container, {
+        multiple_curves(container, {
             width: 1024,
             height: 284,
             margins: {top: 20, right: 30, bottom: 30, left: 50},
             title: 'Brightness Timeseries by Feature',
             xlabel: 'Timesteps',
             ylabel: 'Average Brightness',
+            color_scheme: this.color_scheme
         }, this.timeseries);
 
         return true;
@@ -221,156 +222,18 @@ Caim.prototype.render_binned = function() {
     if (this.binned.length !== 0) {
         let container = d3.select('#binned').html('');
 
-        this.spike_trains(container, {
+        spike_trains(container, {
             width: 1024,
             height: 284,
             margins: {top: 20, right: 30, bottom: 30, left: 50},
             title: 'Binned Brightness by Feature',
             xlabel: 'Timesteps',
             ylabel: 'Binned Brightness',
+            color_scheme: this.color_scheme
         }, this.binned);
 
         return true;
     } else {
         return false;
     }
-};
-
-Caim.prototype.spike_trains = function(container, fmt, data) {
-    const width = fmt.width - fmt.margins.left - fmt.margins.right;
-    const height = fmt.height - fmt.margins.top - fmt.margins.bottom;
-
-    const x = d3.scaleLinear().rangeRound([0, width]);
-    const y = d3.scaleLinear().rangeRound([height, 0]);
-
-    x.domain([0, d3.max(data.map((d) => d.length))-1]);
-    y.domain([0, data.length+1]);
-
-    let svg = container.append('svg')
-        .attr('title', fmt.title)
-        .attr('version', 1.1)
-        .attr('xmlns', 'http://www.w3.org/2000/svg')
-        .attr('width', fmt.width)
-        .attr('height', fmt.height);
-
-    let g = svg.append('g')
-        .attr('transform', 'translate(' + fmt.margins.left + ',' + fmt.margins.top + ')');
-
-    g.append('g')
-        .attr('transform', 'translate(0,' + height + ')')
-        .call(d3.axisBottom(x))
-        .append('text')
-        .attr('fill', '#000000')
-        .attr('x', width)
-        .attr('y', 7*fmt.margins.bottom/8)
-        .attr('text-anchor', 'end')
-        .text(fmt.xlabel);
-
-    let left = null;
-    if (data.length == 1) {
-        left = g.append('g').call(d3.axisLeft(y).ticks(2));
-    } else {
-        left = g.append('g').call(d3.axisLeft(y).ticks(Math.max(3, data.length)));
-    }
-
-    left.append('text')
-        .attr('fill', '#000000')
-        .attr('transform', 'rotate(-90)')
-        .attr('y', -3*fmt.margins.left/4)
-        .attr('text-anchor', 'end')
-        .text(fmt.ylabel);
-
-    left.selectAll('.tick')
-        .each(function(d) {
-            if (d == 0 || d == data.length + 1) {
-                this.remove();
-            }
-        });
-
-    data.forEach((d, i) => {
-        g.selectAll('.train')
-            .append('g')
-            .data(d)
-            .enter().append('line')
-            .attr('x1', (_, j) => x(j))
-            .attr('y1', y(i + 1.4))
-            .attr('x2', (_, j) => x(j))
-            .attr('y2', y(i + 0.6))
-            .attr('stroke', this.color_scheme(i))
-            .attr('stroke-opacity', (d) => d)
-            .attr('stroke-width', 2);
-    });
-
-    svg.append('text')
-        .text(fmt.title)
-        .attr('x', fmt.margins.left + width/2)
-        .attr('y', fmt.margins.top/3)
-        .attr('dy', '1em')
-        .attr('text-anchor', 'middle');
-};
-
-Caim.prototype.multiple_curves = function(container, fmt, data) {
-    let width = fmt.width - fmt.margins.left - fmt.margins.right,
-        height = fmt.height - fmt.margins.top - fmt.margins.bottom;
-
-    let x = d3.scaleLinear().rangeRound([0, width]),
-        y = d3.scaleLinear().rangeRound([height, 0]);
-
-    x.domain((fmt.xrange) ? fmt.xrange : [0, d3.max(data.map((d) => d.length)) - 1]);
-
-    if (fmt.yrange) {
-        y.domain(fmt.yrange);
-    } else {
-        let ymin = d3.min(data.map((d) => d3.min(d))),
-            ymax = d3.max(data.map((d) => d3.max(d)));
-        y.domain([ymin, ymax]);
-    }
-
-    let line = d3.line()
-        .x((d,i) => x(i))
-        .y(y);
-
-    let svg = container.append('svg')
-        .attr('title', fmt.title)
-        .attr('version', 1.1)
-        .attr('xmlns', 'http://www.w3.org/2000/svg')
-        .attr('width', fmt.width)
-        .attr('height', fmt.height);
-
-    let g = svg.append('g')
-        .attr('transform', 'translate(' + fmt.margins.left + ',' + fmt.margins.top + ')');
-
-    let bottom = g.append('g')
-        .attr('transform', 'translate(0,' + height + ')')
-        .call(d3.axisBottom(x));
-
-    bottom.append('text')
-        .attr('fill', '#000000')
-        .attr('x', width)
-        .attr('y', 7*fmt.margins.bottom/8)
-        .attr('text-anchor', 'end')
-        .text(fmt.xlabel);
-
-    g.append('g')
-        .call(d3.axisLeft(y))
-        .append('text')
-        .attr('fill', '#000000')
-        .attr('transform', 'rotate(-90)')
-        .attr('y', -3*fmt.margins.left/4)
-        .attr('text-anchor', 'end')
-        .text(fmt.ylabel);
-
-    g.selectAll('.series')
-        .data(data)
-        .enter().append('path')
-        .attr('fill', 'none')
-        .attr('d', line)
-        .attr('stroke', (_, i) => this.color_scheme(i));
-
-    svg.append('text')
-        .attr('x', fmt.margins.left + width/2)
-        .attr('y', fmt.margins.top/3)
-        .attr('dy', '1em')
-        .attr('text-anchor', 'middle')
-        .text(fmt.title);
 };
