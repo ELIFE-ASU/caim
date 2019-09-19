@@ -158,3 +158,123 @@ function matrix(container, fmt, data, cell_callback) {
         cell_callback(visible_cell);
     }
 }
+
+// eslint-disable-next-line no-unused-vars
+function row_matrix(container, fmt, data, cell_callback) {
+    const num_features = Math.max(0, ...Object.keys(data).map(k => 1 + parseInt(k, 10)));
+
+    let visible_cell = null;
+
+    const section = d3.select(container)
+        .classed('phase--hidden', data.length === 0)
+        .html('');
+
+    const nodes = [];
+    data.forEach(function(link) {
+        link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
+    });
+
+    const width = fmt.cell_width * (nodes.length + 1) + fmt.margin + fmt.padding;
+    const height = 2 * fmt.cell_height + fmt.margin + fmt.padding;
+
+    const svg = section.append('svg')
+        .attr('title', fmt.title)
+        .attr('version', 1.1)
+        .attr('xmlns', 'http://www.w3.org/2000/svg')
+        .attr('width', width)
+        .attr('height', height)
+        .attr('font-family', 'sans-serif');
+
+    const sources = svg.append('g')
+        .attr('font-size', fmt.font_size)
+        .attr('transform', function() {
+            const x = fmt.padding;
+            const y = fmt.margin;
+            return 'translate(' + x + ',' + y + ')';
+        });
+
+    sources.selectAll('rect')
+        .data(data)
+        .enter().append('rect')
+        .attr('x', (d) => fmt.cell_width * d.source.name)
+        .attr('width', fmt.cell_width)
+        .attr('height', fmt.cell_height)
+        .attr('fill', (d) => fmt.color_scheme(d.source.name))
+        .attr('stroke', 'black');
+
+    sources.append('text')
+        .attr('fill', '#000000')
+        .attr('dy', '-0.5em')
+        .text('Target');
+
+    function onclick(d) {
+        if (cell_callback) {
+            if (visible_cell) {
+                let { source } = visible_cell;
+                cells.select(`#cell-${source}`).classed('cell--selected', false);
+                cells.select(`#cell-text-${source}`).classed('text--selected', false);
+                if (d.source.name === source) {
+                    visible_cell = null;
+                } else {
+                    source = d.source.name;
+                    visible_cell = { source };
+                    cells.select(`#cell-${source}`).classed('cell--selected', true);
+                    cells.select(`#cell-text-${source}`).classed('text--selected', true);
+                }
+            } else {
+                const source = d.source.name;
+                visible_cell = { source };
+                cells.select(`#cell-${source}`).classed('cell--selected', true);
+                cells.select(`#cell-text-${source}`).classed('text--selected', true);
+            }
+            cell_callback(visible_cell);
+        }
+    }
+
+    const cells = svg.append('g')
+        .attr('font-size', fmt.font_size)
+        .attr('transform', function() {
+            const x = fmt.padding;
+            const y = fmt.margin + fmt.cell_height + fmt.padding;
+            return 'translate(' + x + ',' + y + ')';
+        });
+
+    cells.selectAll('rect')
+        .data(data)
+        .enter().append('rect')
+        .attr('class', 'cell')
+        .attr('id', (d) => 'cell-' + d.source.name)
+        .attr('x', (d) => fmt.cell_width * d.source.name)
+        .attr('width', fmt.cell_width)
+        .attr('height', fmt.cell_height)
+        .attr('fill', (d) => fmt.cell_color_scheme(Number(d.sig.p < 0.05)))
+        .attr('stroke', 'black')
+        .on('click', onclick)
+        .append('title')
+        .text((d) => `p = ${d.sig.p.toFixed(3)}`);
+
+    cells.selectAll('text')
+        .data(data)
+        .enter().append('text')
+        .attr('class', 'cell-text')
+        .attr('id', (d) => 'cell-text-' + d.source.name)
+        .attr('x', (d) => fmt.cell_width * (d.source.name + 0.5))
+        .attr('y', 0.5 * fmt.cell_height)
+        .attr('dy', '0.25em')
+        .attr('text-anchor', 'middle')
+        .attr('fill', (d) => text_color(fmt.cell_color_scheme, Number(d.sig.p < 0.05)))
+        .text((d) => `${d.y.toFixed(3)} ${fmt.units}`)
+        .on('click', onclick)
+        .append('title')
+        .text((d) => `p = ${d.sig.p.toFixed(3)}`);
+
+    if (cell_callback && visible_cell) {
+        const { source } = visible_cell;
+        if (source >= num_features) {
+            visible_cell = null;
+        } else {
+            cells.select(`#cell-${source}`).classed('cell--selected', true);
+        }
+        cell_callback(visible_cell);
+    }
+}

@@ -6,6 +6,7 @@ const {Toolset} = require('./src/selection');
 let windows = {
     main: null,
     mutual_info: null,
+    active_info: null,
     transfer_entropy: null
 };
 
@@ -48,6 +49,13 @@ function create_window() {
                     id: 'mutual-info',
                     click: mutual_info,
                     accelerator: 'CommandOrControl+M',
+                    enabled: false
+                },
+                {
+                    label: 'Active Information',
+                    id: 'active-info',
+                    click: active_info,
+                    accelerator: 'CommandOrControl+A',
                     enabled: false
                 },
                 {
@@ -188,8 +196,7 @@ async function open_session_dialog(menuItem, browserWindow) {
 
             if (session.metadata.shapes && session.metadata.shapes.length !== 0) {
                 menu_item_state('mutual-info', true);
-            }
-            if (session.metadata.shapes && session.metadata.shapes.length !== 0) {
+                menu_item_state('active-info', true);
                 menu_item_state('transfer-entropy', true);
             }
 
@@ -274,6 +281,34 @@ function mutual_info() {
     menu_item_state('mutual-info', false);
 }
 
+function active_info() {
+    if (session) {
+        if (!windows.active_info) {
+            windows.active_info = new BrowserWindow({
+                width: 1030,
+                height: 800,
+                show: false,
+                webPreferences: {
+                    nodeIntegration: true
+                }
+            }).on('ready-to-show', function() {
+                if (session.metadata.shapes && session.metadata.shapes.length !== 0) {
+                    session.active_info();
+                    session.save();
+                }
+                this.send('active-info', session.metadata.analyses.active_info);
+                this.show();
+            }).on('closed', function() {
+                windows.active_info = null;
+                menu_item_state('active-info', true);
+            });
+
+            windows.active_info.loadFile('assets/active_info.html');
+        }
+    }
+    menu_item_state('active-info', false);
+}
+
 function transfer_entropy() {
     if (session) {
         if (!windows.transfer_entropy) {
@@ -329,6 +364,7 @@ ipcMain.on('clear-shapes', function() {
         session.save();
 
         menu_item_state('mutual-info', session.metadata.shapes.length !== 0);
+        menu_item_state('active-info', session.metadata.shapes.length !== 0);
         menu_item_state('transfer-entropy', session.metadata.shapes.length !== 0);
 
         windows.main.send('plot-timeseries', {
@@ -339,6 +375,10 @@ ipcMain.on('clear-shapes', function() {
         if (windows.mutual_info) {
             windows.mutual_info.close();
             windows.mutual_info = null;
+        }
+        if (windows.active_info) {
+            windows.active_info.close();
+            windows.active_info = null;
         }
         if (windows.transfer_entropy) {
             windows.transfer_entropy.close();
@@ -355,12 +395,16 @@ ipcMain.on('push-shape', function(event, shape, binner) {
         if (windows.mutual_info) {
             session.mutual_info();
         }
+        if (windows.active_info) {
+            session.active_info();
+        }
         if (windows.transfer_entropy) {
             session.transfer_entropy();
         }
         session.save();
 
         menu_item_state('mutual-info', session.metadata.shapes.length !== 0);
+        menu_item_state('active-info', session.metadata.shapes.length !== 0);
         menu_item_state('transfer-entropy', session.metadata.shapes.length !== 0);
 
         windows.main.send('plot-timeseries', {
@@ -374,6 +418,14 @@ ipcMain.on('push-shape', function(event, shape, binner) {
             } else {
                 windows.mutual_info.close();
                 windows.mutual_info = null;
+            }
+        }
+        if (windows.active_info) {
+            if (session.metadata.shapes.length !== 0) {
+                windows.active_info.send('active-info', session.metadata.analyses.active_info);
+            } else {
+                windows.active_info.close();
+                windows.active_info = null;
             }
         }
         if (windows.transfer_entropy) {
@@ -393,6 +445,9 @@ ipcMain.on('pop-shape', function() {
         if (windows.mutual_info) {
             session.mutual_info();
         }
+        if (windows.active_info) {
+            session.active_info();
+        }
         if (windows.transfer_entropy) {
             session.transfer_entropy();
         }
@@ -411,6 +466,14 @@ ipcMain.on('pop-shape', function() {
                 windows.mutual_info = null;
             }
         }
+        if (windows.active_info) {
+            if (session.metadata.shapes.length !== 0) {
+                windows.active_info.send('active-info', session.metadata.analyses.active_info);
+            } else {
+                windows.active_info.close();
+                windows.active_info = null;
+            }
+        }
         if (windows.transfer_entropy) {
             if (session.metadata.shapes.length !== 0) {
                 windows.transfer_entropy.send('transfer-entropy', session.metadata.analyses.transfer_entropy);
@@ -421,6 +484,7 @@ ipcMain.on('pop-shape', function() {
         }
 
         menu_item_state('mutual-info', session.metadata.shapes.length !== 0);
+        menu_item_state('active-info', session.metadata.shapes.length !== 0);
         menu_item_state('transfer-entropy', session.metadata.shapes.length !== 0);
     }
 });
@@ -430,6 +494,9 @@ ipcMain.on('rebin', function(event, binner) {
         session.rebin(binner);
         if (windows.mutual_info) {
             session.mutual_info();
+        }
+        if (windows.active_info) {
+            session.active_info();
         }
         if (windows.transfer_entropy) {
             session.transfer_entropy();
@@ -443,6 +510,9 @@ ipcMain.on('rebin', function(event, binner) {
 
         if (windows.mutual_info) {
             windows.mutual_info.send('mutual-info', session.metadata.analyses.mutual_info);
+        }
+        if (windows.active_info) {
+            windows.active_info.send('active-info', session.metadata.analyses.active_info);
         }
         if (windows.transfer_entropy) {
             windows.transfer_entropy.send('transfer-entropy', session.metadata.analyses.transfer_entropy);

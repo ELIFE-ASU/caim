@@ -1,4 +1,4 @@
-const { mutualInfo, transferEntropy, Significance } = require('informjs');
+const { activeInfo, mutualInfo, transferEntropy, Significance } = require('informjs');
 
 const nperms = 1000;
 
@@ -17,6 +17,20 @@ module.exports.crossCorrelation = function(xs, ys) {
     for (let i = 1; i <= M; ++i) {
         const mi = mutualInfo(xs.slice(i, N), ys.slice(0, N-i), nperms);
         curve[M+i] = { x: i, y: mi };
+    }
+    return curve;
+};
+
+module.exports.activeInfo = function(xs) {
+    const K = Math.min(16, xs.length - 1);
+    const curve = new Array(K - 1);
+    for (let k = 1; k < Math.min(6, K); ++k) {
+        const { value, sig } = Significance.activeInfo(xs, k, nperms);
+        curve[k - 1] = { x: k, y: value, sig };
+    }
+    for (let k = Math.min(6, K); k < K; ++k) {
+        const ai = activeInfo(xs, k);
+        curve[k - 1] = { x: k, y: ai };
     }
     return curve;
 };

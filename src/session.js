@@ -156,6 +156,20 @@ Session.prototype.mutual_info = function() {
     }
 };
 
+Session.prototype.active_info = function() {
+    if (this.metadata.binned && this.metadata.binned.length !== 0) {
+        const len = this.metadata.binned.length;
+        const binned = this.metadata.binned;
+        const ai = {};
+        for (let source = 0; source < len; ++source) {
+            ai[source] = Info.activeInfo(binned[source]);
+        }
+        this.metadata.analyses.active_info = ai;
+    } else if (this.metadata.analyses.active_info !== undefined) {
+        delete this.metadata.analyses.active_info;
+    }
+};
+
 Session.prototype.transfer_entropy = function() {
     if (this.metadata.binned && this.metadata.binned.length !== 0) {
         const len = this.metadata.binned.length;
