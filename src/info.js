@@ -22,10 +22,15 @@ module.exports.crossCorrelation = function(xs, ys) {
 };
 
 module.exports.transferEntropy = function(xs, ys) {
-    const K = Math.min(16, xs.length-1);
-    const curve = {};
-    for (let k=1; k < K; ++k) {
-        curve[k] = transferEntropy(xs, ys, k);
+    const K = Math.min(16, xs.length - 1);
+    const curve = new Array(K - 1);
+    for (let k = 1; k < Math.min(3, K); ++k) {
+        const { value, sig } = Significance.transferEntropy(xs, ys, k, nperms);
+        curve[k - 1] = { x: k, y: value, sig };
+    }
+    for (let k = Math.min(3, K); k < K; ++k) {
+        const te = transferEntropy(xs, ys, k);
+        curve[k - 1] = { x: k, y: te };
     }
     return curve;
 };
