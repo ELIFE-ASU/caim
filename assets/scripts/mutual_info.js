@@ -243,15 +243,14 @@ const { ipcRenderer } = require('electron');
         cross_correlation = data;
 
         mutual_info = new Array();
-        for (let source in data) {
+        for (let source in cross_correlation) {
             num_features = Math.max(num_features, 1 + parseInt(source));
-            for (let target in data[source]) {
-                const i = (data[source][target].length - 1) / 2;
-                const cc = data[source][target][i];
+            for (let target in cross_correlation[source]) {
+                const mi = cross_correlation[source][target].find(({ x }) => x == 0);
                 mutual_info.push(Object.assign({
                     source: parseInt(source),
                     target: parseInt(target)
-                }, cc));
+                }, mi));
             }
         }
 
