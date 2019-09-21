@@ -92,11 +92,20 @@ function multiple_curves(container, fmt, data) {
             new remote.Menu.buildFromTemplate([
                 {
                     label: 'Export Graphic',
-                    id: 'export',
+                    id: 'export-graphic',
                     click: () => ipcRenderer.send('export', {
                         name: 'timeseries',
                         type: 'svg',
                         data: this.outerHTML
+                    })
+                },
+                {
+                    label: 'Export Data',
+                    id: 'export-data',
+                    click: () => ipcRenderer.send('export', {
+                        name: 'timeseries',
+                        type: 'json',
+                        data
                     })
                 }
             ]).popup();

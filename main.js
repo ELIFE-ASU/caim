@@ -534,10 +534,23 @@ ipcMain.on('export', async function(event, { name, type, data }) {
             filters: [
                 {name: 'Images', extensions: ['svg']},
                 {name: 'All Files', extensions: ['*']}
-            ],
+            ]
         });
         if (!canceled && filePath !== undefined) {
             return exportImage(filePath, type, data);
+        }
+    } else if (type === 'json') {
+        const { canceled, filePath } = await dialog.showSaveDialog({
+            title: 'Save graphic to...',
+            defaultPath: `${name}.json`,
+            buttonLabel: 'Save',
+            filters: [
+                {name: 'JSON', extensions: ['json']},
+                {name: 'All Files', extensions: ['*']}
+            ]
+        });
+        if (!canceled && filePath !== undefined) {
+            return exportData(filePath, data);
         }
     }
     return;
@@ -565,6 +578,26 @@ const exportImage = async function(filePath, type, data) {
         );
         return;
     }
+
+    return fs.writeFile(filePath, data);
+};
+
+const exportData = async function(filePath, data) {
+    const ext = path.extname(filePath);
+    if (ext.toLowerCase() !== '.json') {
+        const response = await dialog.showMessageBoxSync({
+            type: 'question',
+            buttons: ['Save', 'Cancel'],
+            cancelId: 1,
+            title: 'Unexpected File Extension',
+            message: `Expected file extension is ".json", but you specified "${ext}". Save anyway?`
+        });
+        if (response === 1) {
+            return;
+        }
+    }
+
+    data = JSON.stringify(data, null, 4);
 
     return fs.writeFile(filePath, data);
 };
