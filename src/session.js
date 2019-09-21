@@ -4,9 +4,12 @@ const Info = require('./info');
 const Jimp = require('jimp');
 const fs = require('fs-extra');
 const path = require('path');
+const semver = require('semver');
+
+const { major, minor, patch } = semver.parse(require('../package.json').version);
 
 const Meta = {
-    video: null,
+    video: { major, minor, patch },
     frames: false,
     range: false,
     shapes: null,
