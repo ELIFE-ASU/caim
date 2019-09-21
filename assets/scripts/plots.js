@@ -1,4 +1,5 @@
-/* global d3 */
+/* global d3, ipcRenderer */
+const { remote } = require('electron');
 
 // eslint-disable-next-line no-unused-vars
 function single_curve(container, fmt, data) {
@@ -79,12 +80,27 @@ function multiple_curves(container, fmt, data) {
         .x((d,i) => x(i))
         .y(y);
 
-    let svg = container.append('svg')
+    let svg = d3.select(container)
+        .html('')
+        .append('svg')
         .attr('title', fmt.title)
         .attr('version', 1.1)
         .attr('xmlns', 'http://www.w3.org/2000/svg')
         .attr('width', fmt.width)
-        .attr('height', fmt.height);
+        .attr('height', fmt.height)
+        .on('contextmenu', function() {
+            new remote.Menu.buildFromTemplate([
+                {
+                    label: 'Export Graphic',
+                    id: 'export',
+                    click: () => ipcRenderer.send('export', {
+                        name: 'timeseries',
+                        type: 'svg',
+                        data: this.outerHTML
+                    })
+                }
+            ]).popup();
+        });
 
     let g = svg.append('g')
         .attr('transform', 'translate(' + fmt.margins.left + ',' + fmt.margins.top + ')');

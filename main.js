@@ -1,5 +1,6 @@
 const {app, dialog, BrowserWindow, Menu, ipcMain} = require('electron');
 const fs = require('fs-extra');
+const path = require('path');
 const Session = require('./src/session');
 const {Toolset} = require('./src/selection');
 
@@ -120,6 +121,10 @@ function create_window() {
 
     windows.main.loadFile('assets/caim.html');
 }
+
+const menu_item_state = function(id, state) {
+    app.getApplicationMenu().getMenuItemById(id).enabled = state;
+};
 
 app.on('ready', create_window);
 
@@ -520,6 +525,46 @@ ipcMain.on('rebin', function(event, binner) {
     }
 });
 
-const menu_item_state = function(id, state) {
-    app.getApplicationMenu().getMenuItemById(id).enabled = state;
+ipcMain.on('export', async function(event, { name, type, data }) {
+    if (type === 'svg') {
+        const { canceled, filePath } = await dialog.showSaveDialog({
+            title: 'Save graphic to...',
+            defaultPath: `${name}.svg`,
+            buttonLabel: 'Save',
+            filters: [
+                {name: 'Images', extensions: ['svg']},
+                {name: 'All Files', extensions: ['*']}
+            ],
+        });
+        if (!canceled && filePath !== undefined) {
+            return exportImage(filePath, type, data);
+        }
+    }
+    return;
+});
+
+const exportImage = async function(filePath, type, data) {
+    if (type === 'svg') {
+        const ext = path.extname(filePath);
+        if (ext.toLowerCase() !== '.svg') {
+            const response = await dialog.showMessageBoxSync({
+                type: 'question',
+                buttons: ['Save', 'Cancel'],
+                cancelId: 1,
+                title: 'Unexpected File Extension',
+                message: `Expected file extension is ".svg", but you specified "${ext}". Save anyway?`
+            });
+            if (response === 1) {
+                return;
+            }
+        }
+    } else {
+        dialog.showErrorBox(
+            'Unsupported image type',
+            `The data to export has an unexpected type (${type}).\nPlease report this to the maintainers.`
+        );
+        return;
+    }
+
+    return fs.writeFile(filePath, data);
 };
