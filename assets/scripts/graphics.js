@@ -233,9 +233,7 @@ function matrix(container, fmt, data, cell_callback) {
 
     let visible_cell = null;
 
-    const section = d3.select(container)
-        .classed('phase--hidden', data.length === 0)
-        .html('');
+    d3.select(container).classed('phase--hidden', data.length === 0).html('');
 
     const nodes = [];
     data.forEach(function(link) {
@@ -375,9 +373,7 @@ function row_matrix(container, fmt, data, cell_callback) {
 
     let visible_cell = null;
 
-    const section = d3.select(container)
-        .classed('phase--hidden', data.length === 0)
-        .html('');
+    d3.select(container).classed('phase--hidden', data.length === 0).html('');
 
     const nodes = [];
     data.forEach(function(link) {

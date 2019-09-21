@@ -155,7 +155,7 @@ async function new_session_dialog(menuItem, browserWindow) {
 
     if (!canceled && filePaths !== undefined) {
         if (filePaths.length === 1) {
-            session_path = filePaths[0];
+            const session_path = filePaths[0];
 
             fs.ensureDirSync(session_path);
 
@@ -577,7 +577,7 @@ const exportImage = async function(filePath, type, data) {
 
         return fs.writeFile(filePath, data);
     } else if (type === 'png') {
-        data = Buffer.from(data.replace(/^data:image\/png;base64,/, ''), 'base64')
+        data = Buffer.from(data.replace(/^data:image\/png;base64,/, ''), 'base64');
         return Jimp.read(data).then(img => img.write(filePath));
     } else {
         dialog.showErrorBox(

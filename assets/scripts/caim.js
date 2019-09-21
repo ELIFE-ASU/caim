@@ -1,4 +1,4 @@
-/* global Image, multiple_curves, spike_trains */
+/* global Image, multiple_curves, spike_trains, remote */
 const {ipcRenderer} = require('electron');
 const d3 = require('d3');
 const {Point, Toolset} = require('../src/selection');
