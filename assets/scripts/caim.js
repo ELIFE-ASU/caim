@@ -219,13 +219,12 @@ Caim.prototype.render_timeseries = function() {
 
 Caim.prototype.render_binned = function() {
     if (this.binned.length !== 0) {
-        let container = d3.select('#binned').html('');
-
-        spike_trains(container, {
+        spike_trains('#binned', {
             width: 1024,
             height: 284,
             margins: {top: 20, right: 30, bottom: 30, left: 50},
             title: 'Binned Brightness by Feature',
+            basename: 'timeseries_binned',
             xlabel: 'Timesteps',
             ylabel: 'Binned Brightness',
             color_scheme: this.color_scheme

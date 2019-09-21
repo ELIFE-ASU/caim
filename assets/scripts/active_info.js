@@ -17,6 +17,7 @@ const { ipcRenderer } = require('electron');
                 height: 284,
                 margins: {top: 20, right: 30, bottom: 30, left: 50},
                 title: 'Active Information vs History Length',
+                basename: `active_info_history_${source}`,
                 xlabel: 'History Length',
                 ylabel: 'AI (bits)',
                 color_scheme
@@ -33,6 +34,7 @@ const { ipcRenderer } = require('electron');
             margin: 20,
             padding: 5,
             title: 'Active Information',
+            basename: 'active_info',
             units: 'bits',
             font_size: 12,
             color_scheme,

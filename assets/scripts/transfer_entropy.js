@@ -17,6 +17,7 @@ const { ipcRenderer } = require('electron');
                 height: 284,
                 margins: {top: 20, right: 30, bottom: 30, left: 50},
                 title: 'Transfer Entropy vs History Length',
+                basename: `transfer_entropy_${source}_${target}`,
                 xlabel: 'History Length',
                 ylabel: 'TE (bits)',
                 color_scheme
@@ -33,6 +34,7 @@ const { ipcRenderer } = require('electron');
             margin: 20,
             padding: 5,
             title: 'Transfer Entropy',
+            basename: 'transfer_entropy',
             units: 'bits',
             font_size: 12,
             color_scheme,

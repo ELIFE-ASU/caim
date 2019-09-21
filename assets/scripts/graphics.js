@@ -46,12 +46,7 @@ function text_color(scheme, value, threshold=186) {
 
 // eslint-disable-next-line no-unused-vars
 function single_curve(container, fmt, data) {
-    const svg = d3.select(container).append('svg')
-        .attr('title', fmt.title)
-        .attr('version', 1.1)
-        .attr('xmlns', 'http://www.w3.org/2000/svg')
-        .attr('width', fmt.width)
-        .attr('height', fmt.height);
+    const svg = create_svg(container, fmt, data);
 
     const width = fmt.width - fmt.margins.left - fmt.margins.right;
     const height = fmt.height - fmt.margins.top - fmt.margins.bottom;
@@ -174,12 +169,7 @@ function spike_trains(container, fmt, data) {
     x.domain([0, d3.max(data.map((d) => d.length))-1]);
     y.domain([0, data.length+1]);
 
-    const svg = container.append('svg')
-        .attr('title', fmt.title)
-        .attr('version', 1.1)
-        .attr('xmlns', 'http://www.w3.org/2000/svg')
-        .attr('width', fmt.width)
-        .attr('height', fmt.height);
+    const svg = create_svg(container, fmt, data);
 
     const g = svg.append('g')
         .attr('transform', 'translate(' + fmt.margins.left + ',' + fmt.margins.top + ')');
@@ -256,13 +246,7 @@ function matrix(container, fmt, data, cell_callback) {
     const width = fmt.cell_width * (nodes.length + 1) + fmt.margin + fmt.padding;
     const height = fmt.cell_height * (nodes.length + 1) + fmt.margin + fmt.padding;
 
-    const svg = section.append('svg')
-        .attr('title', fmt.title)
-        .attr('version', 1.1)
-        .attr('xmlns', 'http://www.w3.org/2000/svg')
-        .attr('width', width)
-        .attr('height', height)
-        .attr('font-family', 'sans-serif');
+    const svg = create_svg(container, Object.assign({ width, height }, fmt), data);
 
     const sources = svg.append('g')
         .attr('font-size', fmt.font_size)
@@ -403,13 +387,7 @@ function row_matrix(container, fmt, data, cell_callback) {
     const width = fmt.cell_width * (nodes.length + 1) + fmt.margin + fmt.padding;
     const height = 2 * fmt.cell_height + fmt.margin + fmt.padding;
 
-    const svg = section.append('svg')
-        .attr('title', fmt.title)
-        .attr('version', 1.1)
-        .attr('xmlns', 'http://www.w3.org/2000/svg')
-        .attr('width', width)
-        .attr('height', height)
-        .attr('font-family', 'sans-serif');
+    const svg = create_svg(container, Object.assign({ width, height }, fmt), data);
 
     const sources = svg.append('g')
         .attr('font-size', fmt.font_size)
