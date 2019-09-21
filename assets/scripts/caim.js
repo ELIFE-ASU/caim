@@ -200,9 +200,7 @@ Caim.prototype.render_series = function(timeseries, binned) {
 
 Caim.prototype.render_timeseries = function() {
     if (this.timeseries.length !== 0) {
-        let container = d3.select('#timeseries').html('');
-
-        multiple_curves(container, {
+        multiple_curves('#timeseries', {
             width: 1024,
             height: 284,
             margins: {top: 20, right: 30, bottom: 30, left: 50},
