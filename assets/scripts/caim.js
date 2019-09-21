@@ -205,6 +205,7 @@ Caim.prototype.render_timeseries = function() {
             height: 284,
             margins: {top: 20, right: 30, bottom: 30, left: 50},
             title: 'Brightness Timeseries by Feature',
+            basename: 'timeseries',
             xlabel: 'Timesteps',
             ylabel: 'Average Brightness',
             color_scheme: this.color_scheme
