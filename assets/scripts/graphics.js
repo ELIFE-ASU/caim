@@ -46,27 +46,27 @@ function text_color(scheme, value, threshold=186) {
 
 // eslint-disable-next-line no-unused-vars
 function single_curve(container, fmt, data) {
-    let svg = d3.select(container).append('svg')
+    const svg = d3.select(container).append('svg')
         .attr('title', fmt.title)
         .attr('version', 1.1)
         .attr('xmlns', 'http://www.w3.org/2000/svg')
         .attr('width', fmt.width)
         .attr('height', fmt.height);
 
-    let width = fmt.width - fmt.margins.left - fmt.margins.right,
-        height = fmt.height - fmt.margins.top - fmt.margins.bottom;
+    const width = fmt.width - fmt.margins.left - fmt.margins.right;
+    const height = fmt.height - fmt.margins.top - fmt.margins.bottom;
 
-    let x = d3.scaleLinear().rangeRound([0, width]),
-        y = d3.scaleLinear().rangeRound([height, 0]);
+    const x = d3.scaleLinear().rangeRound([0, width]);
+    const y = d3.scaleLinear().rangeRound([height, 0]);
 
     x.domain((fmt.xrange) ? fmt.xrange : d3.extent(data, (d) => d.x));
     y.domain((fmt.yrange) ? fmt.yrange : d3.extent(data, (d) => d.y));
 
-    let line = d3.line()
+    const line = d3.line()
         .x((d) => x(d.x))
         .y((d) => y(d.y));
 
-    let g = svg.append('g')
+    const g = svg.append('g')
         .attr('transform', 'translate(' + fmt.margins.left + ',' + fmt.margins.top + ')');
 
     g.append('g')
@@ -103,32 +103,32 @@ function single_curve(container, fmt, data) {
 
 // eslint-disable-next-line no-unused-vars
 function multiple_curves(container, fmt, data) {
-    let width = fmt.width - fmt.margins.left - fmt.margins.right,
-        height = fmt.height - fmt.margins.top - fmt.margins.bottom;
+    const width = fmt.width - fmt.margins.left - fmt.margins.right;
+    const height = fmt.height - fmt.margins.top - fmt.margins.bottom;
 
-    let x = d3.scaleLinear().rangeRound([0, width]),
-        y = d3.scaleLinear().rangeRound([height, 0]);
+    const x = d3.scaleLinear().rangeRound([0, width]);
+    const y = d3.scaleLinear().rangeRound([height, 0]);
 
     x.domain((fmt.xrange) ? fmt.xrange : [0, d3.max(data.map((d) => d.length)) - 1]);
 
     if (fmt.yrange) {
         y.domain(fmt.yrange);
     } else {
-        let ymin = d3.min(data.map((d) => d3.min(d))),
-            ymax = d3.max(data.map((d) => d3.max(d)));
+        const ymin = d3.min(data.map((d) => d3.min(d)));
+        const ymax = d3.max(data.map((d) => d3.max(d)));
         y.domain([ymin, ymax]);
     }
 
-    let line = d3.line()
+    const line = d3.line()
         .x((d,i) => x(i))
         .y(y);
 
-    let svg = create_svg(container, fmt, data);
+    const svg = create_svg(container, fmt, data);
 
-    let g = svg.append('g')
+    const g = svg.append('g')
         .attr('transform', 'translate(' + fmt.margins.left + ',' + fmt.margins.top + ')');
 
-    let bottom = g.append('g')
+    const bottom = g.append('g')
         .attr('transform', 'translate(0,' + height + ')')
         .call(d3.axisBottom(x));
 
@@ -174,14 +174,14 @@ function spike_trains(container, fmt, data) {
     x.domain([0, d3.max(data.map((d) => d.length))-1]);
     y.domain([0, data.length+1]);
 
-    let svg = container.append('svg')
+    const svg = container.append('svg')
         .attr('title', fmt.title)
         .attr('version', 1.1)
         .attr('xmlns', 'http://www.w3.org/2000/svg')
         .attr('width', fmt.width)
         .attr('height', fmt.height);
 
-    let g = svg.append('g')
+    const g = svg.append('g')
         .attr('transform', 'translate(' + fmt.margins.left + ',' + fmt.margins.top + ')');
 
     g.append('g')
@@ -288,7 +288,7 @@ function matrix(container, fmt, data, cell_callback) {
         .attr('text-anchor', 'end')
         .text('Source');
 
-    let targets = svg.append('g')
+    const targets = svg.append('g')
         .attr('font-size', fmt.font_size)
         .attr('transform', function() {
             const x = fmt.margin + fmt.cell_width + fmt.padding;
