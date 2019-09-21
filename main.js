@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const Session = require('./src/session');
 const {Toolset} = require('./src/selection');
+const Jimp = require('jimp');
 
 let windows = {
     main: null,
@@ -525,14 +526,16 @@ ipcMain.on('rebin', function(event, binner) {
     }
 });
 
+const imageTypes = ['svg', 'png'];
+
 ipcMain.on('export', async function(event, { name, type, data }) {
-    if (type === 'svg') {
+    if (imageTypes.includes(type)) {
         const { canceled, filePath } = await dialog.showSaveDialog({
             title: 'Save graphic to...',
-            defaultPath: `${name}.svg`,
+            defaultPath: `${name}.${type}`,
             buttonLabel: 'Save',
             filters: [
-                {name: 'Images', extensions: ['svg']},
+                {name: 'Images', extensions: imageTypes},
                 {name: 'All Files', extensions: ['*']}
             ]
         });
@@ -571,6 +574,11 @@ const exportImage = async function(filePath, type, data) {
                 return;
             }
         }
+
+        return fs.writeFile(filePath, data);
+    } else if (type === 'png') {
+        data = Buffer.from(data.replace(/^data:image\/png;base64,/, ''), 'base64')
+        return Jimp.read(data).then(img => img.write(filePath));
     } else {
         dialog.showErrorBox(
             'Unsupported image type',
@@ -578,8 +586,6 @@ const exportImage = async function(filePath, type, data) {
         );
         return;
     }
-
-    return fs.writeFile(filePath, data);
 };
 
 const exportData = async function(filePath, data) {

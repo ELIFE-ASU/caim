@@ -74,6 +74,30 @@ function Caim() {
                 }
             };
 
+            caim.canvas.oncontextmenu = function() {
+                const data = this.toDataURL('image/png');
+                new remote.Menu.buildFromTemplate([
+                    {
+                        label: 'Export Graphic',
+                        id: 'export-graphic',
+                        click: () => ipcRenderer.send('export', {
+                            name: 'selection',
+                            type: 'png',
+                            data: data
+                        })
+                    },
+                    {
+                        label: 'Export Selection Data',
+                        id: 'export-data',
+                        click: () => ipcRenderer.send('export', {
+                            name: 'selection',
+                            type: 'json',
+                            data: (caim.shapes === null) ? [] : caim.shapes
+                        })
+                    }
+                ]).popup();
+            };
+
             caim.canvas.onmouseleave = caim.canvas.onmouseup;
 
             caim.redraw();
