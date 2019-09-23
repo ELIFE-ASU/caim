@@ -9,8 +9,9 @@ const { ipcRenderer } = require('electron');
     let history = null;
     let transfer_entropy = null;
 
-    const render_history = function({ source, target }) {
-        if (source !== undefined && target !== undefined) {
+    const render_history = function(cell) {
+        if (cell && cell.source !== undefined && cell.target !== undefined) {
+            const { source, target } = cell;
             d3.select('#history').classed('phase--hidden', false).html('');
             single_curve('#history', {
                 width: 1024,

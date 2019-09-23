@@ -9,8 +9,9 @@ const { ipcRenderer } = require('electron');
     let cross_correlation = null;
     let mutual_info = null;
 
-    const render_correlation = function({ source, target }) {
-        if (source !== undefined && target !== undefined) {
+    const render_correlation = function(cell) {
+        if (cell && cell.source !== undefined && cell.target !== undefined) {
+            const { source, target } = cell;
             d3.select('#cross-correlation').classed('phase--hidden', false).html('');
             single_curve('#cross-correlation', {
                 width: 1024,

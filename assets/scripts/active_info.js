@@ -9,8 +9,9 @@ const { ipcRenderer } = require('electron');
     let history = null;
     let active_info = null;
 
-    const render_history = function({ source }) {
-        if (source !== undefined) {
+    const render_history = function(cell) {
+        if (cell && cell.source !== undefined) {
+            const { source } = cell;
             d3.select('#history').classed('phase--hidden', false).html('');
             single_curve('#history', {
                 width: 1024,
