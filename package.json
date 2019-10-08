@@ -151,9 +151,9 @@
     }
   },
   "devDependencies": {
-    "electron": "^6.0.9",
+    "electron": "^6.0.11",
     "electron-builder": "^21.2.0",
-    "eslint": "^6.4.0",
+    "eslint": "^6.5.1",
     "eslint-plugin-jest": "^22.17.0",
     "jest": "^24.9.0"
   },
@@ -164,7 +164,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^8.1.0",
     "informjs": "^0.3.0",
-    "jimp": "^0.8.2",
+    "jimp": "^0.8.4",
     "semver": "^6.3.0",
     "statistics": "^3.3.0"
   }
