@@ -72,7 +72,9 @@ const Feature = {
             }
         }
         return mean;
-    }
+    },
+
+    is_group: false
 };
 
 const Rectangular =  Object.assign(Object.create(Feature), {
@@ -205,6 +207,74 @@ FreeForm.from = (data) => Object.assign(Object.create(Formular), data, {
     box: BoundingBox.from(data.box)
 });
 
+const FeatureGroup = Object.assign({
+    timeseries(frames) {
+        return this.shapes.map(s => s.timeseries(frames));
+    },
+
+    draw(context) {
+        for (let shape of this.shapes) {
+            shape.draw(context);
+        }
+    }
+}, {
+    type: 'feature-group',
+    is_group: true,
+    shapes: []
+});
+
+const Gridy = Object.assign(Object.create(FeatureGroup), {
+    add_point(b) {
+        this.boundary.b = b;
+        this.box = BoundingBox(this.boundary.a, this.boundary.b);
+
+        let { num_cells_wide, num_cells_high, shapes } = this;
+        let { tl } = this.box;
+
+        const cell_width = this.box.width / num_cells_wide;
+        const cell_height = this.box.height / num_cells_high;
+        let shape_index = 0;
+        for (let i = 0; i < num_cells_high; i += 1) {
+            for (let j = 0; j < num_cells_wide; j += 1, shape_index += 1) {
+                const x = tl.x + cell_width * (i + 1);
+                const y = tl.y + cell_height * (j + 1);
+                shapes[shape_index].add_point(Point(x, y));
+            }
+        }
+    }
+});
+
+const Grid = function(a, b, num_cells_wide = 2, num_cells_high = 2) {
+    const box = BoundingBox(a, b);
+
+    const shapes = new Array();
+    const { tl } = box;
+    const cell_width = box.width / num_cells_wide;
+    const cell_height = box.height / num_cells_high;
+    let shape_index = 0;
+    for (let i = 0; i < num_cells_high; i += 1) {
+        for (let j = 0; j < num_cells_wide; j += 1, shape_index += 1) {
+            const u = Point(tl.x + cell_width * i, tl.y + cell_height * j);
+            const v = Point(tl.x + cell_width * (i + 1), tl.y + cell_height * (j + 1));
+            shapes.push(Rectangle(u, v));
+        }
+    }
+
+    return Object.assign(Object.create(Gridy), {
+        type: 'grid',
+        num_cells_wide,
+        num_cells_high,
+        boundary: { a, b },
+        box,
+        shapes
+    });
+};
+
+Grid.from = (data) => Object.assign(Object.create(Gridy), data, {
+    box: BoundingBox.from(data.box),
+    shapes: data.shapes.map(Rectangle.from)
+});
+
 const Toolset = Object.create({
     freeform: {
         label: 'Free Form',
@@ -223,10 +293,16 @@ const Toolset = Object.create({
         factory: Circle,
         checked: false
     },
+
+    grid: {
+        label: 'Grid',
+        factory: Grid,
+        checked: false
+    }
 }, {
     shape: {
-        value: function(type, point) {
-            let shape = this[type].factory(point, point);
+        value: function(type, point, ...args) {
+            let shape = this[type].factory(point, point, ...args);
             return shape;
         },
         enumerable: false,
@@ -248,5 +324,6 @@ module.exports = {
     Rectangle: Rectangle,
     Circle: Circle,
     FreeForm: FreeForm,
+    Grid: Grid,
     Toolset: Toolset
 };
