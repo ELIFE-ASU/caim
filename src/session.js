@@ -92,38 +92,65 @@ Session.prototype.clear_shapes = function() {
 Session.prototype.push_shape = function(shape, binner) {
     let timeseries = shape.timeseries(this.active_frames);
 
+    this.metadata.binning_method = binner;
+
     if (!this.metadata.shapes) {
         this.metadata.shapes = [ shape ];
     } else {
         this.metadata.shapes.push(shape);
     }
 
-    if (!this.metadata.timeseries) {
-        this.metadata.timeseries = [timeseries];
-    } else {
-        this.metadata.timeseries.push(timeseries);
-    }
+    if (shape.is_group) {
+        if (!this.metadata.timeseries) {
+            this.metadata.timeseries = [...timeseries];
+        } else {
+            this.metadata.timeseries.push(...timeseries);
+        }
 
-    this.metadata.binning_method = binner;
-
-    if (!this.metadata.binned) {
-        this.metadata.binned = [ Binners.bin(binner, timeseries) ];
+        const binned = timeseries.map(ts => Binners.bin(binner, ts));
+        if (!this.metadata.binned) {
+            this.metadata.binned = binned
+        } else {
+            this.metadata.binned.push(...binned);
+        }
     } else {
-        this.metadata.binned.push(Binners.bin(binner, timeseries));
+        if (!this.metadata.timeseries) {
+            this.metadata.timeseries = [timeseries];
+        } else {
+            this.metadata.timeseries.push(timeseries);
+        }
+
+        if (!this.metadata.binned) {
+            this.metadata.binned = [ Binners.bin(binner, timeseries) ];
+        } else {
+            this.metadata.binned.push(Binners.bin(binner, timeseries));
+        }
     }
 };
 
 Session.prototype.pop_shape = function() {
     if (this.metadata.shapes) {
-        this.metadata.shapes.pop();
-    }
+        const shape = this.metadata.shapes.pop();
 
-    if (this.metadata.timeseries) {
-        this.metadata.timeseries.pop();
-    }
+        if (shape.is_group) {
+            for (let i = 0; i < shape.shapes.length; ++i) {
+                if (this.metadata.timeseries) {
+                    this.metadata.timeseries.pop();
+                }
 
-    if (this.metadata.binned) {
-        this.metadata.binned.pop();
+                if (this.metadata.binned) {
+                    this.metadata.binned.pop();
+                }
+            }
+        } else {
+            if (this.metadata.timeseries) {
+                this.metadata.timeseries.pop();
+            }
+
+            if (this.metadata.binned) {
+                this.metadata.binned.pop();
+            }
+        }
     }
 };
 
