@@ -107,3 +107,20 @@ body {
 .text--selected {
     fill: #000000;
 }
+
+.module__tools-form {
+    width: 100%;
+    clear: left;
+    display: flex;
+    justify-content: center;
+    margin: 10px 0px;
+}
+
+.module__tools-form--hidden {
+    display: none;
+}
+
+.module__number {
+    width: 3em;
+    margin: 0px 10px;
+}

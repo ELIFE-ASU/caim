@@ -31,16 +31,27 @@ let tools = d3.select('#tools');
 for (let tool in Toolset) {
     let label = tools.append('label');
 
-    label.append('input')
+    let input = label.append('input')
         .attr('type', 'radio')
         .attr('id', tool)
         .classed('module__button', true)
         .attr('name', 'tool')
-        .property('checked', Toolset[tool].checked);
+        .property('checked', Toolset[tool].checked)
+        .on('click', (Toolset[tool].form) ? Toolset[tool].form : () => {
+            d3.select('#tools-form')
+                .html('')
+                .classed('module__tools-form--hidden', true);
+        });
 
     label.classed('module__button-label', true)
         .append('text').text(Toolset[tool].label);
 }
+
+d3.select('#selection')
+    .insert('div', '#controls')
+    .attr('id', 'tools-form')
+    .classed('module__tools-form', true)
+    .classed('module__tools-form--hidden', true);
 
 let binners = d3.select('#binners').on('change', function() {
     caim.rebin(this.value);

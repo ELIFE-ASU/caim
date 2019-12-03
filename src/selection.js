@@ -242,26 +242,29 @@ const Gridy = Object.assign(Object.create(FeatureGroup), {
         let shape_index = 0;
         for (let i = 0; i < num_cells_high; i += 1) {
             for (let j = 0; j < num_cells_wide; j += 1, shape_index += 1) {
-                const u = Point(tl.x + cell_width * i, tl.y + cell_height * j);
-                const v = Point(tl.x + cell_width * (i + 1), tl.y + cell_height * (j + 1));
+                const u = Point(tl.x + cell_width * j, tl.y + cell_height * i);
+                const v = Point(tl.x + cell_width * (j + 1), tl.y + cell_height * (i + 1));
                 this.shapes.push(Rectangle(u, v));
             }
         }
     }
 });
 
-const Grid = function(a, b, num_cells_wide = 2, num_cells_high = 2) {
+const Grid = function(a, b, num_cells_wide, num_cells_high) {
     const box = BoundingBox(a, b);
 
     const shapes = new Array();
     const { tl } = box;
     const cell_width = box.width / num_cells_wide;
     const cell_height = box.height / num_cells_high;
+
+    console.log("Width: ", num_cells_wide, cell_width);
+    console.log("Height: ", num_cells_high, cell_height);
     let shape_index = 0;
     for (let i = 0; i < num_cells_high; i += 1) {
         for (let j = 0; j < num_cells_wide; j += 1, shape_index += 1) {
-            const u = Point(tl.x + cell_width * i, tl.y + cell_height * j);
-            const v = Point(tl.x + cell_width * (i + 1), tl.y + cell_height * (j + 1));
+            const u = Point(tl.x + cell_width * j, tl.y + cell_height * i);
+            const v = Point(tl.x + cell_width * (j + 1), tl.y + cell_height * (i + 1));
             shapes.push(Rectangle(u, v));
         }
     }
@@ -285,31 +288,75 @@ const Toolset = Object.create({
     freeform: {
         label: 'Free Form',
         factory: FreeForm,
-        checked: true
+        checked: true,
+        form: undefined,
+        gather: undefined
     },
 
     rectangle: {
         label: 'Rectangle',
         factory: Rectangle,
-        checked: false
+        checked: false,
+        form: undefined,
+        gather: undefined
     },
 
     circle: {
         label: 'Circle',
         factory: Circle,
-        checked: false
+        checked: false,
+        form: undefined,
+        gather: undefined
     },
 
     grid: {
         label: 'Grid',
         factory: Grid,
-        checked: false
+        checked: false,
+        form: () => {
+            const div = d3.select('#tools-form');
+            div.html('')
+                .classed('module__tools-form--hidden', false);
+
+            let width = div.append('label')
+                .classed('module__input-label', true);
+
+            width.append('text')
+                .text('Grid Width:');
+            width.append('input')
+                .attr('type', 'number')
+                .attr('id', 'cells-wide')
+                .classed('module__number', true)
+                .attr('name', 'grid-control')
+                .attr('min', 1)
+                .attr('max', 100)
+                .attr('value', 2);
+
+            let height = div.append('label')
+                .classed('module__input-label', true);
+            height.append('text')
+                .text('Grid Height:');
+            height.append('input')
+                .attr('type', 'number')
+                .attr('id', 'cells-high')
+                .classed('module__number', true)
+                .attr('name', 'grid-control')
+                .attr('min', 1)
+                .attr('max', 100)
+                .attr('value', 2);
+        },
+        gather: () => {
+            const cell_width = d3.select('#cells-wide').property('value');
+            const cell_height = d3.select('#cells-high').property('value');
+            return [cell_width, cell_height];
+        }
     }
 }, {
     shape: {
-        value: function(type, point, ...args) {
-            let shape = this[type].factory(point, point, ...args);
-            return shape;
+        value: function(type, point) {
+            const tool = this[type];
+            const args = tool.gather ? tool.gather() : [];
+            return this[type].factory(point, point, ...args);
         },
         enumerable: false,
         writable: false
