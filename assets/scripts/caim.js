@@ -4,10 +4,34 @@ const d3 = require('d3');
 const {Point, Toolset} = require('../src/selection');
 const Binners = require('../src/binners');
 
+const GraphicsContext = (canvas, color_scheme) => {
+    const context = Object.assign(canvas.getContext('2d'), {
+        next_color() {
+            this.color_index += 1;
+            this.strokeStyle = this.color_scheme(this.color_index);
+            this.fillStyle = this.color_scheme(this.color_index);
+        },
+
+        reset_colors() {
+            this.color_index = 0;
+            this.strokeStyle = this.color_scheme(this.color_index);
+            this.fillStyle = this.color_scheme(this.color_index);
+        },
+
+        color() {
+            return this.color_scheme(this.color_index);
+        }
+    }, {
+        color_index: 0,
+        color_scheme
+    });
+
+    return context;
+};
+
 function Caim() {
     this.canvas = d3.select('#selection canvas').node();
-    this.context = this.canvas.getContext('2d');
-    this.color_scheme = d3.scaleOrdinal(d3.schemeCategory10);
+    this.context = GraphicsContext(this.canvas, d3.scaleOrdinal(d3.schemeCategory10));
     this.background = new Image();
     this.background.onload = (function(caim) {
         return function() {
@@ -148,10 +172,10 @@ Caim.prototype.redraw = function() {
     this.context.lineJoint = 'round';
     this.context.lineWidth = 5;
 
-    this.shapes.forEach((shape, idx) => {
-        this.context.strokeStyle = this.color_scheme(idx);
-        this.context.fillStyle = this.color_scheme(idx);
+    this.context.reset_colors();
+    this.shapes.forEach(shape => {
         shape.draw(this.context);
+        this.context.next_color();
     });
 };
 
@@ -232,7 +256,7 @@ Caim.prototype.render_timeseries = function() {
             basename: 'timeseries',
             xlabel: 'Timesteps',
             ylabel: 'Average Brightness',
-            color_scheme: this.color_scheme
+            color_scheme: this.context.color_scheme
         }, this.timeseries);
 
         return true;
@@ -251,7 +275,7 @@ Caim.prototype.render_binned = function() {
             basename: 'timeseries_binned',
             xlabel: 'Timesteps',
             ylabel: 'Binned Brightness',
-            color_scheme: this.color_scheme
+            color_scheme: this.context.color_scheme
         }, this.binned);
 
         return true;
