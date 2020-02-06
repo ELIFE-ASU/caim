@@ -5,6 +5,8 @@ const Session = require('./src/session');
 const {Toolset} = require('./src/selection');
 const Jimp = require('jimp');
 
+app.allowRendererProcessReuse = true;
+
 let windows = {
     main: null,
     mutual_info: null,
@@ -124,7 +126,7 @@ function create_window() {
 }
 
 const menu_item_state = function(id, state) {
-    app.getApplicationMenu().getMenuItemById(id).enabled = state;
+    Menu.getApplicationMenu().getMenuItemById(id).enabled = state;
 };
 
 app.on('ready', create_window);
