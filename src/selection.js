@@ -1,8 +1,53 @@
+const Jimp = require('jimp');
+
 const Point = function(x, y) {
     if (typeof x !== 'number' || typeof y !== 'number') {
         throw new Error('x and y must be numbers');
     }
     return { x, y };
+};
+
+const pointDiff = (p, q) => Point(p.x - q.x, p.y - q.y);
+
+const pointSum = (p, q) => Point(p.x + q.x, p.y + q.y);
+
+const pointDot = (p, q) => (p.x * q.x) + (p.y * q.y);
+
+const pointCross = (p, q) => (p.x * q.y) - (p.y * q.x);
+
+const pointNorm = (p) => Math.sqrt(pointDot(p, p));
+
+const pointEqual = (p, q) => p.x == q.x && p.y == q.y;
+
+const jarvis = function(points) {
+    const isleft = (p, a, b) => {
+        let x = pointDiff(p, a),
+            y = pointDiff(b, a);
+        return pointCross(x, y) < 0.0 && pointDot(x, y) > 0.0;
+    }
+    const len = points.length;
+    const hull = new Array();
+    let p = points[0];
+    for (let i = 1; i < len; ++i) {
+        if (points[i].x < p.x) {
+            p = points[i];
+        }
+    }
+    while (true) {
+        hull.push(p)
+        let endpoint = points[0];
+        for (let j = 0; j < len; ++j) {
+            if (pointEqual(p, endpoint) || isleft(points[j], p, endpoint)) {
+                endpoint = points[j];
+                j = 0;
+            }
+        }
+        p = endpoint
+        if (pointEqual(p, hull[0])) {
+            break;
+        }
+    }
+    return hull;
 };
 
 const Box = {
@@ -78,7 +123,7 @@ const Feature = {
 };
 
 const Rectangular =  Object.assign(Object.create(Feature), {
-    add_point(b) {
+    async add_point(b) {
         this.boundary.b = b;
         this.box = BoundingBox(this.boundary.a, this.boundary.b);
     },
@@ -95,7 +140,7 @@ const Rectangular =  Object.assign(Object.create(Feature), {
     }
 });
 
-const Rectangle = function(a, b) {
+const Rectangle = async function(a, b) {
     return Object.assign(Object.create(Rectangular), {
         type: 'rectangle',
         boundary: { a, b },
@@ -108,7 +153,7 @@ Rectangle.from = (data) => Object.assign(Object.create(Rectangular), data, {
 });
 
 const Circular = Object.assign(Object.create(Feature), {
-    add_point(b) {
+    async add_point(b) {
         let { x, y } = this.center,
             radius = Math.sqrt((b.x - x)**2 + (b.y - y)**2),
             r = Math.ceil(radius);
@@ -134,7 +179,7 @@ const Circular = Object.assign(Object.create(Feature), {
     }
 });
 
-const Circle = function(a, b) {
+const Circle = async function(a, b) {
     let radius = Math.sqrt((b.x - a.x)**2 + (b.y - a.y)**2),
         r = Math.ceil(radius),
         tl = Point(a.x - r, a.y - r),
@@ -153,7 +198,7 @@ Circle.from = (data) => Object.assign(Object.create(Circular), data, {
 });
 
 const Formular = Object.assign(Object.create(Feature), {
-    add_point(b) {
+    async add_point(b) {
         this.boundary.push(b);
         this.box.include(b);
     },
@@ -195,7 +240,7 @@ const Formular = Object.assign(Object.create(Feature), {
     }
 });
 
-const FreeForm = function(a) {
+const FreeForm = async function(a) {
     return Object.assign(Object.create(Formular), {
         type: 'freeform',
         boundary: [a],
@@ -204,6 +249,54 @@ const FreeForm = function(a) {
 };
 
 FreeForm.from = (data) => Object.assign(Object.create(Formular), data, {
+    box: BoundingBox.from(data.box)
+});
+
+const Regional = Object.assign(Object.create(Feature), {
+    async add_point(b) {
+        this.box.include(b)
+        this.points.push(b)
+    },
+
+    draw(context) {
+        const points = jarvis(this.points);
+        if (points.length == 1) {
+            const p = points[0];
+            context.beginPath();
+            context.arc(p.x, p.y, 1, 0, 2*Math.PI);
+            context.stroke();
+        } else {
+            context.globalAlpha = 0.7;
+            context.beginPath();
+            context.moveTo(points[0].x, points[0].y);
+            for (let i = 0; i < points.length - 1; ++i) {
+                context.lineTo(points[i+1].x, points[i+1].y);
+            }
+            context.fill();
+            context.globalAlpha = 1.0;
+        }
+    },
+
+    is_inside(x, y) {
+        for (let i = 0, len = this.points.length; i < len; ++i) {
+            const p = this.points[i];
+            if (p.x == x && p.y == y) {
+                return true;
+            }
+        }
+        return false;
+    },
+});
+
+const Region = async function(a) {
+    return Object.assign(Object.create(Regional), {
+        type: 'region',
+        points: [a],
+        box: BoundingBox(a, a)
+    });
+};
+
+Region.from = (data) => Object.assign(Object.create(Regional), data, {
     box: BoundingBox.from(data.box)
 });
 
@@ -229,7 +322,7 @@ const FeatureGroup = Object.assign({
 });
 
 const Gridy = Object.assign(Object.create(FeatureGroup), {
-    add_point(b) {
+    async add_point(b) {
         this.boundary.b = b;
         this.box = BoundingBox(this.boundary.a, this.boundary.b);
         this.shapes = new Array();
@@ -244,13 +337,13 @@ const Gridy = Object.assign(Object.create(FeatureGroup), {
             for (let j = 0; j < num_cells_wide; j += 1, shape_index += 1) {
                 const u = Point(tl.x + cell_width * j, tl.y + cell_height * i);
                 const v = Point(tl.x + cell_width * (j + 1), tl.y + cell_height * (i + 1));
-                this.shapes.push(Rectangle(u, v));
+                this.shapes.push(await Rectangle(u, v));
             }
         }
     }
 });
 
-const Grid = function(a, b, num_cells_wide, num_cells_high) {
+const Grid = async function(a, b, num_cells_wide, num_cells_high) {
     const box = BoundingBox(a, b);
 
     const shapes = new Array();
@@ -258,14 +351,12 @@ const Grid = function(a, b, num_cells_wide, num_cells_high) {
     const cell_width = box.width / num_cells_wide;
     const cell_height = box.height / num_cells_high;
 
-    console.log("Width: ", num_cells_wide, cell_width);
-    console.log("Height: ", num_cells_high, cell_height);
     let shape_index = 0;
     for (let i = 0; i < num_cells_high; i += 1) {
         for (let j = 0; j < num_cells_wide; j += 1, shape_index += 1) {
             const u = Point(tl.x + cell_width * j, tl.y + cell_height * i);
             const v = Point(tl.x + cell_width * (j + 1), tl.y + cell_height * (i + 1));
-            shapes.push(Rectangle(u, v));
+            shapes.push(await Rectangle(u, v));
         }
     }
 
@@ -284,13 +375,68 @@ Grid.from = (data) => Object.assign(Object.create(Gridy), data, {
     shapes: data.shapes.map(Rectangle.from)
 });
 
+const Masky = Object.assign(Object.create(FeatureGroup), {
+    async add_point() {}
+});
+
+const Mask = async function(filename) {
+    const img = await Jimp.read(filename);
+
+    const colorEqual = (c, d) => c.r == d.r && c.g == d.g && c.b == d.b;
+    const colors = new Array();
+    const clusters = new Array();
+    const { height, width } = img.bitmap;
+    const box = BoundingBox(Point(0,0), Point(width, height));
+    img.scan(0, 0, width, height, function(x, y, idx) {
+        let r = this.bitmap.data[idx + 0],
+            g = this.bitmap.data[idx + 1],
+            b = this.bitmap.data[idx + 2];
+
+        if (r != 0x0 || g != 0x0 || b != 0x0) {
+            let c = { r, g, b };
+            let idx = colors.findIndex(d => colorEqual(c, d));
+            if (idx === -1) {
+                colors.push(c);
+                clusters.push([Point(x, y)]);
+            } else {
+                clusters[idx].push(Point(x, y));
+            }
+        }
+    });
+
+    if (clusters.some(cluster => cluster.length === 0)) {
+        throw(Error('The mask seems to have regions of zero area. This is likely a bug'));
+    }
+
+    const shapes = await Promise.all(clusters.map(async cluster => {
+        const region = await Region(cluster[0]);
+        await Promise.all(cluster.slice(1).map(p => {
+            region.add_point(p);
+        }));
+        return region;
+    }));
+
+    return Object.assign(Object.create(Masky), {
+        type: 'mask',
+        filename,
+        box,
+        shapes
+    });
+};
+
+Mask.from = (data) => Object.assign(Object.create(Masky), data, {
+    box: BoundingBox.from(data.box),
+    shapes: data.shapes.map(Region.from)
+});
+
 const Toolset = Object.create({
     freeform: {
         label: 'Free Form',
         factory: FreeForm,
         checked: true,
         form: undefined,
-        gather: undefined
+        gather: undefined,
+        onclick: true
     },
 
     rectangle: {
@@ -298,7 +444,8 @@ const Toolset = Object.create({
         factory: Rectangle,
         checked: false,
         form: undefined,
-        gather: undefined
+        gather: undefined,
+        onclick: true
     },
 
     circle: {
@@ -306,7 +453,8 @@ const Toolset = Object.create({
         factory: Circle,
         checked: false,
         form: undefined,
-        gather: undefined
+        gather: undefined,
+        onclick: true
     },
 
     grid: {
@@ -349,14 +497,51 @@ const Toolset = Object.create({
             const cell_width = d3.select('#cells-wide').property('value');
             const cell_height = d3.select('#cells-high').property('value');
             return [cell_width, cell_height];
-        }
+        },
+        onclick: true
+    },
+
+    mask: {
+        label: 'Mask',
+        factory: Mask,
+        checked: false,
+        form: () => {
+            const div = d3.select('#tools-form');
+            div.html('')
+                .classed('module__tools-form--hidden', false);
+            div.append('input')
+                .attr('type', 'file')
+                .attr('id', 'mask-filename')
+                .attr('name', 'mask-control');
+            let submit = div.append('input')
+                .attr('type', 'submit')
+                .attr('id', 'mask-submit')
+                .attr('name', 'mask-control')
+                .on('click', async () => {
+                    const files = d3.select('#mask-filename').node().files;
+                    if (files.length === 0) {
+                        alert('You must choose a selection mask before continuing');
+                    } else {
+                        caim.submit_shape(await Toolset.shape('mask'));
+                    }
+                });
+        },
+        gather: () => {
+            const filename = d3.select('#mask-filename').node().files[0].path;
+            return [filename];
+        },
+        onclick: false
     }
 }, {
     shape: {
-        value: function(type, point) {
+        value: async function(type, point) {
             const tool = this[type];
             const args = tool.gather ? tool.gather() : [];
-            return this[type].factory(point, point, ...args);
+            if (this[type].onclick) {
+                return this[type].factory(point, point, ...args);
+            } else {
+                return this[type].factory(...args);
+            }
         },
         enumerable: false,
         writable: false
@@ -368,15 +553,25 @@ const Toolset = Object.create({
         },
         enumerable: false,
         writable: false
+    },
+
+    onclick: {
+        value: function(type) {
+            return this[type].onclick;
+        },
+        enumerable: false,
+        writable: false
     }
 });
 
 module.exports = {
-    Point: Point,
-    BoundingBox: BoundingBox,
-    Rectangle: Rectangle,
-    Circle: Circle,
-    FreeForm: FreeForm,
-    Grid: Grid,
-    Toolset: Toolset
+    Point,
+    BoundingBox,
+    Rectangle,
+    Circle,
+    FreeForm,
+    Region,
+    Grid,
+    Mask,
+    Toolset
 };

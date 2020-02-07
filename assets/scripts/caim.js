@@ -4,6 +4,8 @@ const d3 = require('d3');
 const {Point, Toolset} = require('../src/selection');
 const Binners = require('../src/binners');
 
+const apples = 'apples';
+
 const GraphicsContext = (canvas, color_scheme) => {
     const context = Object.assign(canvas.getContext('2d'), {
         next_color() {
@@ -50,41 +52,45 @@ function Caim() {
 
             let paint = false;
 
-            let add_click = function(x, y, start) {
+            let add_click = async function(x, y, tool, start) {
                 if (caim.undone_shapes.length !== 0) {
                     caim.undone_shapes = new Array();
                 }
 
                 if (start) {
-                    let tool = d3.select('input[name="tool"]:checked').attr('id');
-                    caim.shapes.push(Toolset.shape(tool, Point(x, y)));
+                    caim.shapes.push(await Toolset.shape(tool, Point(x, y)));
                 } else {
                     let shape = caim.shapes[caim.shapes.length - 1];
-                    shape.add_point(Point(x, y));
+                    await shape.add_point(Point(x, y));
                 }
             };
 
-            caim.canvas.onmousedown = function(event) {
-                let x = event.pageX - this.offsetLeft,
-                    y = event.pageY - this.offsetTop;
-
-                paint = true;
-                add_click(x, y, true);
-                caim.redraw();
-            };
-
-            caim.canvas.onmousemove = function(event) {
-                if (paint) {
+            caim.canvas.onmousedown = async function(event) {
+                let tool = d3.select('input[name="tool"]:checked').attr('id');
+                if (Toolset.onclick(tool)) {
                     let x = event.pageX - this.offsetLeft,
                         y = event.pageY - this.offsetTop;
 
-                    add_click(x, y, false);
-                    caim.redraw();
+                    paint = true;
+                    await add_click(x, y, tool, true);
                 }
+                caim.redraw();
+            };
+
+            caim.canvas.onmousemove = async function(event) {
+                let tool = d3.select('input[name="tool"]:checked').attr('id');
+                if (Toolset.onclick(tool) && paint) {
+                    let x = event.pageX - this.offsetLeft,
+                        y = event.pageY - this.offsetTop;
+
+                    await add_click(x, y, tool, false);
+                }
+                caim.redraw();
             };
 
             caim.canvas.onmouseup = function() {
-                if (paint) {
+                let tool = d3.select('input[name="tool"]:checked').attr('id');
+                if (Toolset.onclick(tool) && paint) {
                     paint = false;
                     if (caim.shapes.length !== 0) {
                         let shape = caim.shapes[caim.shapes.length - 1];
@@ -94,8 +100,8 @@ function Caim() {
                             ipcRenderer.send('push-shape', shape, caim.binning_method);
                         }
                     }
-                    caim.redraw();
                 }
+                caim.redraw();
             };
 
             caim.canvas.oncontextmenu = function() {
@@ -282,4 +288,10 @@ Caim.prototype.render_binned = function() {
     } else {
         return false;
     }
+};
+
+Caim.prototype.submit_shape = function(shape) {
+    caim.shapes.push(shape)
+    ipcRenderer.send('push-shape', shape, caim.binning_method);
+    caim.redraw();
 };
