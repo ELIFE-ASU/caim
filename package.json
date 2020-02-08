@@ -1,6 +1,6 @@
 {
   "name": "caim",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Information analysis of videographic time series data",
   "main": "main.js",
   "scripts": {
