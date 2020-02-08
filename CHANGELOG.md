@@ -10,6 +10,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 * Grid selection
+* Mask selection
+* Fix FeatureGroup loading on Session.load
 
 ## [0.2.0] - 2019-09-23
 
