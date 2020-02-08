@@ -118,8 +118,6 @@ const Feature = {
         }
         return mean;
     },
-
-    is_group: false
 };
 
 const Rectangular =  Object.assign(Object.create(Feature), {
@@ -300,7 +298,7 @@ Region.from = (data) => Object.assign(Object.create(Regional), data, {
     box: BoundingBox.from(data.box)
 });
 
-const FeatureGroup = Object.assign({
+const FeatureGroup = {
     timeseries(frames) {
         return this.shapes.map(s => s.timeseries(frames));
     },
@@ -314,12 +312,8 @@ const FeatureGroup = Object.assign({
         if (len != 0) {
             this.shapes[len - 1].draw(context);
         }
-    }
-}, {
-    type: 'feature-group',
-    is_group: true,
-    shapes: []
-});
+    },
+};
 
 const Gridy = Object.assign(Object.create(FeatureGroup), {
     async add_point(b) {
@@ -555,6 +549,14 @@ const Toolset = Object.create({
         writable: false
     },
 
+    isFeatureGroup: {
+        value: function(shape) {
+            return FeatureGroup.isPrototypeOf(shape);
+        },
+        enumerable: false,
+        writable: false
+    },
+
     onclick: {
         value: function(type) {
             return this[type].onclick;
@@ -567,6 +569,8 @@ const Toolset = Object.create({
 module.exports = {
     Point,
     BoundingBox,
+    Feature,
+    FeatureGroup,
     Rectangle,
     Circle,
     FreeForm,

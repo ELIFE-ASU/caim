@@ -1,6 +1,7 @@
 const Binners = require('./binners');
 const Frame = require('./frame');
 const Info = require('./info');
+const { Toolset } = require('./selection');
 const Jimp = require('jimp');
 const fs = require('fs-extra');
 const path = require('path');
@@ -65,9 +66,16 @@ Session.prototype.import_video = async function(video_path) {
 
 Session.load = async function(session_filename) {
     const session_path = path.dirname(session_filename);
-    const data = await fs.readFile(session_filename);
+    const data = await fs.readFile(session_filename)
+        .then(data => JSON.parse(data))
+        .then(data => {
+            if (data.shapes) {
+                data.shapes = data.shapes.map(shape => Toolset.from(shape));
+            }
+            return data;
+        });
 
-    let session = new Session(session_path, JSON.parse(data));
+    let session = new Session(session_path, data);
 
     if (session.metadata.frames) {
         const frames_path = path.join(session.path, 'frames');
@@ -100,7 +108,7 @@ Session.prototype.push_shape = function(shape, binner) {
         this.metadata.shapes.push(shape);
     }
 
-    if (shape.is_group) {
+    if (Toolset.isFeatureGroup(shape)) {
         if (!this.metadata.timeseries) {
             this.metadata.timeseries = [...timeseries];
         } else {
@@ -132,10 +140,11 @@ Session.prototype.pop_shape = function() {
     if (this.metadata.shapes) {
         const shape = this.metadata.shapes.pop();
 
-        if (shape.is_group) {
+        if (Toolset.isFeatureGroup(shape)) {
             for (let i = 0; i < shape.shapes.length; ++i) {
                 if (this.metadata.timeseries) {
                     this.metadata.timeseries.pop();
+                } else {
                 }
 
                 if (this.metadata.binned) {
