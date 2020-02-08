@@ -1,4 +1,5 @@
 const Jimp = require('jimp');
+const { Delaunay } = require('d3-delaunay');
 
 const Point = function(x, y) {
     if (typeof x !== 'number' || typeof y !== 'number') {
@@ -9,45 +10,30 @@ const Point = function(x, y) {
 
 const pointDiff = (p, q) => Point(p.x - q.x, p.y - q.y);
 
-const pointSum = (p, q) => Point(p.x + q.x, p.y + q.y);
-
 const pointDot = (p, q) => (p.x * q.x) + (p.y * q.y);
-
-const pointCross = (p, q) => (p.x * q.y) - (p.y * q.x);
 
 const pointNorm = (p) => Math.sqrt(pointDot(p, p));
 
-const pointEqual = (p, q) => p.x == q.x && p.y == q.y;
+const pointDistance = (p, q) => pointNorm(pointDiff(p, q));
 
-const jarvis = function(points) {
-    const isleft = (p, a, b) => {
-        let x = pointDiff(p, a),
-            y = pointDiff(b, a);
-        return pointCross(x, y) < 0.0 && pointDot(x, y) > 0.0;
-    }
-    const len = points.length;
-    const hull = new Array();
-    let p = points[0];
-    for (let i = 1; i < len; ++i) {
-        if (points[i].x < p.x) {
-            p = points[i];
+const triangulate = function(data, alpha) {
+    const isShort = (a, b) => pointDistance(a, b) < alpha;
+    const { points, triangles } = Delaunay.from(data, d => d.x, d => d.y);
+    let ts = Array();
+    for (let i = 0, len = triangles.length / 3; i < len; ++i) {
+        let p0 = triangles[3*i + 0],
+            p1 = triangles[3*i + 1],
+            p2 = triangles[3*i + 2];
+
+        let a = Point(points[2*p0 + 0], points[2*p0 + 1]),
+            b = Point(points[2*p1 + 0], points[2*p1 + 1]),
+            c = Point(points[2*p2 + 0], points[2*p2 + 1]);
+
+        if (isShort(a, b) && isShort(b, c) && isShort(c, a)) {
+            ts.push({ a, b, c });
         }
     }
-    while (true) {
-        hull.push(p)
-        let endpoint = points[0];
-        for (let j = 0; j < len; ++j) {
-            if (pointEqual(p, endpoint) || isleft(points[j], p, endpoint)) {
-                endpoint = points[j];
-                j = 0;
-            }
-        }
-        p = endpoint
-        if (pointEqual(p, hull[0])) {
-            break;
-        }
-    }
-    return hull;
+    return ts;
 };
 
 const Box = {
@@ -257,20 +243,33 @@ const Regional = Object.assign(Object.create(Feature), {
     },
 
     draw(context) {
-        const points = jarvis(this.points);
-        if (points.length == 1) {
-            const p = points[0];
+        if (this.points.length == 1) {
+            const p = this.points[0];
+            context.beginPath();
+            context.arc(p.x, p.y, 1, 0, 2*Math.PI);
+            context.fill();
+
             context.beginPath();
             context.arc(p.x, p.y, 1, 0, 2*Math.PI);
             context.stroke();
-        } else {
-            context.globalAlpha = 0.7;
+        } else if (this.points.length == 2) {
+            const p = this.points[0];
+            const q = this.points[0];
             context.beginPath();
-            context.moveTo(points[0].x, points[0].y);
-            for (let i = 0; i < points.length - 1; ++i) {
-                context.lineTo(points[i+1].x, points[i+1].y);
+            context.moveTo(p.x, p.y);
+            context.lineTo(q.x, q.y);
+            context.stroke();
+        } else {
+            const triangles = triangulate(this.points, Math.sqrt(3));
+
+            context.globalAlpha = 0.7;
+            for (let i = 0; i < triangles.length; ++i) {
+                context.beginPath();
+                context.moveTo(triangles[i].a.x, triangles[i].a.y);
+                context.lineTo(triangles[i].b.x, triangles[i].b.y);
+                context.lineTo(triangles[i].c.x, triangles[i].c.y);
+                context.fill();
             }
-            context.fill();
             context.globalAlpha = 1.0;
         }
     },

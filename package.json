@@ -159,6 +159,7 @@
   },
   "dependencies": {
     "d3": "^5.15.0",
+    "d3-delaunay": "^5.2.1",
     "ffmpeg-static-electron": "*",
     "ffprobe-static-electron": "*",
     "fluent-ffmpeg": "*",
