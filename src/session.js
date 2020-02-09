@@ -11,7 +11,8 @@ const { sprintf } = require('sprintf-js');
 const { major, minor, patch } = semver.parse(require('../package.json').version);
 
 const Meta = {
-    video: { major, minor, patch },
+    version: { major, minor, patch },
+    video: null,
     frames: false,
     range: false,
     shapes: null,
