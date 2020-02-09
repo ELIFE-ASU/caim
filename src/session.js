@@ -117,7 +117,7 @@ Session.prototype.push_shape = function(shape, binner) {
 
         const binned = timeseries.map(ts => Binners.bin(binner, ts));
         if (!this.metadata.binned) {
-            this.metadata.binned = binned
+            this.metadata.binned = binned;
         } else {
             this.metadata.binned.push(...binned);
         }
@@ -144,7 +144,6 @@ Session.prototype.pop_shape = function() {
             for (let i = 0; i < shape.shapes.length; ++i) {
                 if (this.metadata.timeseries) {
                     this.metadata.timeseries.pop();
-                } else {
                 }
 
                 if (this.metadata.binned) {

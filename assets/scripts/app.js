@@ -31,7 +31,7 @@ let tools = d3.select('#tools');
 for (let tool in Toolset) {
     let label = tools.append('label');
 
-    let input = label.append('input')
+    label.append('input')
         .attr('type', 'radio')
         .attr('id', tool)
         .classed('module__button', true)

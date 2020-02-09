@@ -1,3 +1,4 @@
+/* global alert, caim, d3 */
 const Jimp = require('jimp');
 const { Delaunay } = require('d3-delaunay');
 
@@ -238,8 +239,8 @@ FreeForm.from = (data) => Object.assign(Object.create(Formular), data, {
 
 const Regional = Object.assign(Object.create(Feature), {
     async add_point(b) {
-        this.box.include(b)
-        this.points.push(b)
+        this.box.include(b);
+        this.points.push(b);
     },
 
     draw(context) {
@@ -330,7 +331,7 @@ const Gridy = Object.assign(Object.create(FeatureGroup), {
             for (let j = 0; j < num_cells_wide; j += 1, shape_index += 1) {
                 const u = Point(tl.x + cell_width * j, tl.y + cell_height * i);
                 const v = Point(tl.x + cell_width * (j + 1), tl.y + cell_height * (i + 1));
-                this.shapes.push(await Rectangle(u, v));
+                shapes.push(await Rectangle(u, v));
             }
         }
     }
@@ -502,11 +503,13 @@ const Toolset = Object.create({
             const div = d3.select('#tools-form');
             div.html('')
                 .classed('module__tools-form--hidden', false);
+
             div.append('input')
                 .attr('type', 'file')
                 .attr('id', 'mask-filename')
                 .attr('name', 'mask-control');
-            let submit = div.append('input')
+
+            div.append('input')
                 .attr('type', 'submit')
                 .attr('id', 'mask-submit')
                 .attr('name', 'mask-control')
@@ -550,7 +553,7 @@ const Toolset = Object.create({
 
     isFeatureGroup: {
         value: function(shape) {
-            return FeatureGroup.isPrototypeOf(shape);
+            return Object.prototype.isPrototypeOf.call(FeatureGroup, shape);
         },
         enumerable: false,
         writable: false

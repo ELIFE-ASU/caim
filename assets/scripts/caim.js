@@ -4,8 +4,6 @@ const d3 = require('d3');
 const {Point, Toolset} = require('../src/selection');
 const Binners = require('../src/binners');
 
-const apples = 'apples';
-
 const GraphicsContext = (canvas, color_scheme) => {
     const context = Object.assign(canvas.getContext('2d'), {
         next_color() {
@@ -291,7 +289,7 @@ Caim.prototype.render_binned = function() {
 };
 
 Caim.prototype.submit_shape = function(shape) {
-    caim.shapes.push(shape)
-    ipcRenderer.send('push-shape', shape, caim.binning_method);
-    caim.redraw();
+    this.shapes.push(shape);
+    ipcRenderer.send('push-shape', shape, this.binning_method);
+    this.redraw();
 };
