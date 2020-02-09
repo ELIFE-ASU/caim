@@ -9,7 +9,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-* Import frames from images in a directory ([#20](issues/20))
+* Import frames from images in a directory (#20)
 
 ## [0.3.0] - 2020-02-08
 
