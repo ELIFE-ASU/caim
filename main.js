@@ -39,6 +39,13 @@ function create_window() {
                     accelerator: 'CommandOrControl+I'
                 },
                 {
+                    label: 'Import Frames',
+                    id: 'import-frames',
+                    enabled: false,
+                    click: import_frames_dialog,
+                    accelerator: 'CommandOrControl+F'
+                },
+                {
                     label: 'Quit',
                     id: 'quit',
                     role: 'quit'
@@ -171,6 +178,7 @@ async function new_session_dialog(menuItem, browserWindow) {
                 session.save();
 
                 menu_item_state('import-video', true);
+                menu_item_state('import-frames', true);
 
                 browserWindow.send('load-session', session.path, session.metadata);
             }
@@ -201,6 +209,7 @@ async function open_session_dialog(menuItem, browserWindow) {
             session = await Session.load(filePaths[0]);
 
             menu_item_state('import-video', true);
+            menu_item_state('import-frames', true);
 
             if (session.metadata.shapes && session.metadata.shapes.length !== 0) {
                 menu_item_state('mutual-info', true);
@@ -255,6 +264,39 @@ async function import_video_dialog(menuItem, browserWindow) {
         } else {
             error_dialog({
                 title: 'Import Video Error',
+                message: 'Too many paths selected, select only one'
+            });
+        }
+    }
+}
+
+async function import_frames_dialog(menuItem, browserWindow) {
+    let { canceled, filePaths } = await dialog.showOpenDialog(browserWindow, {
+        title: 'Choose Directory of Frame Images',
+        properties: [
+            'openDirectory'
+        ]
+    });
+
+    if (!canceled && filePaths !== undefined) {
+        if (filePaths.length === 1) {
+            try {
+                await session.import_frames(filePaths[0]);
+                await session.save();
+
+                let uri = await session.range_image.getBase64Async('image/png');
+
+                browserWindow.send('load-session', session.path, session.metadata, uri);
+            } catch(err) {
+                error_dialog({
+                    title: 'Import Frames Error',
+                    message: 'Failed to import frames',
+                    detail: err.toString()
+                });
+            }
+        } else {
+            error_dialog({
+                title: 'Import Frames Error',
                 message: 'Too many paths selected, select only one'
             });
         }
@@ -364,6 +406,10 @@ ipcMain.on('open-session', function() {
 
 ipcMain.on('import-video', function() {
     import_video_dialog(null, windows.main);
+});
+
+ipcMain.on('import-frames', function() {
+    import_frames_dialog(null, windows.main);
 });
 
 ipcMain.on('clear-shapes', function() {

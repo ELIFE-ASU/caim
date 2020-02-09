@@ -167,6 +167,7 @@
     "informjs": "*",
     "jimp": "^0.9.3",
     "semver": "^7.1.2",
+    "sprintf-js": "^1.1.2",
     "statistics": "*"
   }
 }

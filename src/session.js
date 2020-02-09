@@ -6,6 +6,7 @@ const Jimp = require('jimp');
 const fs = require('fs-extra');
 const path = require('path');
 const semver = require('semver');
+const { sprintf } = require('sprintf-js');
 
 const { major, minor, patch } = semver.parse(require('../package.json').version);
 
@@ -60,6 +61,42 @@ Session.prototype.import_video = async function(video_path) {
     await this.range_image.write(range_path);
 
     this.metadata.video = video_filename;
+    this.metadata.frames = true;
+    this.metadata.range = true;
+};
+
+Session.prototype.import_frames = async function(frames_path) {
+    const local_frames_path = path.join(this.path, 'frames');
+    const range_path = path.join(this.path, 'range.png');
+
+    await fs.ensureDir(local_frames_path);
+    await fs.emptyDir(local_frames_path);
+
+    const frame_filenames = await fs.readdir(frames_path).then(filenames => {
+        return filenames.map(f => path.join(frames_path, f));
+    });
+    if (frame_filenames.length == 0) {
+        throw new Error('Frames directory is empty');
+    }
+
+    const exts = frame_filenames.map(path.extname);
+    if (exts.some(ext => ext !== exts[0])) {
+        throw new Error('All files in frames directory must have the same extension');
+    }
+
+    frame_filenames.sort();
+
+    await Promise.all(frame_filenames.map((filename, i) => {
+        const local_filename = path.join(local_frames_path, sprintf('%06d.png', i + 1));
+        fs.copyFile(filename, local_filename);
+    }));
+
+
+    this.active_frames = await Frame.load(local_frames_path);
+    this.range_image = await Frame.rangeImage(this.active_frames);
+    await this.range_image.write(range_path);
+
+    this.metadata.video = null;
     this.metadata.frames = true;
     this.metadata.range = true;
 };

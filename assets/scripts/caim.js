@@ -223,6 +223,10 @@ Caim.prototype.import_video = function() {
     ipcRenderer.send('import-video');
 };
 
+Caim.prototype.import_frames = function() {
+    ipcRenderer.send('import-frames');
+};
+
 Caim.prototype.rebin = function(binner) {
     this.binning_method = binner;
     ipcRenderer.send('rebin', this.binning_method);
