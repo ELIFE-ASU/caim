@@ -158,6 +158,8 @@
     "jest": "^25.1.0"
   },
   "dependencies": {
+    "commander": "^4.1.1",
+    "csv": "^5.3.1",
     "d3": "^5.15.0",
     "d3-delaunay": "^5.2.1",
     "ffmpeg-static-electron": "*",
@@ -167,6 +169,7 @@
     "informjs": "*",
     "jimp": "^0.9.3",
     "semver": "^7.1.2",
+    "signale": "^1.4.0",
     "sprintf-js": "^1.1.2",
     "statistics": "*"
   }
